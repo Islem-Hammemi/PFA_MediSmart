@@ -130,6 +130,43 @@ const getMedecinSemaine = async () => {
   return doc;
 };
 
+// =============================================
+// repository/medecinRepository.js
+// Accès base de données MySQL - Table medecin
+// Toutes les requêtes SQL liées au médecin
+// =============================================
+
+
+// ── Trouver un médecin par email ─────────────────────────────────────────────
+const trouverParEmail = async (email) => {
+  const [rows] = await pool.execute(
+     `SELECT u.id AS user_id, u.email, u.password_hash, u.nom, u.prenom, u.role,
+            m.id AS medecin_id, m.specialite, m.numero_ordre
+     FROM USERS u
+     JOIN MEDECINS m ON m.user_id = u.id
+     WHERE u.email = ? AND u.role = 'medecin'
+     LIMIT 1`,
+    [email]
+  );
+  return rows[0] || null;
+};
+
+// ── Trouver un médecin par ID ────────────────────────────────────────────────
+const trouverParId = async (id) => {
+  const [rows] = await pool.execute(
+    // FIX: u.role ajouté – était manquant, causait req.utilisateur.role = undefined
+    // ce qui faisait échouer autoriserRole("medecin") avec un 403 systématique
+    `SELECT u.id AS user_id, u.email, u.nom, u.prenom, u.role,
+            m.id AS medecin_id, m.specialite, m.numero_ordre
+     FROM USERS u
+     JOIN MEDECINS m ON m.user_id = u.id
+     WHERE u.id = ? AND u.role = 'medecin'
+     LIMIT 1`,
+    [id]
+  );
+  return rows[0] || null;
+};
+
 module.exports = {
   findAll,
   findBySearch,
@@ -138,4 +175,6 @@ module.exports = {
   checkOut,
   updatePhoto,
   getMedecinSemaine, 
+  trouverParEmail,
+  trouverParId,
 };

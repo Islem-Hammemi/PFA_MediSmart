@@ -15,6 +15,8 @@ app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ── Routes 
+const authRoutes = require("./routes/authRoutes");
+app.use("/api/auth", authRoutes);
 app.use("/medecins", medecinRoutes);
 
 // ── Health check 
