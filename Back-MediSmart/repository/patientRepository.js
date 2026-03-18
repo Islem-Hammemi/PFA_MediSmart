@@ -71,3 +71,57 @@ module.exports = {
   trouverParId,
   creer,
 };
+
+ 
+const insertEvaluation = async (patientId, medecinId, note, commentaire) => {
+  const sql = ` INSERT INTO evaluations (patient_id, medecin_id, note, commentaire)
+    VALUES (?, ?, ?, ?)
+  `;
+  const [result] = await db.execute(sql, [patientId, medecinId, note, commentaire]);
+  return result;
+};
+ 
+
+const findEvaluationByPatientAndMedecin = async (patientId, medecinId) => {
+  const sql = `
+    SELECT * FROM evaluations
+    WHERE patient_id = ? AND medecin_id = ?
+    LIMIT 1
+  `;
+  const [rows] = await db.execute(sql, [patientId, medecinId]);
+  return rows.length > 0 ? rows[0] : null;
+};
+ 
+const calculateAverageNoteForMedecin = async (medecinId) => {
+  const sql = `
+    SELECT AVG(note) AS moyenne
+    FROM evaluations
+    WHERE medecin_id = ?
+  `;
+  const [rows] = await db.execute(sql, [medecinId]);
+  return rows[0].moyenne || 0;
+};
+ 
+const updateNoteMoyenneMedecin = async (medecinId, nouvelleMoyenne) => {
+  const sql = `
+    UPDATE medecins
+    SET note_moyenne = ?
+    WHERE id = ?
+  `;
+  await db.execute(sql, [nouvelleMoyenne, medecinId]);
+};
+ 
+
+const findMedecinById = async (medecinId) => {
+  const sql = `SELECT id FROM medecins WHERE id = ? LIMIT 1`;
+  const [rows] = await db.execute(sql, [medecinId]);
+  return rows.length > 0 ? rows[0] : null;
+};
+ 
+module.exports = {
+  insertEvaluation,
+  findEvaluationByPatientAndMedecin,
+  calculateAverageNoteForMedecin,
+  updateNoteMoyenneMedecin,
+  findMedecinById,
+};

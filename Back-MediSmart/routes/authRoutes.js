@@ -1,7 +1,4 @@
-// =============================================
-// routes/authRoutes.js
-// Définition des routes d'authentification
-// =============================================
+
 const express = require("express");
 const router = express.Router();
 
@@ -15,22 +12,26 @@ const {
 
 const { proteger } = require("../middleware/authMiddleware");
 
-// ── Patient ──────────────────────────────────────────────────────────────────
-// US3 : Inscription patient
+
 router.post("/patient/register", registerPatient);
 
-// US4 : Connexion patient
+
 router.post("/patient/login", loginPatient);
 
-// ── Médecin ──────────────────────────────────────────────────────────────────
-// US5 : Connexion médecin
+
 router.post("/medecin/login", loginMedecin);
 
-// ── Session ──────────────────────────────────────────────────────────────────
-// Récupérer l'utilisateur connecté (token requis)
+
 router.get("/me", proteger, getMe);
 
-// Déconnexion
 router.post("/logout", proteger, logout);
 
+
+
+const { verifyToken } = require("../middleware/authMiddleware");
+ 
+const { createEvaluation } = require("../presentation/evaluationcontroller");
+ 
+router.post("/", verifyToken, createEvaluation);
+ 
 module.exports = router;
