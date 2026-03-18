@@ -31,17 +31,15 @@ const {
   getMedecinsPresents,
   checkIn,
   checkOut,
-  getMedecinSemaine, // ← nouveau
-  uploadPhoto,       // ← nouveau
+  getMedecinSemaine, 
+  uploadPhoto,       
 } = require("../presentation/medecinController");
 
-// ── Routes existantes ─────────────────────────────────────
+
 router.get("/",          getMedecins);
 router.get("/presents",  getMedecinsPresents);
 router.post("/checkin",  checkIn);
 router.post("/checkout", checkOut);
-
-// ── Nouvelles routes ──────────────────────────────────────
 router.get("/semaine",  getMedecinSemaine);
 router.post("/photo",   upload.single("photo"), uploadPhoto);
 
