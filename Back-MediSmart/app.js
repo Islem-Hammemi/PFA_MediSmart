@@ -5,6 +5,7 @@ require("dotenv").config();
 
 const medecinRoutes = require("./routes/medecinRoutes");
 const patientRoutes = require("./routes/patientRoutes"); 
+const ticketRoutes  = require("./routes/ticketRoutes");
 
 const app = express();
 
@@ -22,9 +23,13 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ── Routes 
 const authRoutes = require("./routes/authRoutes");
-app.use("/api/auth", authRoutes);
-app.use("/medecins", medecinRoutes);
-app.use("/api", patientRoutes);
+app.use("/api/auth",     authRoutes);
+app.use("/api/medecins", medecinRoutes);  // ← ajouter /api
+app.use("/api/patients", patientRoutes);  // ← préciser /patients
+app.use("/api/tickets",  ticketRoutes);
+
+/*app.use("/medecins", medecinRoutes);
+app.use("/api", patientRoutes);*/
 
 // ── Health check 
 app.get("/", (req, res) => {

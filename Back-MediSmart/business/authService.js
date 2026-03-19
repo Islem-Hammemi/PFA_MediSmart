@@ -153,6 +153,8 @@ const connecter = async ({ email, motDePasse }) => {
       prenom:   utilisateur.prenom,
       email:    utilisateur.email,
       role:     utilisateur.role,
+      patient_id: utilisateur.patient_id || null,   // ← ajouter
+      medecin_id: utilisateur.medecin_id || null,   // ← ajouter
     },
   };
 };
