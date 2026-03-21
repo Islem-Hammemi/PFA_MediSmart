@@ -65,9 +65,70 @@ const creer = async ({ nom, prenom, email, passwordHash, telephone, dateNaissanc
     conn.release();
   }
 };
+const getTicketsByPatient=async (patientId)=>{
+    const [rows] = await pool.execute(
+        `SELECT
+        t.id          AS ticket_id,
+        t.numero,
+        t.position,
+        t.statut,
+        t.created_at,
+        m.id          AS medecin_id,
+        u.nom         AS medecin_nom,
+        u.prenom      AS medecin_prenom,
+        m.specialite
+     FROM   TICKETS  t
+     JOIN   MEDECINS m ON m.id  = t.medecin_id
+     JOIN   USERS    u ON u.id  = m.user_id
+     WHERE  t.patient_id = ?
+     ORDER  BY t.created_at DESC`,
+    [patientId]
+  );
+  return rows;
+};
+const getDossiersByPatient = async (patientId) => {
+  const [rows] = await pool.execute(
+    `SELECT
+        d.id                AS dossier_id,
+        d.date_consultation,
+        d.diagnostic,
+        d.traitement,
+        d.notes,
+        m.id                AS medecin_id,
+        u.nom               AS medecin_nom,
+        u.prenom            AS medecin_prenom,
+        m.specialite
+     FROM   DOSSIERS_MEDICAUX d
+     JOIN   MEDECINS          m ON m.id  = d.medecin_id
+     JOIN   USERS             u ON u.id  = m.user_id
+     WHERE  d.patient_id = ?
+     ORDER  BY d.date_consultation DESC`,
+    [patientId]
+  );
+  return rows;
+};
+// ── US12 : Supprimer la session (logout) ─────────────────────
+const deleteSession = async (token) => {
+  const [result] = await pool.execute(
+    'DELETE FROM SESSIONS WHERE token = ?',
+    [token]
+  );
+  return result.affectedRows;
+};
+ 
+// ── Utilitaire : récupérer patient_id depuis user_id ─────────
+// Réutilise trouverParId pour éviter une requête SQL supplémentaire
+const getPatientIdByUserId = async (userId) => {
+  const patient = await trouverParId(userId);
+  return patient?.patient_id ?? null;
+};
 
 module.exports = {
   trouverParEmail,
   trouverParId,
   creer,
+  getTicketsByPatient,
+  getDossiersByPatient,
+  deleteSession,
+  getPatientIdByUserId,
 };

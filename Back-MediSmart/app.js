@@ -4,11 +4,17 @@ const path    = require("path");
 require("dotenv").config();
 
 const medecinRoutes = require("./routes/medecinRoutes");
+const patientRoutes = require("./routes/patientRoutes"); 
 
 const app = express();
 
+
+
 // ── Middlewares
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost:5173", "http://localhost:5174"],
+  credentials: true,
+}));
 app.use(express.json());
 
 // ── Fichiers statiques (photos médecins) 
@@ -18,6 +24,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 const authRoutes = require("./routes/authRoutes");
 app.use("/api/auth", authRoutes);
 app.use("/medecins", medecinRoutes);
+app.use("/api", patientRoutes);
 
 // ── Health check 
 app.get("/", (req, res) => {

@@ -1,6 +1,7 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import { isAuthenticated } from "../services/authService";
 import "./cmp.css";
-
 
 // ── Status Badge ─────────────────────────────────────────────
 const StatusBadge = ({ statut }) => {
@@ -36,15 +37,21 @@ const StarRating = ({ note }) => {
 // ── Doctor Card ──────────────────────────────────────────────
 const DoctorCard = ({ doctor, index = 0 }) => {
   const API_BASE = "http://localhost:5000";
+  const navigate = useNavigate();
   const photoUrl = doctor.photo ? `${API_BASE}${doctor.photo}` : null;
   const initials = `${doctor.prenom?.[0] ?? ""}${doctor.nom?.[0] ?? ""}`.toUpperCase();
+
+  const handleAction = () => {
+    if (isAuthenticated()) navigate("/dashboard-patient");
+    else navigate("/login");
+  };
 
   return (
     <div className="doctor-card" style={{ animationDelay: `${index * 80}ms` }}>
 
       {/* ── Hover overlay with two action buttons ── */}
       <div className="doctor-card__overlay">
-        <button className="overlay-btn overlay-btn--appointment">
+        <button className="overlay-btn overlay-btn--appointment" onClick={handleAction}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
@@ -54,7 +61,7 @@ const DoctorCard = ({ doctor, index = 0 }) => {
           </svg>
           Book Appointment
         </button>
-        <button className="overlay-btn overlay-btn--ticket">
+        <button className="overlay-btn overlay-btn--ticket" onClick={handleAction}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2">
             <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/>
@@ -63,41 +70,29 @@ const DoctorCard = ({ doctor, index = 0 }) => {
         </button>
       </div>
 
-      {/* ── Card content (gets blurred on hover) ── */}
+      {/* ── Card content ── */}
       <div className="doctor-card__content">
-
         <div className="doctor-card__header">
           <div className="doctor-card__avatar-wrap">
             {photoUrl ? (
-              <img
-                src={photoUrl}
-                alt={`Dr. ${doctor.prenom} ${doctor.nom}`}
-                className="doctor-card__avatar"
-              />
+              <img src={photoUrl} alt={`Dr. ${doctor.prenom} ${doctor.nom}`} className="doctor-card__avatar" />
             ) : (
-              <div className="doctor-card__avatar doctor-card__avatar--initials">
-                {initials}
-              </div>
+              <div className="doctor-card__avatar doctor-card__avatar--initials">{initials}</div>
             )}
           </div>
-
           <div className="doctor-card__info">
             <div className="doctor-card__name-row">
-              <h3 className="doctor-card__name">
-                Dr. {doctor.prenom} {doctor.nom}
-              </h3>
+              <h3 className="doctor-card__name">Dr. {doctor.prenom} {doctor.nom}</h3>
               <StatusBadge statut={doctor.statut} />
             </div>
             <p className="doctor-card__specialty">{doctor.specialite}</p>
             <StarRating note={doctor.evaluation} />
           </div>
         </div>
-
         <div className="doctor-card__footer">
           <div className="doctor-card__meta">
             <span className="meta-item meta-item--patients">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" strokeWidth="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                 <circle cx="9" cy="7" r="4"/>
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
@@ -106,8 +101,7 @@ const DoctorCard = ({ doctor, index = 0 }) => {
               {doctor.nb_evaluations ?? 0} patients
             </span>
             <span className="meta-item meta-item--time">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" strokeWidth="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="10"/>
                 <polyline points="12 6 12 12 16 14"/>
               </svg>
@@ -115,7 +109,6 @@ const DoctorCard = ({ doctor, index = 0 }) => {
             </span>
           </div>
         </div>
-
       </div>
     </div>
   );

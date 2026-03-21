@@ -1,29 +1,39 @@
-import NavBar from "./components/NavBar"
-import Footerr from "./components/Footerr"
-import Acceuil from "./pages/Acceuil"
-import Navbarpatient from "./components/Navbarpatient"
-import Patientdashboard from "./pages/patientdashboard"
-import Stats from "./components/Stats"
-import Nextapp from "./components/Nextapp"
-import Ticket from "./components/Ticket"
-import Patientbuttons from "./components/Patientbuttons"
+import React from 'react';
+import { Routes, Route } from "react-router-dom";
+import Acceuil from "./pages/Acceuil";
+import Patientdashboard from "./pages/patientdashboard";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Doctors from "./pages/Doctors"; 
+import Specialities from "./pages/Specialities"
+import PrivateRoute from "./components/PrivateRoute";
+
 function App() {
-
-
   return (
-    <div>
-      <Navbarpatient/>
-      <Patientdashboard/>
-      <Stats/>
-      <Nextapp/>
-      <Ticket/>
-      <Patientbuttons/>
-      <Footerr/>
+    <Routes>
+      <Route path="/" element={<Acceuil />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/doctors" element={<Doctors />} />
+      <Route path="/specialities" element={<Specialities />} />
 
-     
-    </div>
-  )
+      
+      <Route
+        path="/dashboard-patient"
+        element={
+          <PrivateRoute allowedRole="patient">
+            <Patientdashboard />
+          </PrivateRoute>
+        }
+      />
+    </Routes>
+    
+  );
 }
 
-export default App
+export default App;
+
+
+
+
 

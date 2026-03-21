@@ -62,7 +62,7 @@ const inscrirePatient = async ({ nom, prenom, email, motDePasse, telephone, date
   };
 };
 
-// ── US4 : Connexion Patient ──────────────────────────────────────────────────
+/* ── US4 : Connexion Patient ──────────────────────────────────────────────────
 const connecterPatient = async ({ email, motDePasse }) => {
   const patient = await patientRepo.trouverParEmail(email);
   if (!patient) {
@@ -117,15 +117,50 @@ const connecterMedecin = async ({ email, motDePasse }) => {
     },
   };
 };
-
+*/
 // ── Déconnexion : supprimer le token de SESSIONS ────────────────────────────
 const deconnecter = async (token) => {
   await sessionRepo.supprimer(token);
 };
 
+// ── Login unique (patient ou médecin) ────────────────────────
+const connecter = async ({ email, motDePasse }) => {
+  // Chercher d'abord dans les patients
+  let utilisateur = await patientRepo.trouverParEmail(email);
+  
+  // Si pas trouvé, chercher dans les médecins
+  if (!utilisateur) {
+    utilisateur = await medecinRepo.trouverParEmail(email);
+  }
+
+  if (!utilisateur) {
+    throw new Error("Email ou mot de passe incorrect.");
+  }
+
+  const valide = await bcrypt.compare(motDePasse, utilisateur.password_hash);
+  if (!valide) {
+    throw new Error("Email ou mot de passe incorrect.");
+  }
+
+  const token = await genererToken(utilisateur.user_id, utilisateur.role);
+
+  return {
+    token,
+    role: utilisateur.role, // ← le frontend redirige selon ça
+    utilisateur: {
+      id:       utilisateur.user_id,
+      nom:      utilisateur.nom,
+      prenom:   utilisateur.prenom,
+      email:    utilisateur.email,
+      role:     utilisateur.role,
+    },
+  };
+};
+
 module.exports = {
   inscrirePatient,
-  connecterPatient,
-  connecterMedecin,
+  //connecterPatient,
+  //connecterMedecin,
+  connecter,
   deconnecter,
 };
