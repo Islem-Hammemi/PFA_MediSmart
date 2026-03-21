@@ -1,40 +1,62 @@
-
-
+// =============================================
+// presentation/patientController.js
+// =============================================
 const patientService = require('../business/patientService');
 
-// US9
+// ─── US9 : GET /api/tickets/patient ──────────────────────────
 const getMyTickets = async (req, res) => {
   try {
-    const tickets = await patientService.getMyTickets(req.utilisateur.user_id); // ← fix
-    return res.status(200).json({ success: true, data: tickets });
-  } catch (err) {
-    const status = err.message === 'Profil patient introuvable.' ? 400 : 500;
-    return res.status(status).json({ success: false, message: err.message });
+    const data = await patientService.getMyTickets(req.utilisateur.user_id);
+    res.status(200).json({ success: true, count: data.length, data });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// US10
+// ─── US10 : GET /api/dossiers/patient ────────────────────────
 const getMyDossiers = async (req, res) => {
   try {
-    const dossiers = await patientService.getMyDossiers(req.utilisateur.user_id); // ← fix
-    return res.status(200).json({ success: true, data: dossiers });
-  } catch (err) {
-    const status = err.message === 'Profil patient introuvable.' ? 400 : 500;
-    return res.status(status).json({ success: false, message: err.message });
+    const data = await patientService.getMyDossiers(req.utilisateur.user_id);
+    res.status(200).json({ success: true, count: data.length, data });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// US12
+// ─── US12 : POST /api/logout ─────────────────────────────────
 const logout = async (req, res) => {
   try {
-    await patientService.logout(req.token); // ← fix (middleware attache req.token)
-    return res.status(200).json({ success: true, message: 'Déconnexion réussie.' });
-  } catch (err) {
-    const status = err.message === 'Token manquant.' ? 400
-                 : err.message === 'Session introuvable.' ? 404
-                 : 500;
-    return res.status(status).json({ success: false, message: err.message });
+    await patientService.logout(req.token);
+    res.status(200).json({ success: true, message: 'Déconnexion réussie.' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-module.exports = { getMyTickets, getMyDossiers, logout };
+// ─── NOUVEAU : GET /api/patient/dashboard/stats ───────────────
+const getDashboardStats = async (req, res) => {
+  try {
+    const data = await patientService.getDashboardStats(req.utilisateur.user_id);
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ─── NOUVEAU : GET /api/patient/dashboard/next-appointment ────
+const getNextAppointment = async (req, res) => {
+  try {
+    const data = await patientService.getNextAppointment(req.utilisateur.user_id);
+    res.status(200).json({ success: true, data }); // data = null si aucun RDV
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+module.exports = {
+  getMyTickets,
+  getMyDossiers,
+  logout,
+  getDashboardStats,   // nouveau
+  getNextAppointment,  // nouveau
+};

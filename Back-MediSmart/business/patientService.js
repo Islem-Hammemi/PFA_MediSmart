@@ -1,15 +1,14 @@
-
-
+// =============================================
+// business/patientService.js
+// =============================================
 const patientRepository = require('../repository/patientRepository');
 
-// ─── US9 : Consultation tickets ───────────────────────────────
+// ─── US9 : Tickets ────────────────────────────────────────────
 const getMyTickets = async (userId) => {
   const patientId = await patientRepository.getPatientIdByUserId(userId);
   if (!patientId) throw new Error('Profil patient introuvable.');
 
   const rows = await patientRepository.getTicketsByPatient(patientId);
-
-  // Structurer la réponse (même pattern que medecinService)
   return rows.map(row => ({
     ticket_id:  row.ticket_id,
     numero:     row.numero,
@@ -25,13 +24,12 @@ const getMyTickets = async (userId) => {
   }));
 };
 
-// ─── US10 : Consultation dossiers médicaux ────────────────────
+// ─── US10 : Dossiers médicaux ─────────────────────────────────
 const getMyDossiers = async (userId) => {
   const patientId = await patientRepository.getPatientIdByUserId(userId);
   if (!patientId) throw new Error('Profil patient introuvable.');
 
   const rows = await patientRepository.getDossiersByPatient(patientId);
-
   return rows.map(row => ({
     dossier_id:        row.dossier_id,
     date_consultation: row.date_consultation,
@@ -50,13 +48,28 @@ const getMyDossiers = async (userId) => {
 // ─── US12 : Logout ────────────────────────────────────────────
 const logout = async (token) => {
   if (!token) throw new Error('Token manquant.');
-
   const affected = await patientRepository.deleteSession(token);
   if (affected === 0) throw new Error('Session introuvable.');
+};
+
+// ─── NOUVEAU : Stats dashboard ────────────────────────────────
+const getDashboardStats = async (userId) => {
+  const patientId = await patientRepository.getPatientIdByUserId(userId);
+  if (!patientId) throw new Error('Profil patient introuvable.');
+  return await patientRepository.getDashboardStats(patientId);
+};
+
+// ─── NOUVEAU : Prochain rendez-vous ──────────────────────────
+const getNextAppointment = async (userId) => {
+  const patientId = await patientRepository.getPatientIdByUserId(userId);
+  if (!patientId) throw new Error('Profil patient introuvable.');
+  return await patientRepository.getNextAppointment(patientId);
 };
 
 module.exports = {
   getMyTickets,
   getMyDossiers,
   logout,
+  getDashboardStats,   // nouveau
+  getNextAppointment,  // nouveau
 };

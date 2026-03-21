@@ -1,13 +1,10 @@
 // =============================================
 // repository/patientRepository.js
-// Accès MySQL – Tables USERS + PATIENTS
 // =============================================
 const pool = require("../config/db");
 
-// ── Trouver un patient par email (avec son profil) ───────────────────────────
 const trouverParEmail = async (email) => {
   const [rows] = await pool.execute(
-    // FIX: u.role était déjà présent ici – OK
     `SELECT u.id AS user_id, u.email, u.password_hash, u.nom, u.prenom, u.role,
             p.id AS patient_id, p.date_naissance, p.telephone
      FROM USERS u
@@ -19,11 +16,8 @@ const trouverParEmail = async (email) => {
   return rows[0] || null;
 };
 
-// ── Trouver un patient par user_id (sans mot de passe) ──────────────────────
 const trouverParId = async (userId) => {
   const [rows] = await pool.execute(
-    // FIX: u.role ajouté – était manquant, causait req.utilisateur.role = undefined
-    // ce qui faisait échouer autoriserRole("patient") avec un 403 systématique
     `SELECT u.id AS user_id, u.email, u.nom, u.prenom, u.role,
             p.id AS patient_id, p.date_naissance, p.telephone
      FROM USERS u
@@ -35,39 +29,38 @@ const trouverParId = async (userId) => {
   return rows[0] || null;
 };
 
-// ── Créer un patient (USERS + PATIENTS en transaction) ──────────────────────
-const creer = async ({ nom, prenom, email, passwordHash, telephone, dateNaissance, assurance }) => {
+const creer = async ({ nom, prenom, email, passwordHash, telephone, dateNaissance }) => {
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
-
-    // 1. Insérer dans USERS
     const [userResult] = await conn.execute(
       `INSERT INTO USERS (email, password_hash, nom, prenom, role)
        VALUES (?, ?, ?, ?, 'patient')`,
       [email, passwordHash, nom, prenom]
     );
     const userId = userResult.insertId;
-
-    // 2. Insérer dans PATIENTS
+    console.log("✅ USER created with id:", userId);
     await conn.execute(
       `INSERT INTO PATIENTS (user_id, date_naissance, telephone)
        VALUES (?, ?, ?)`,
       [userId, dateNaissance || null, telephone || null]
     );
+    console.log("✅ PATIENT created");
 
     await conn.commit();
     return trouverParId(userId);
   } catch (err) {
     await conn.rollback();
+    console.log("❌ Transaction rolled back:", err.message);
     throw err;
   } finally {
     conn.release();
   }
 };
-const getTicketsByPatient=async (patientId)=>{
-    const [rows] = await pool.execute(
-        `SELECT
+
+const getTicketsByPatient = async (patientId) => {
+  const [rows] = await pool.execute(
+    `SELECT
         t.id          AS ticket_id,
         t.numero,
         t.position,
@@ -86,6 +79,7 @@ const getTicketsByPatient=async (patientId)=>{
   );
   return rows;
 };
+
 const getDossiersByPatient = async (patientId) => {
   const [rows] = await pool.execute(
     `SELECT
@@ -107,7 +101,7 @@ const getDossiersByPatient = async (patientId) => {
   );
   return rows;
 };
-// ── US12 : Supprimer la session (logout) ─────────────────────
+
 const deleteSession = async (token) => {
   const [result] = await pool.execute(
     'DELETE FROM SESSIONS WHERE token = ?',
@@ -115,12 +109,72 @@ const deleteSession = async (token) => {
   );
   return result.affectedRows;
 };
- 
-// ── Utilitaire : récupérer patient_id depuis user_id ─────────
-// Réutilise trouverParId pour éviter une requête SQL supplémentaire
+
 const getPatientIdByUserId = async (userId) => {
   const patient = await trouverParId(userId);
   return patient?.patient_id ?? null;
+};
+
+// ── NOUVEAU : Stats dashboard ─────────────────────────────────
+const getDashboardStats = async (patientId) => {
+  // Upcoming appointments (statut planifie ou confirme, date future)
+  const [[{ upcoming }]] = await pool.execute(
+    `SELECT COUNT(*) AS upcoming
+     FROM RENDEZ_VOUS
+     WHERE patient_id = ?
+       AND statut IN ('planifie', 'confirme')
+       AND date_heure > NOW()`,
+    [patientId]
+  );
+
+  // Active tickets (en_attente ou en_cours)
+  const [[{ activeTickets }]] = await pool.execute(
+    `SELECT COUNT(*) AS activeTickets
+     FROM TICKETS
+     WHERE patient_id = ?
+       AND statut IN ('en_attente', 'en_cours')`,
+    [patientId]
+  );
+
+  // Past visits (dossiers medicaux = consultations terminées)
+  const [[{ pastVisits }]] = await pool.execute(
+    `SELECT COUNT(*) AS pastVisits
+     FROM DOSSIERS_MEDICAUX
+     WHERE patient_id = ?`,
+    [patientId]
+  );
+
+  return {
+    upcoming:     Number(upcoming),
+    activeTickets: Number(activeTickets),
+    pastVisits:   Number(pastVisits),
+  };
+};
+
+// ── NOUVEAU : Prochain rendez-vous ────────────────────────────
+const getNextAppointment = async (patientId) => {
+  const [rows] = await pool.execute(
+    `SELECT
+        r.id         AS rdv_id,
+        r.date_heure,
+        r.statut,
+        r.motif,
+        m.id         AS medecin_id,
+        u.nom        AS medecin_nom,
+        u.prenom     AS medecin_prenom,
+        m.specialite,
+        m.photo
+     FROM RENDEZ_VOUS r
+     JOIN MEDECINS m ON m.id  = r.medecin_id
+     JOIN USERS    u ON u.id  = m.user_id
+     WHERE r.patient_id = ?
+       AND r.statut IN ('planifie', 'confirme')
+       AND r.date_heure > NOW()
+     ORDER BY r.date_heure ASC
+     LIMIT 1`,
+    [patientId]
+  );
+  return rows[0] || null;
 };
 
 module.exports = {
@@ -131,4 +185,6 @@ module.exports = {
   getDossiersByPatient,
   deleteSession,
   getPatientIdByUserId,
+  getDashboardStats,    // nouveau
+  getNextAppointment,   // nouveau
 };
