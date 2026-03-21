@@ -1,0 +1,163 @@
+/* ============================================================
+   MediSmart – specialitiesgrid.css
+   Styles for: SpecialitiesGrid
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --sp-surface:   #ffffff;
+  --sp-bg:        #f1f4f9;
+  --sp-border:    #e2e7f0;
+  --sp-text:      #1a2236;
+  --sp-muted:     #6b7a99;
+  --sp-accent:    #3b7de9;
+  --sp-accent-h:  #2563d4;
+  --sp-shadow:    0 2px 12px rgba(30,58,110,.07), 0 1px 3px rgba(30,58,110,.05);
+  --sp-shadow-h:  0 8px 28px rgba(30,58,110,.12);
+  --sp-font:      'DM Sans', sans-serif;
+  --sp-radius:    16px;
+  --sp-transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Grid ────────────────────────────────────────────────── */
+.sp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 32px 40px 56px;
+  background: var(--sp-bg);
+  font-family: var(--sp-font);
+  
+}
+
+/* ── Card ────────────────────────────────────────────────── */
+.sp-card {
+  background: var(--sp-surface);
+  border-radius: var(--sp-radius);
+  border: 4px solid;
+  border-color: #3b7de9;
+  border-bottom: #ffffff;
+  border-left: #ffffff;
+  border-right: #ffffff;
+  padding: 28px 24px 20px;
+  box-shadow: var(--sp-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: spReveal 0.45s ease forwards;
+  transition: box-shadow var(--sp-transition), transform var(--sp-transition),
+              border-color var(--sp-transition);
+    margin-top: -80px;  
+  position: relative; 
+  z-index: 10;   
+  margin-bottom: 95px;
+  margin-right: 20px;
+}
+
+.sp-card:hover {
+  box-shadow: var(--sp-shadow-h);
+  transform: translateY(-3px);
+  border-color: rgba(59,125,233,.25);
+}
+
+@keyframes spReveal {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Icon ────────────────────────────────────────────────── */
+.sp-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #eff6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sp-card__icon svg {
+  width: 24px;
+  height: 24px;
+  color: var(--sp-accent);
+}
+
+/* ── Name ────────────────────────────────────────────────── */
+.sp-card__name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--sp-text);
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+/* ── Description ─────────────────────────────────────────── */
+.sp-card__desc {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--sp-muted);
+  margin: 0;
+  flex: 1;
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.sp-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid var(--sp-border);
+  margin-top: auto;
+}
+
+.sp-card__count {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--sp-muted);
+}
+
+.sp-card__count svg {
+  color: var(--sp-accent);
+  flex-shrink: 0;
+}
+
+/* ── View button ─────────────────────────────────────────── */
+.sp-card__view {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  font-family: var(--sp-font);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sp-accent);
+  cursor: pointer;
+  padding: 0;
+  transition: gap var(--sp-transition), color var(--sp-transition);
+}
+
+.sp-card__view:hover {
+  color: var(--sp-accent-h);
+  gap: 8px;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .sp-grid {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 24px 20px 40px;
+  }
+}
+
+@media (max-width: 560px) {
+  .sp-grid {
+    grid-template-columns: 1fr;
+  }
+}
