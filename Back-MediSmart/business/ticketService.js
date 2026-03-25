@@ -64,6 +64,11 @@ const ticketService = {
     return tickets;
   },
 
+  //zedtha
+  async getQueueStatus(medecin_id) {
+  return await ticketRepository.getQueueStatus(medecin_id);
+},
+
 };
 
 module.exports = ticketService;

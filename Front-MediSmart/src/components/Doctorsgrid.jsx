@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./doccmp.css";
 
-import { useNavigate } from "react-router-dom";
-import { isAuthenticated } from "../services/authService";
-
-const API_BASE = "http://localhost:5000";
+const API_BASE = "http://localhost:5000/api";  // ✅ fixed
 const PER_PAGE = 9;
 
-// ── Status Badge ──────────────────────────────────────────
 const StatusBadge = ({ statut }) => {
   const config = {
     disponible:      { label: "Available", className: "dg-badge dg-badge--available" },
@@ -18,7 +14,6 @@ const StatusBadge = ({ statut }) => {
   return <span className={className}>{label}</span>;
 };
 
-// ── Star Rating ───────────────────────────────────────────
 const StarRating = ({ note }) => {
   const stars = [];
   const full  = Math.floor(note || 0);
@@ -36,17 +31,15 @@ const StarRating = ({ note }) => {
   );
 };
 
-// ── Doctor Card ───────────────────────────────────────────
 const DoctorCard = ({ doctor, index }) => {
-    const navigate = useNavigate();
-  const photoUrl = doctor.photo ? `${API_BASE}${doctor.photo}` : null;
+  const photoUrl = doctor.photo ? `http://localhost:5000${doctor.photo}` : null;
   const initials = `${doctor.prenom?.[0] ?? ""}${doctor.nom?.[0] ?? ""}`.toUpperCase();
 
   return (
     <div className="dg-card" style={{ animationDelay: `${index * 60}ms` }}>
 
       <div className="dg-overlay">
-        <button className="dg-overlay__btn dg-overlay__btn--appointment"  onClick={() => { if (!isAuthenticated()) navigate("/login"); }} >
+        <button className="dg-overlay__btn dg-overlay__btn--appointment">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2">
             <rect x="3" y="4" width="18" height="18" rx="2"/>
@@ -56,7 +49,7 @@ const DoctorCard = ({ doctor, index }) => {
           </svg>
           Book Appointment
         </button>
-        <button className="dg-overlay__btn dg-overlay__btn--ticket" onClick={() => { if (!isAuthenticated()) navigate("/login"); }} >
+        <button className="dg-overlay__btn dg-overlay__btn--ticket">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2">
             <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/>
@@ -107,7 +100,6 @@ const DoctorCard = ({ doctor, index }) => {
   );
 };
 
-// ── Pagination ────────────────────────────────────────────
 const Pagination = ({ current, total, onChange }) => {
   if (total <= 1) return null;
   return (
@@ -133,7 +125,6 @@ const Pagination = ({ current, total, onChange }) => {
   );
 };
 
-// ── Main component ────────────────────────────────────────
 function DoctorsGrid({ search = "", specialty = "" }) {
   const [allDoctors, setAllDoctors] = useState([]);
   const [filtered,   setFiltered]   = useState([]);
@@ -141,7 +132,6 @@ function DoctorsGrid({ search = "", specialty = "" }) {
   const [error,      setError]      = useState(null);
   const [page,       setPage]       = useState(1);
 
-  // Fetch all doctors once
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
@@ -158,7 +148,6 @@ function DoctorsGrid({ search = "", specialty = "" }) {
     fetchDoctors();
   }, []);
 
-  // Filter on search/specialty change
   useEffect(() => {
     let result = allDoctors;
 

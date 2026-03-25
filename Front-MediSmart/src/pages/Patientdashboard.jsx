@@ -29,23 +29,6 @@ function Patientdashboard() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       <Stats />
       <Nextapp />
       <Ticket />

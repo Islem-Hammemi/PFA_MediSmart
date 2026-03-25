@@ -2,6 +2,8 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./specialitiesgrid.css";
 
+import { Stethoscope,HandHeart,Bone,Baby } from "lucide-react";
+
 const SPECIALITIES = [
   {
     id: 1,
@@ -19,9 +21,7 @@ const SPECIALITIES = [
     id: 2,
     name: "General Medicine",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-      </svg>
+      <Stethoscope/>
     ),
     description:
       "Comprehensive primary care for adults covering routine check-ups, chronic disease management, and preventive health screenings for overall wellness.",
@@ -31,12 +31,7 @@ const SPECIALITIES = [
     id: 3,
     name: "Dermatology",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <circle cx="12" cy="12" r="10"/>
-        <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-        <line x1="9" y1="9" x2="9.01" y2="9"/>
-        <line x1="15" y1="9" x2="15.01" y2="9"/>
-      </svg>
+      <HandHeart/>
     ),
     description:
       "Expert care for skin, hair, and nail conditions. From acne and eczema to skin cancer screenings, our dermatologists provide comprehensive skin health solutions.",
@@ -46,13 +41,7 @@ const SPECIALITIES = [
     id: 4,
     name: "Orthopedics",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
-        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
-        <line x1="6" y1="1" x2="6" y2="4"/>
-        <line x1="10" y1="1" x2="10" y2="4"/>
-        <line x1="14" y1="1" x2="14" y2="4"/>
-      </svg>
+      <Bone/>
     ),
     description:
       "Treatment of musculoskeletal conditions including bones, joints, ligaments, and muscles. Specializing in sports injuries, fractures, and joint replacement.",
@@ -62,12 +51,7 @@ const SPECIALITIES = [
     id: 5,
     name: "Pediatrics",
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-        <circle cx="9" cy="7" r="4"/>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-      </svg>
+      <Baby/>
     ),
     description:
       "Dedicated healthcare for infants, children, and adolescents. Our pediatricians provide preventive care, vaccinations, and treatment for childhood illnesses.",

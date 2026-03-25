@@ -321,6 +321,64 @@
 
 
 
+/* ── Add these to your existing patient.css ── */
+
+/* Empty ticket state */
+.ticket-card__side-bar--empty {
+  background: #e2e7f0; /* grey instead of orange */
+}
+
+.ticket-card__no-ticket {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px 0 8px;
+  text-align: center;
+}
+
+.ticket-card__no-ticket p {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.ticket-card__book-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3b7de9;
+  text-decoration: none;
+  padding: 6px 14px;
+  border: 1.5px solid #3b7de9;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+}
+
+.ticket-card__book-link:hover {
+  background: #3b7de9;
+  color: #fff;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

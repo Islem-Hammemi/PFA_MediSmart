@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { isAuthenticated } from "../services/authService";
+import { useEffect, useState } from "react";
 import "./cmp.css";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = "http://localhost:5000/api";  // ✅ fixed
 
 const StarRating = ({ note }) => {
   const stars = [];
   const full  = Math.floor(note || 0);
   const half  = (note - full) >= 0.5;
+
   for (let i = 1; i <= 5; i++) {
     if (i <= full)                   stars.push(<span key={i} className="dow-star dow-star--full">★</span>);
     else if (i === full + 1 && half) stars.push(<span key={i} className="dow-star dow-star--half">★</span>);
@@ -21,7 +20,6 @@ const Docofweek = () => {
   const [doctor,  setDoctor]  = useState(null);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetch_ = async () => {
@@ -39,18 +37,14 @@ const Docofweek = () => {
     fetch_();
   }, []);
 
-  const handleBook = () => {
-    if (isAuthenticated()) navigate("/dashboard-patient");
-    else navigate("/login");
-  };
-
-  const photoUrl = doctor?.photo ? `${API_BASE}${doctor.photo}` : null;
+  const photoUrl = doctor?.photo ? `http://localhost:5000${doctor.photo}` : null;
   const initials = doctor
     ? `${doctor.prenom?.[0] ?? ""}${doctor.nom?.[0] ?? ""}`.toUpperCase()
     : "";
 
   return (
     <section className="dow-section">
+
       <div className="dow-label">
         <span className="dow-label__bar" />
         <h2 className="dow-label__text">Doctor of the Week</h2>
@@ -70,21 +64,31 @@ const Docofweek = () => {
       )}
 
       {error && <div className="dow-error">⚠️ {error}</div>}
-      {!loading && !error && !doctor && <div className="dow-error">No doctor of the week found.</div>}
+
+      {!loading && !error && !doctor && (
+        <div className="dow-error">No doctor of the week found.</div>
+      )}
 
       {!loading && !error && doctor && (
         <div className="dow-card">
 
-          {/* ── Left panel ── */}
           <div className="dow-card__left">
             <div className="dow-card__circle" />
+
             <div className="dow-card__photo-wrap">
               {photoUrl ? (
-                <img src={photoUrl} alt={`Dr. ${doctor.prenom} ${doctor.nom}`} className="dow-card__photo" />
+                <img
+                  src={photoUrl}
+                  alt={`Dr. ${doctor.prenom} ${doctor.nom}`}
+                  className="dow-card__photo"
+                />
               ) : (
-                <div className="dow-card__photo dow-card__photo--initials">{initials}</div>
+                <div className="dow-card__photo dow-card__photo--initials">
+                  {initials}
+                </div>
               )}
             </div>
+
             <div className="dow-card__identity">
               <h3 className="dow-card__name">Dr. {doctor.prenom} {doctor.nom}</h3>
               <p className="dow-card__specialty">{doctor.specialite}</p>
@@ -98,7 +102,6 @@ const Docofweek = () => {
             </div>
           </div>
 
-          {/* ── Right panel ── */}
           <div className="dow-card__right">
             <h4 className="dow-card__tagline">Exceptional Patient Care</h4>
             <p className="dow-card__testimonial">
@@ -107,7 +110,8 @@ const Docofweek = () => {
 
             <div className="dow-card__stats">
               <div className="dow-stat">
-                <svg className="dow-stat__icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                <svg className="dow-stat__icon" width="28" height="28" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" strokeWidth="1.6">
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                   <circle cx="9" cy="7" r="4"/>
                   <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
@@ -117,8 +121,10 @@ const Docofweek = () => {
                 <span className="dow-stat__value">{doctor.nb_patients_semaine ?? 0}</span>
                 <span className="dow-stat__sub">this week</span>
               </div>
+
               <div className="dow-stat">
-                <svg className="dow-stat__icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                <svg className="dow-stat__icon" width="28" height="28" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" strokeWidth="1.6">
                   <circle cx="12" cy="12" r="10"/>
                   <polyline points="12 6 12 12 16 14"/>
                 </svg>
@@ -131,10 +137,7 @@ const Docofweek = () => {
               </div>
             </div>
 
-            {/* ← onClick ajouté */}
-            <button className="dow-btn" onClick={handleBook}>
-              Book Appointment &nbsp;→
-            </button>
+            <button className="dow-btn">Book Appointment &nbsp;→</button>
           </div>
 
         </div>

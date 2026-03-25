@@ -7,6 +7,8 @@ import Register from "./pages/Register";
 import Doctors from "./pages/Doctors"; 
 import Specialities from "./pages/Specialities"
 import PrivateRoute from "./components/PrivateRoute";
+import Queue from './pages/Queue';
+import Appointments from './pages/Appointments';
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/doctors" element={<Doctors />} />
       <Route path="/specialities" element={<Specialities />} />
+      <Route path="/queue" element={<Queue />} />
+      <Route path="/appointments" element={<Appointments />} />
 
       
       <Route

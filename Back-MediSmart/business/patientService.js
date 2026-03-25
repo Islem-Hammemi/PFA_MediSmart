@@ -52,14 +52,14 @@ const logout = async (token) => {
   if (affected === 0) throw new Error('Session introuvable.');
 };
 
-// ─── NOUVEAU : Stats dashboard ────────────────────────────────
+// ─── Stats dashboard ──────────────────────────────────────────
 const getDashboardStats = async (userId) => {
   const patientId = await patientRepository.getPatientIdByUserId(userId);
   if (!patientId) throw new Error('Profil patient introuvable.');
   return await patientRepository.getDashboardStats(patientId);
 };
 
-// ─── NOUVEAU : Prochain rendez-vous ──────────────────────────
+// ─── Prochain rendez-vous ─────────────────────────────────────
 const getNextAppointment = async (userId) => {
   const patientId = await patientRepository.getPatientIdByUserId(userId);
   if (!patientId) throw new Error('Profil patient introuvable.');
@@ -70,6 +70,6 @@ module.exports = {
   getMyTickets,
   getMyDossiers,
   logout,
-  getDashboardStats,   // nouveau
-  getNextAppointment,  // nouveau
+  getDashboardStats,
+  getNextAppointment,
 };
