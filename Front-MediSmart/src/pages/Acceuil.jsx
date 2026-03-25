@@ -1,22 +1,35 @@
 import React from 'react'
 import './acceuil.css'
-import { CalendarCheck,Stethoscope, Clock, Users,Search, SlidersHorizontal,ArrowRight, Star } from 'lucide-react';
+import { CalendarCheck, Stethoscope, Clock, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { isAuthenticated } from '../services/authService';
 
-import Searchbarre from '../components/Searchbarre';  
+import NavBar from '../components/NavBar';
+import NavBarpatient from '../components/Navbarpatient';
+import Footerr from '../components/Footerr';
+import Searchbarre from '../components/Searchbarre';
 import Doctorofweek from '../components/Docofweek';
 import Chatbot from '../components/Chatbot';
 
-
-
-
-
-
-
-
 function Acceuil() {
-  return(
-     <div>
+  const navigate = useNavigate();
+
+  const handleBookAppointment = () => {
+    if (!isAuthenticated()) {
+      navigate("/login");
+    } else {
+      document.getElementById("doctors-section")?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  return (
+    <div>
+
+      {/* ── Navbar: patient navbar if logged in, regular if not ── */}
+      {isAuthenticated() ? <NavBarpatient /> : <NavBar />}
+
       <Chatbot />
+
       <section className="hero">
         <div className="hero-badge">
           <span className="badge-icon">🏥</span>
@@ -31,7 +44,8 @@ function Acceuil() {
           Your health and comfort are our top priorities.<br /> Book an appointment
           or get a ticket today — we've got you.
         </p>
-        <button className="hero-btn">
+
+        <button className="hero-btn" onClick={handleBookAppointment}>
           <CalendarCheck size={16} />
           Book Appointment
         </button>
@@ -43,19 +57,12 @@ function Acceuil() {
             <img className="avatar" src="https://randomuser.me/api/portraits/men/52.jpg" alt="doctor 3" />
             <img className="avatar" src="https://randomuser.me/api/portraits/women/68.jpg" alt="doctor 4" />
           </div>
-          <span className="stats-text">more than 20 doctors </span>
-
+          <span className="stats-text">more than 20 doctors</span>
           <div className="divider-dot" />
-
           <span className="online-dot" />
           <span className="stats-text">Avg. wait: 18 min</span>
         </div>
       </section>
-
-
-
-
-
 
       <div className="stats-box">
         <div className="stat-item">
@@ -63,11 +70,12 @@ function Acceuil() {
             <Stethoscope size={20} color="#3b82f6" />
           </div>
           <div className="stat-number">+20</div>
-          <div className="stat-label">Doctors </div>
+          <div className="stat-label">Doctors</div>
         </div>
 
         <div className="stat-divider" />
-          <div className="stat-item">
+
+        <div className="stat-item">
           <div className="stat-icon-wrap blue">
             <Clock size={20} color="#3b82f6" />
           </div>
@@ -77,33 +85,23 @@ function Acceuil() {
 
         <div className="stat-divider" />
 
-          <div className="stat-item">
-            <div className="stat-icon-wrap blue">
-              <Users size={20} color="#3b82f6" />
+        <div className="stat-item">
+          <div className="stat-icon-wrap blue">
+            <Users size={20} color="#3b82f6" />
+          </div>
+          <div className="stat-number">+100</div>
+          <div className="stat-label">Patients Served</div>
         </div>
-        <div className="stat-number">+100</div>
-        <div className="stat-label">Patients Served </div>
       </div>
-    </div>
 
-
-
-     
-     
-      <Searchbarre />
-   
-
-
-    
-
-<Doctorofweek />
-
-
+      <div id="doctors-section">
+        <Searchbarre />
+        <Doctorofweek />
+        <Footerr />
+      </div>
 
     </div>
-
-    )
+  );
 }
 
 export default Acceuil;
-

@@ -1,15 +1,7 @@
-import React from 'react';
-import { CalendarCheck,Stethoscope, Clock, Users,Search, SlidersHorizontal,ArrowRight, Star } from 'lucide-react';
-
-
 import { useEffect, useState } from "react";
 import "./cmp.css";
 
-
-
-const API_BASE = "http://localhost:5000";
-
-
+const API_BASE = "http://localhost:5000/api";  // ✅ fixed
 
 const StarRating = ({ note }) => {
   const stars = [];
@@ -45,7 +37,7 @@ const Docofweek = () => {
     fetch_();
   }, []);
 
-  const photoUrl = doctor?.photo ? `${API_BASE}${doctor.photo}` : null;
+  const photoUrl = doctor?.photo ? `http://localhost:5000${doctor.photo}` : null;
   const initials = doctor
     ? `${doctor.prenom?.[0] ?? ""}${doctor.nom?.[0] ?? ""}`.toUpperCase()
     : "";
@@ -53,13 +45,11 @@ const Docofweek = () => {
   return (
     <section className="dow-section">
 
-      {/* Section label */}
       <div className="dow-label">
         <span className="dow-label__bar" />
         <h2 className="dow-label__text">Doctor of the Week</h2>
       </div>
 
-      {/* Loading */}
       {loading && (
         <div className="dow-skeleton">
           <div className="dow-skeleton__left" />
@@ -73,21 +63,15 @@ const Docofweek = () => {
         </div>
       )}
 
-      {/* Error */}
-      {error && (
-        <div className="dow-error">⚠️ {error}</div>
-      )}
+      {error && <div className="dow-error">⚠️ {error}</div>}
 
-      {/* Empty */}
       {!loading && !error && !doctor && (
         <div className="dow-error">No doctor of the week found.</div>
       )}
 
-      {/* Card */}
       {!loading && !error && doctor && (
         <div className="dow-card">
 
-          {/* ── Left panel (dark) ── */}
           <div className="dow-card__left">
             <div className="dow-card__circle" />
 
@@ -106,9 +90,7 @@ const Docofweek = () => {
             </div>
 
             <div className="dow-card__identity">
-              <h3 className="dow-card__name">
-                Dr. {doctor.prenom} {doctor.nom}
-              </h3>
+              <h3 className="dow-card__name">Dr. {doctor.prenom} {doctor.nom}</h3>
               <p className="dow-card__specialty">{doctor.specialite}</p>
               <div className="dow-card__rating">
                 <StarRating note={doctor.note_moyenne} />
@@ -120,14 +102,12 @@ const Docofweek = () => {
             </div>
           </div>
 
-          {/* ── Right panel (light) ── */}
           <div className="dow-card__right">
             <h4 className="dow-card__tagline">Exceptional Patient Care</h4>
             <p className="dow-card__testimonial">
-             "{doctor.commentaire || `Dr. ${doctor.nom} is an exceptional doctor who goes above and beyond for their patients.`}"
+              "{doctor.commentaire || `Dr. ${doctor.nom} is an exceptional doctor who goes above and beyond for their patients.`}"
             </p>
 
-            {/* Stats */}
             <div className="dow-card__stats">
               <div className="dow-stat">
                 <svg className="dow-stat__icon" width="28" height="28" viewBox="0 0 24 24"
@@ -157,10 +137,7 @@ const Docofweek = () => {
               </div>
             </div>
 
-            {/* CTA */}
-            <button className="dow-btn">
-              Book Appointment &nbsp;→
-            </button>
+            <button className="dow-btn">Book Appointment &nbsp;→</button>
           </div>
 
         </div>

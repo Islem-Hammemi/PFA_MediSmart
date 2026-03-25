@@ -1,0 +1,506 @@
+/* ── StatsCards.css ─────────────────────────────────────── */
+ 
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 0 24px 32px;
+  max-width: 1280px;
+  margin: 0 auto;
+  margin-top: -60px;
+}
+
+
+ 
+.stats-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 24px 28px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+ 
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
+ 
+.stats-card__value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0f1c3f;
+  line-height: 1;
+  font-family: "DM Sans", "Segoe UI", sans-serif;
+}
+ 
+.stats-card__value--accent {
+  color: #f59e0b;
+}
+ 
+.stats-card__label {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #7a8fae;
+  font-family: "DM Sans", "Segoe UI", sans-serif;
+}
+ 
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+    padding: 0 16px 24px;
+  }
+}
+
+
+
+
+
+/* ── NextAppointment.css ────────────────────────────────── */
+ 
+.appointment-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+  font-family: 'Inter', sans-serif;
+  margin-left: 50px;
+  margin-right: 50px;
+  margin-top: 50px;
+}
+ 
+/* ── Header ─────────────────────────────────────────────── */
+.appointment-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+ 
+.appointment-card__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f1c3f;
+}
+ 
+.appointment-card__view-all {
+  font-size: 0.825rem;
+  font-weight: 500;
+  color: #3b82f6;
+  text-decoration: none;
+}
+ 
+.appointment-card__view-all:hover {
+  text-decoration: underline;
+}
+ 
+/* ── Row ─────────────────────────────────────────────────── */
+.appointment-card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+ 
+.appointment-card__left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+ 
+/* ── Avatar ──────────────────────────────────────────────── */
+.appointment-card__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+ 
+/* ── Info ────────────────────────────────────────────────── */
+.appointment-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+ 
+.appointment-card__name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0f1c3f;
+}
+ 
+.appointment-card__specialty {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #7a8fae;
+}
+ 
+/* ── Right ───────────────────────────────────────────────── */
+.appointment-card__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+ 
+.appointment-card__date {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+ 
+.appointment-card__date-day {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #0f1c3f;
+}
+ 
+.appointment-card__date-time {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #7a8fae;
+}
+ 
+/* ── Status Badge ────────────────────────────────────────── */
+.appointment-card__status {
+  padding: 5px 14px;
+  background: #d1fae5;
+  color: #059669;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 99px;
+}
+
+
+
+
+
+/* ── ActiveTicket.css ───────────────────────────────────── */
+ 
+.ticket-card {
+  display: flex;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+    margin-left: 50px;
+    margin-right: 50px;
+    margin-top: 50px;
+}
+ 
+/* ── Left orange bar ─────────────────────────────────────── */
+.ticket-card__side-bar {
+  width: 5px;
+  flex-shrink: 0;
+  background: #f59e0b;
+  border-radius: 4px 0 0 4px;
+}
+ 
+/* ── Body ────────────────────────────────────────────────── */
+.ticket-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px;
+  flex: 1;
+}
+ 
+/* ── Header ──────────────────────────────────────────────── */
+.ticket-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+ 
+.ticket-card__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f1c3f;
+}
+ 
+.ticket-card__status {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: #f59e0b;
+}
+ 
+/* ── Middle row ──────────────────────────────────────────── */
+.ticket-card__middle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+ 
+.ticket-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+ 
+.ticket-card__id {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f1c3f;
+  letter-spacing: -0.2px;
+}
+ 
+.ticket-card__doctor {
+  font-size: 0.825rem;
+  font-weight: 400;
+  color: #7a8fae;
+}
+ 
+/* ── Stats ───────────────────────────────────────────────── */
+.ticket-card__stats {
+  display: flex;
+  gap: 28px;
+  flex-shrink: 0;
+}
+ 
+.ticket-card__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+ 
+.ticket-card__stat-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f1c3f;
+}
+ 
+.ticket-card__stat-label {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #7a8fae;
+}
+ 
+/* ── Button ──────────────────────────────────────────────── */
+.ticket-card__btn {
+  width: 100%;
+  padding: 14px;
+  background: #0f1c3f;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+ 
+.ticket-card__btn:hover {
+  background: #1a2f5e;
+  transform: translateY(-1px);
+}
+ 
+.ticket-card__btn:active {
+  transform: translateY(0);
+}
+
+
+
+
+/* ── Add these to your existing patient.css ── */
+
+/* Empty ticket state */
+.ticket-card__side-bar--empty {
+  background: #e2e7f0; /* grey instead of orange */
+}
+
+.ticket-card__no-ticket {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px 0 8px;
+  text-align: center;
+}
+
+.ticket-card__no-ticket p {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.ticket-card__book-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3b7de9;
+  text-decoration: none;
+  padding: 6px 14px;
+  border: 1.5px solid #3b7de9;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+}
+
+.ticket-card__book-link:hover {
+  background: #3b7de9;
+  color: #fff;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ── QuickActions.css ───────────────────────────────────── */
+ 
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  font-family: 'Inter', sans-serif;
+  margin-left: 50px;
+  margin-right: 50px;
+  margin-top: 70px;
+  margin-bottom: 80px;
+
+}
+ 
+.quick-action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  
+  padding: 28px 22px;
+  background: #ffffff;
+  border: 1px solid #f0f2f5;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  color: #3b82f6;
+  transition:
+    background 0.22s ease,
+    border-color 0.22s ease,
+    color 0.22s ease,
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+ 
+.quick-action-card:hover {
+  background: #0f1c3f;
+  border-color: #0f1c3f;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.35);
+}
+ 
+.quick-action-card:active {
+  transform: translateY(0);
+}
+ 
+.quick-action-card__icon {
+  flex-shrink: 0;
+}
+ 
+.quick-action-card__label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0f1c3f;
+  transition: color 0.22s ease;
+}
+ 
+.quick-action-card:hover .quick-action-card__label {
+  color: #ffffff;
+}
+ 
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .quick-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ── Add these to your existing patient.css ── */
+
+/* Empty appointment state */
+.appointment-card__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px 20px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.appointment-card__empty p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.appointment-card__book-btn {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3b7de9;
+  text-decoration: none;
+  padding: 6px 14px;
+  border: 1.5px solid #3b7de9;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+}
+
+.appointment-card__book-btn:hover {
+  background: #3b7de9;
+  color: #fff;
+}

@@ -31,7 +31,7 @@ const registerPatient = async (req, res) => {
   }
 };
 
-// ── US4 : POST /api/auth/patient/login ──────────────────────────────────────
+/* ── US4 : POST /api/auth/patient/login ──────────────────────────────────────
 const loginPatient = async (req, res) => {
   try {
     const { email, motDePasse } = req.body;
@@ -78,7 +78,7 @@ const loginMedecin = async (req, res) => {
     res.status(401).json({ success: false, message: error.message });
   }
 };
-
+*/
 // ── Déconnexion : supprime le token de la table SESSIONS ────────────────────
 const logout = async (req, res) => {
   try {
@@ -100,10 +100,28 @@ const getMe = async (req, res) => {
   });
 };
 
+// ── Login unique ─────────────────────────────────────────────
+const login = async (req, res) => {
+  try {
+    const { email, motDePasse } = req.body;
+    if (!email || !motDePasse) {
+      return res.status(400).json({
+        success: false,
+        message: "Email et mot de passe requis.",
+      });
+    }
+    const resultat = await authService.connecter({ email, motDePasse });
+    res.status(200).json({ success: true, data: resultat });
+  } catch (error) {
+    res.status(401).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   registerPatient,
-  loginPatient,
-  loginMedecin,
+  //loginPatient,
+  //loginMedecin,
   logout,
   getMe,
+  login,
 };
