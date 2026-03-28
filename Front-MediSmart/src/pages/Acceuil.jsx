@@ -16,6 +16,7 @@ import Chatbot from '../components/Chatbot';
 function Acceuil() {
   return(
      <div>
+      
       <Chatbot />
       <section className="hero">
         <div className="hero-badge">

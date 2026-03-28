@@ -1,17 +1,16 @@
-import NavBar from "./components/NavBar"
-import Footerr from "./components/Footerr"
-import Acceuil from "./pages/Acceuil"
+import React from 'react';
+import Appoinment from './pages/Appoinment'; 
 
 function App() {
 
 
   return (
     <div>
-      <NavBar/>
-      <Acceuil/>
-      <Footerr/>
+
+     <Appoinment />
     </div>
   )
 }
 
 export default App
+
