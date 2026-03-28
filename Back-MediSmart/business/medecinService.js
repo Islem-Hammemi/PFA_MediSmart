@@ -1,6 +1,6 @@
 const medecinRepository = require("../repository/medecinRepository");
 
-// ── existantes ────────────────────────────────────────────
+
 
 const getMedecins = async (search) => {
   if (!search || search.trim() === "") {
@@ -24,7 +24,7 @@ const checkOutMedecin = async (userId) => {
   return await medecinRepository.checkOut(userId);
 };
 
-// ── NOUVEAU ───────────────────────────────────────────────
+
 
 // Médecin de la semaine (meilleure note + plus de tickets)
 const getMedecinSemaine = async () => {
@@ -39,10 +39,10 @@ const updatePhoto = async (userId, photoPath) => {
 };
 
 module.exports = {
-  getMedecins,           // existant
-  getMedecinsPresents,   // existant
-  checkInMedecin,        // existant
-  checkOutMedecin,       // existant
-  getMedecinSemaine,     // nouveau
-  updatePhoto,           // nouveau
+  getMedecins,           
+  getMedecinsPresents,   
+  checkInMedecin,        
+  checkOutMedecin,       
+  getMedecinSemaine,     
+  updatePhoto,           
 };

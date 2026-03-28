@@ -1,6 +1,6 @@
 const medecinService = require("../business/medecinService");
 
-// ── existantes ────────────────────────────────────────────
+
 
 const getMedecins = async (req, res) => {
   try {
@@ -74,7 +74,7 @@ const checkOut = async (req, res) => {
   }
 };
 
-// ── NOUVEAU ───────────────────────────────────────────────
+
 
 // GET /medecins/semaine
 const getMedecinSemaine = async (req, res) => {
@@ -128,6 +128,6 @@ module.exports = {
   getMedecinsPresents,
   checkIn,
   checkOut,
-  getMedecinSemaine,  // nouveau
-  uploadPhoto,        // nouveau
+  getMedecinSemaine,  
+  uploadPhoto,        
 };
