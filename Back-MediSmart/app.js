@@ -8,8 +8,11 @@ const medecinRoutes    = require("./routes/medecinRoutes");
 const patientRoutes    = require("./routes/patientRoutes");
 const ticketRoutes     = require("./routes/ticketRoutes");
 const evaluationRoutes = require("./routes/evaluationRoutes");
+const rendezVousRoutes = require('./routes/rendezVousRoutes');
 
 const app = express();
+
+
 
 // ── Middlewares ───────────────────────────────────────────────
 app.use(cors({
@@ -26,11 +29,12 @@ app.use("/api/auth",        authRoutes);
 app.use("/api/medecins",    medecinRoutes);
 app.use("/api/tickets",     ticketRoutes);      // ✅ before patientRoutes
 app.use("/api/evaluations", evaluationRoutes);
+app.use('/api/rendez-vous', rendezVousRoutes);
 app.use("/api",             patientRoutes);     // ✅ last — catches /api/patient/...
 
 // ── Health check ──────────────────────────────────────────────
 app.get("/", (req, res) => {
-  res.json({ message: "MediSmart API is running 🚀" });
+  res.json({ message: "MediSmart API is running " });
 });
 
 // ── 404 handler ───────────────────────────────────────────────

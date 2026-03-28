@@ -13,7 +13,7 @@ const evaluationRepository = {
    * Vérifie qu'il appartient bien au patient concerné.
    */
   async getRendezVousById(rendez_vous_id, patient_id) {
-    const [rows] = await db.query(
+    const [rows] = await db.execute(
       `SELECT
          r.id,
          r.statut,
@@ -35,7 +35,7 @@ const evaluationRepository = {
    * Contrainte : 1 seule évaluation par rendez-vous.
    */
   async evaluationExistante(rendez_vous_id) {
-    const [rows] = await db.query(
+    const [rows] = await db.execute(
       `SELECT id FROM EVALUATIONS
        WHERE rendez_vous_id = ?
        LIMIT 1`,
@@ -48,19 +48,25 @@ const evaluationRepository = {
    * Enregistre la nouvelle évaluation liée au rendez-vous.
    */
   async creerEvaluation({ patient_id, medecin_id, rendez_vous_id, note, commentaire }) {
-    const [result] = await db.query(
+    const [result] = await db.execute(
       `INSERT INTO EVALUATIONS (patient_id, medecin_id, rendez_vous_id, note, commentaire)
        VALUES (?, ?, ?, ?, ?)`,
       [patient_id, medecin_id, rendez_vous_id, note, commentaire || null]
     );
     return result.insertId;
   },
+  async desactiverFlag(rendez_vous_id) {
+  await db.execute(
+    `UPDATE RENDEZ_VOUS SET evaluation_demandee = FALSE WHERE id = ?`,
+    [rendez_vous_id]
+  );
+},
 
   /**
    * Recalcule la note moyenne et nb_evaluations du médecin.
    */
   async mettreAJourNoteMoyenne(medecin_id) {
-    await db.query(
+    await db.execute(
       `UPDATE MEDECINS
        SET
          note_moyenne   = (
@@ -82,7 +88,7 @@ const evaluationRepository = {
    * Récupère les détails complets de l'évaluation pour la réponse.
    */
   async getEvaluationById(evaluation_id) {
-    const [rows] = await db.query(
+    const [rows] = await db.execute(
       `SELECT
          e.id,
          e.note,

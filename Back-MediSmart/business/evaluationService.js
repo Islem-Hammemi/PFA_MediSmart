@@ -76,6 +76,7 @@ const evaluationService = {
 
     // ── 6. Recalculer la note moyenne du médecin ────────────────────────
     await evaluationRepository.mettreAJourNoteMoyenne(rdv.medecin_id);
+    await evaluationRepository.desactiverFlag(rendez_vous_id);
 
     // ── 7. Retourner les détails complets ───────────────────────────────
     return await evaluationRepository.getEvaluationById(evaluationId);
