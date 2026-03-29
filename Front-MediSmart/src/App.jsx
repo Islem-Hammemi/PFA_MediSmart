@@ -7,7 +7,7 @@ import Doctors from "./pages/Doctors";
 import Specialities from "./pages/Specialities"
 import PrivateRoute from "./components/PrivateRoute";
 import Queue from './pages/Queue';
-import Appointments from './pages/Appointments';
+import Appointments from './pages/Appointment';
 
 function App() {
   return (
