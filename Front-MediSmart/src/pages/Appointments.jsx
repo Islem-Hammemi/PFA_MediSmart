@@ -3,7 +3,7 @@ import './Appointments.css';
 import NavBarpatient from '../components/Navbarpatient';
 import Footerr from '../components/Footerr';
 import { getToken } from '../services/authService';
-import {Calendar , Clock2} from 'lucide-react';
+import { Calendar, Clock2 } from 'lucide-react';
 
 const API_BASE = 'http://localhost:5000/api';
 
@@ -34,14 +34,17 @@ function CancelModal({ appointment, onConfirm, onClose, loading }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-icon lucide-calendar"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M8 2v4" /><path d="M16 2v4" />
+            <rect width="18" height="18" x="3" y="4" rx="2" />
+            <path d="M3 10h18" />
+          </svg>
         </div>
         <h2 className="modal-title">Cancel Appointment?</h2>
         <p className="modal-desc">
           Are you sure you want to cancel your appointment with{' '}
-          <strong>
-            Dr. {appointment.medecin.prenom} {appointment.medecin.nom}
-          </strong>{' '}
+          <strong>Dr. {appointment.medecin.prenom} {appointment.medecin.nom}</strong>{' '}
           on <strong>{formatDate(appointment.date_heure)}</strong> at{' '}
           <strong>{formatTime(appointment.date_heure)}</strong>?
         </p>
@@ -71,10 +74,7 @@ function EmptyState({ tab }) {
       {tab === 'upcoming' ? (
         <>
           <p className="appt-empty-title">No upcoming appointments</p>
-          <p className="appt-empty-sub">
-            Your schedule is clear.{' '}
-            
-          </p>
+          <p className="appt-empty-sub">Your schedule is clear.</p>
         </>
       ) : (
         <>
@@ -88,13 +88,13 @@ function EmptyState({ tab }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 function Appointments() {
-  const [tab, setTab]               = useState('upcoming');
-  const [upcoming, setUpcoming]     = useState([]);
-  const [past, setPast]             = useState([]);
+  const [tab, setTab]                 = useState('upcoming');
+  const [upcoming, setUpcoming]       = useState([]);
+  const [past, setPast]               = useState([]);
   const [loadingList, setLoadingList] = useState(false);
-  const [toCancel, setToCancel]     = useState(null);   // appointment being cancelled
-  const [cancelling, setCancelling] = useState(false);
-  const [error, setError]           = useState(null);
+  const [toCancel, setToCancel]       = useState(null);
+  const [cancelling, setCancelling]   = useState(false);
+  const [error, setError]             = useState(null);
 
   // ── fetch helpers ────────────────────────────────────────────────────────
   const fetchUpcoming = useCallback(async () => {
@@ -127,10 +127,24 @@ function Appointments() {
     }
   }, []);
 
-  // load both on mount so stats are always fresh
+  // Load both on mount so stats are always fresh
+  // Also listen for booking / cancellation events from other components
   useEffect(() => {
     fetchUpcoming();
     fetchPast();
+
+    const onCancelled = () => fetchUpcoming();
+    const onBooked    = () => {
+      fetchUpcoming(); // add the new appointment to the list immediately
+    };
+
+    window.addEventListener('appointment-cancelled', onCancelled);
+    window.addEventListener('appointment-booked',    onBooked);
+
+    return () => {
+      window.removeEventListener('appointment-cancelled', onCancelled);
+      window.removeEventListener('appointment-booked',    onBooked);
+    };
   }, [fetchUpcoming, fetchPast]);
 
   // ── cancel flow ──────────────────────────────────────────────────────────
@@ -145,11 +159,11 @@ function Appointments() {
       const json = await res.json();
       if (!json.success) throw new Error(json.message);
 
-      // optimistically remove from upcoming list
+      // Optimistically remove from upcoming list
       setUpcoming((prev) => prev.filter((a) => a.rdv_id !== toCancel.rdv_id));
       setToCancel(null);
 
-      // notify Stats component (and any other listener) that the count changed
+      // Notify Stats component that the count changed
       window.dispatchEvent(new Event('appointment-cancelled'));
     } catch (err) {
       alert(err.message || 'Could not cancel appointment.');
