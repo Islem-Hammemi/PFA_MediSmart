@@ -8,21 +8,27 @@ function Stats() {
   const [stats,   setStats]   = useState({ upcoming: 0, activeTickets: 0, pastVisits: 0 });
   const [loading, setLoading] = useState(true);
 
+  const fetchStats = async () => {
+    try {
+      const res  = await fetch(`${API_BASE}/patient/dashboard/stats`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      const json = await res.json();
+      if (json.success) setStats(json.data);
+    } catch (err) {
+      console.error("Erreur stats:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const res  = await fetch(`${API_BASE}/patient/dashboard/stats`, {
-          headers: { Authorization: `Bearer ${getToken()}` },
-        });
-        const json = await res.json();
-        if (json.success) setStats(json.data);
-      } catch (err) {
-        console.error("Erreur stats:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchStats();
+
+    // Re-fetch stats whenever an appointment is cancelled (custom event fired from Appointments.jsx)
+    const handler = () => fetchStats();
+    window.addEventListener('appointment-cancelled', handler);
+    return () => window.removeEventListener('appointment-cancelled', handler);
   }, []);
 
   return (
@@ -52,5 +58,3 @@ function Stats() {
 }
 
 export default Stats;
- 
-
