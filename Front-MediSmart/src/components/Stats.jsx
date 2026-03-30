@@ -25,10 +25,15 @@ function Stats() {
   useEffect(() => {
     fetchStats();
 
-    // Re-fetch stats whenever an appointment is cancelled (custom event fired from Appointments.jsx)
+    // Re-fetch stats whenever an appointment is cancelled or a new one is booked
     const handler = () => fetchStats();
     window.addEventListener('appointment-cancelled', handler);
-    return () => window.removeEventListener('appointment-cancelled', handler);
+    window.addEventListener('appointment-booked',    handler);
+
+    return () => {
+      window.removeEventListener('appointment-cancelled', handler);
+      window.removeEventListener('appointment-booked',    handler);
+    };
   }, []);
 
   return (
