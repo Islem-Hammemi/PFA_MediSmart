@@ -1,0 +1,371 @@
+/* ============================================================
+   MediSmart – ticketmodal.css
+   Styles for: TicketModal (Same-Day Ticket)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --tm-primary:   #1e3a6e;
+  --tm-accent:    #3b7de9;
+  --tm-accent-h:  #2563d4;
+  --tm-green:     #22c55e;
+  --tm-warning:   #f59e0b;
+  --tm-red:       #ef4444;
+  --tm-text:      #1a2236;
+  --tm-muted:     #6b7a99;
+  --tm-border:    #e2e7f0;
+  --tm-surface:   #ffffff;
+  --tm-bg:        #f4f7fb;
+  --tm-font:      'DM Sans', sans-serif;
+  --tm-radius:    16px;
+  --tm-transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Backdrop ────────────────────────────────────────────── */
+.tm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 50, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: tmFadeIn 0.2s ease forwards;
+}
+
+@keyframes tmFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Modal ───────────────────────────────────────────────── */
+.tm-modal {
+  background: var(--tm-surface);
+  border-radius: var(--tm-radius);
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 24px 80px rgba(10, 20, 50, 0.25);
+  overflow: hidden;
+  animation: tmSlideUp 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes tmSlideUp {
+  from { opacity: 0; transform: translateY(32px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+.tm-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  background: var(--tm-primary);
+}
+
+.tm-modal__header--success { background: #065f46; }
+.tm-modal__header--warning { background: #92400e; }
+
+.tm-modal__title {
+  font-family: var(--tm-font);
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.tm-modal__close {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.12);
+  border: none;
+  color: rgba(255,255,255,.8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--tm-transition);
+}
+
+.tm-modal__close:hover { background: rgba(255,255,255,.22); }
+
+/* ── Body ────────────────────────────────────────────────── */
+.tm-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ── Doctor row ──────────────────────────────────────────── */
+.tm-doctor {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: var(--tm-bg);
+  border-radius: 12px;
+}
+
+.tm-doctor__photo {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--tm-border);
+  flex-shrink: 0;
+}
+
+.tm-doctor__initials {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dbe8ff, #c7d7f5);
+  color: var(--tm-primary);
+  font-size: 17px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tm-doctor__name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--tm-text);
+  margin: 0 0 3px;
+}
+
+.tm-doctor__specialty {
+  font-size: 12.5px;
+  color: var(--tm-muted);
+  margin: 0;
+}
+
+/* ── Info box ────────────────────────────────────────────── */
+.tm-info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #eff6ff;
+  border-radius: 10px;
+  border: 1px solid #bfdbfe;
+}
+
+.tm-info-box svg { color: var(--tm-accent); flex-shrink: 0; margin-top: 1px; }
+
+.tm-info-box p {
+  font-size: 13px;
+  color: #1e40af;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Ticket card ─────────────────────────────────────────── */
+.tm-ticket {
+  display: flex;
+  background: var(--tm-primary);
+  border-radius: 14px;
+  overflow: hidden;
+  color: #fff;
+}
+
+.tm-ticket__left {
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(255,255,255,.08);
+  min-width: 90px;
+}
+
+.tm-ticket__label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.55);
+}
+
+.tm-ticket__id {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.tm-ticket__divider {
+  width: 1px;
+  background: rgba(255,255,255,.15);
+  margin: 12px 0;
+}
+
+.tm-ticket__right {
+  flex: 1;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tm-ticket__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tm-ticket__key {
+  font-size: 12px;
+  color: rgba(255,255,255,.55);
+  font-weight: 400;
+}
+
+.tm-ticket__val {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.tm-ticket__val--accent { color: #93c5fd; }
+
+/* ── Success hint ────────────────────────────────────────── */
+.tm-success__hint {
+  font-size: 13px;
+  color: var(--tm-muted);
+  text-align: center;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Duplicate state ─────────────────────────────────────── */
+.tm-duplicate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: 8px 0;
+}
+
+.tm-duplicate__icon {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.tm-duplicate h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--tm-text);
+  margin: 0;
+}
+
+.tm-duplicate p {
+  font-size: 13.5px;
+  color: var(--tm-muted);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Loading / Error state ───────────────────────────────── */
+.tm-state {
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.tm-state p {
+  font-size: 14px;
+  color: var(--tm-muted);
+  margin: 0;
+}
+
+.tm-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--tm-border);
+  border-top-color: var(--tm-accent);
+  border-radius: 50%;
+  animation: tmSpin 0.8s linear infinite;
+}
+
+@keyframes tmSpin {
+  to { transform: rotate(360deg); }
+}
+
+.tm-error-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: var(--tm-red);
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tm-error-msg {
+  font-size: 13.5px;
+  color: var(--tm-red);
+  margin: 0;
+}
+
+/* ── Actions row ─────────────────────────────────────────── */
+.tm-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.tm-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-family: var(--tm-font);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all var(--tm-transition);
+  text-align: center;
+}
+
+.tm-btn--primary {
+  background: var(--tm-accent);
+  color: #ffffff;
+}
+
+.tm-btn--primary:hover {
+  background: var(--tm-accent-h);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(59,125,233,.3);
+}
+
+.tm-btn--secondary {
+  background: var(--tm-bg);
+  color: var(--tm-text);
+  border: 1.5px solid var(--tm-border);
+}
+
+.tm-btn--secondary:hover {
+  border-color: var(--tm-accent);
+  color: var(--tm-accent);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .tm-backdrop { padding: 12px; align-items: flex-end; }
+  .tm-modal    { border-radius: 20px 20px 0 0; }
+}

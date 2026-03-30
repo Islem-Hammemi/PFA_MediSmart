@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { isAuthenticated } from "../services/authService";
+import { useNavigate } from "react-router-dom";
 import "./doccmp.css";
+import BookingModal from "./BookingModal";
+import TicketModal from "./TicketModal";
 
-const API_BASE = "http://localhost:5000/api";  // ✅ fixed
+const API_BASE = "http://localhost:5000/api";
 const PER_PAGE = 9;
 
+// ── Status Badge ──────────────────────────────────────────────
 const StatusBadge = ({ statut }) => {
   const config = {
     disponible:      { label: "Available", className: "dg-badge dg-badge--available" },
@@ -14,6 +19,7 @@ const StatusBadge = ({ statut }) => {
   return <span className={className}>{label}</span>;
 };
 
+// ── Star Rating ───────────────────────────────────────────────
 const StarRating = ({ note }) => {
   const stars = [];
   const full  = Math.floor(note || 0);
@@ -31,7 +37,9 @@ const StarRating = ({ note }) => {
   );
 };
 
-const DoctorCard = ({ doctor, index }) => {
+// ── Doctor Card ───────────────────────────────────────────────
+// Receives onBook and onTicket as props from DoctorsGrid
+const DoctorCard = ({ doctor, index, onBook, onTicket }) => {
   const photoUrl = doctor.photo ? `http://localhost:5000${doctor.photo}` : null;
   const initials = `${doctor.prenom?.[0] ?? ""}${doctor.nom?.[0] ?? ""}`.toUpperCase();
 
@@ -39,7 +47,10 @@ const DoctorCard = ({ doctor, index }) => {
     <div className="dg-card" style={{ animationDelay: `${index * 60}ms` }}>
 
       <div className="dg-overlay">
-        <button className="dg-overlay__btn dg-overlay__btn--appointment">
+        <button
+          className="dg-overlay__btn dg-overlay__btn--appointment"
+          onClick={() => onBook(doctor)}
+        >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2">
             <rect x="3" y="4" width="18" height="18" rx="2"/>
@@ -49,7 +60,11 @@ const DoctorCard = ({ doctor, index }) => {
           </svg>
           Book Appointment
         </button>
-        <button className="dg-overlay__btn dg-overlay__btn--ticket">
+
+        <button
+          className="dg-overlay__btn dg-overlay__btn--ticket"
+          onClick={() => onTicket(doctor)}   // ✅ clean — handled in parent
+        >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2">
             <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/>
@@ -100,6 +115,7 @@ const DoctorCard = ({ doctor, index }) => {
   );
 };
 
+// ── Pagination ────────────────────────────────────────────────
 const Pagination = ({ current, total, onChange }) => {
   if (total <= 1) return null;
   return (
@@ -125,12 +141,18 @@ const Pagination = ({ current, total, onChange }) => {
   );
 };
 
+// ── Main DoctorsGrid ──────────────────────────────────────────
 function DoctorsGrid({ search = "", specialty = "" }) {
-  const [allDoctors, setAllDoctors] = useState([]);
-  const [filtered,   setFiltered]   = useState([]);
-  const [loading,    setLoading]    = useState(true);
-  const [error,      setError]      = useState(null);
-  const [page,       setPage]       = useState(1);
+  const navigate = useNavigate();
+
+  const [showModal,       setShowModal]       = useState(false);
+  const [showTicketModal, setShowTicketModal] = useState(false);
+  const [doctor,          setDoctor]          = useState(null);
+  const [allDoctors,      setAllDoctors]      = useState([]);
+  const [filtered,        setFiltered]        = useState([]);
+  const [loading,         setLoading]         = useState(true);
+  const [error,           setError]           = useState(null);
+  const [page,            setPage]            = useState(1);
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -150,7 +172,6 @@ function DoctorsGrid({ search = "", specialty = "" }) {
 
   useEffect(() => {
     let result = allDoctors;
-
     if (search.trim()) {
       const kw = search.toLowerCase();
       result = result.filter(
@@ -160,51 +181,80 @@ function DoctorsGrid({ search = "", specialty = "" }) {
           d.specialite.toLowerCase().includes(kw)
       );
     }
-
     if (specialty) {
       result = result.filter((d) => d.specialite === specialty);
     }
-
     setFiltered(result);
     setPage(1);
   }, [search, specialty, allDoctors]);
+
+  // ── Handlers (auth check lives here) ─────────────────────
+  const handleBook = (doc) => {
+    if (!isAuthenticated()) navigate("/login");
+    else { setDoctor(doc); setShowModal(true); }
+  };
+
+  const handleTicket = (doc) => {
+    if (!isAuthenticated()) navigate("/login");
+    else { setDoctor(doc); setShowTicketModal(true); }
+  };
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const visible    = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   return (
-    <div className="dg-wrap">
+    <>
+      <div className="dg-wrap">
 
-      <p className="dg-count">
-        <span className="dg-count__num">{filtered.length}</span> doctors found
-      </p>
+        <p className="dg-count">
+          <span className="dg-count__num">{filtered.length}</span> doctors found
+        </p>
 
-      {loading && (
-        <div className="dg-grid">
-          {[1,2,3,4,5,6].map((i) => (
-            <div key={i} className="dg-skeleton" />
-          ))}
-        </div>
-      )}
-
-      {error && <div className="dg-state">⚠️ {error}</div>}
-
-      {!loading && !error && filtered.length === 0 && (
-        <div className="dg-state">No doctors found matching your search.</div>
-      )}
-
-      {!loading && !error && filtered.length > 0 && (
-        <>
+        {loading && (
           <div className="dg-grid">
-            {visible.map((doc, i) => (
-              <DoctorCard key={doc.id} doctor={doc} index={i} />
-            ))}
+            {[1,2,3,4,5,6].map((i) => <div key={i} className="dg-skeleton" />)}
           </div>
-          <Pagination current={page} total={totalPages} onChange={setPage} />
-        </>
+        )}
+
+        {error && <div className="dg-state">⚠️ {error}</div>}
+
+        {!loading && !error && filtered.length === 0 && (
+          <div className="dg-state">No doctors found matching your search.</div>
+        )}
+
+        {!loading && !error && filtered.length > 0 && (
+          <>
+            <div className="dg-grid">
+              {visible.map((doc, i) => (
+                <DoctorCard
+                  key={doc.id}
+                  doctor={doc}
+                  index={i}
+                  onBook={handleBook}
+                  onTicket={handleTicket}
+                />
+              ))}
+            </div>
+            <Pagination current={page} total={totalPages} onChange={setPage} />
+          </>
+        )}
+
+      </div>
+
+      {showModal && doctor && (
+        <BookingModal
+          doctor={doctor}
+          onClose={() => { setShowModal(false); setDoctor(null); }}
+        />
       )}
 
-    </div>
+      {showTicketModal && doctor && (
+        <TicketModal
+          doctor={doctor}
+          onClose={() => { setShowTicketModal(false); setDoctor(null); }}
+        />
+      )}
+    </>
   );
 }
 

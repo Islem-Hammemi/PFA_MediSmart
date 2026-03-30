@@ -1,7 +1,9 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import { isAuthenticated } from "../services/authService";
+import { useNavigate } from "react-router-dom";
 import "./cmp.css";
+import BookingModal from "./BookingModal";
+import TicketModal from "./TicketModal";
 
 // ── Status Badge ─────────────────────────────────────────────
 const StatusBadge = ({ statut }) => {
@@ -36,6 +38,10 @@ const StarRating = ({ note }) => {
 
 // ── Doctor Card ──────────────────────────────────────────────
 const DoctorCard = ({ doctor, index = 0 }) => {
+  const [showTicketModal, setShowTicketModal] = useState(false);
+  
+  const [showModal, setShowModal] = useState(false);
+ 
   const API_BASE = "http://localhost:5000";
   const navigate = useNavigate();
   const photoUrl = doctor.photo ? `${API_BASE}${doctor.photo}` : null;
@@ -47,11 +53,14 @@ const DoctorCard = ({ doctor, index = 0 }) => {
   };
 
   return (
+    <>
     <div className="doctor-card" style={{ animationDelay: `${index * 80}ms` }}>
 
       {/* ── Hover overlay with two action buttons ── */}
       <div className="doctor-card__overlay">
-        <button className="overlay-btn overlay-btn--appointment" onClick={handleAction}>
+        <button className="overlay-btn overlay-btn--appointment" onClick={() => {
+          if (!isAuthenticated()) navigate("/login");
+          else setShowModal(true); }} >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
@@ -61,7 +70,7 @@ const DoctorCard = ({ doctor, index = 0 }) => {
           </svg>
           Book Appointment
         </button>
-        <button className="overlay-btn overlay-btn--ticket" onClick={handleAction}>
+        <button className="overlay-btn overlay-btn--ticket" onClick={() => { if (!isAuthenticated()) navigate("/login"); else setShowTicketModal(true); }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2">
             <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/>
@@ -111,6 +120,21 @@ const DoctorCard = ({ doctor, index = 0 }) => {
         </div>
       </div>
     </div>
+    {showModal && (
+  <BookingModal
+    doctor={doctor}
+    onClose={() => setShowModal(false)}
+  />
+)}
+
+  {showTicketModal && (
+  <TicketModal
+    doctor={doctor}
+    onClose={() => setShowTicketModal(false)}
+  />
+)}
+
+          </>
   );
 };
 
