@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getToken } from "../services/authService";
 import "./ticketmodal.css";
+import { Ban } from "lucide-react";
 
 const API_BASE = "http://localhost:5000/api";
 
@@ -66,11 +67,7 @@ function TicketModal({ doctor, onClose }) {
             <div className="tm-modal__header">
               <h2 className="tm-modal__title">Same-Day Ticket</h2>
               <button className="tm-modal__close" onClick={onClose}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth="2.5">
-                  <line x1="18" y1="6" x2="6" y2="18"/>
-                  <line x1="6"  y1="6" x2="18" y2="18"/>
-                </svg>
+               x
               </button>
             </div>
 
@@ -123,11 +120,7 @@ function TicketModal({ doctor, onClose }) {
             <div className="tm-modal__header tm-modal__header--success">
               <h2 className="tm-modal__title">Ticket Created ✓</h2>
               <button className="tm-modal__close" onClick={onClose}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth="2.5">
-                  <line x1="18" y1="6" x2="6" y2="18"/>
-                  <line x1="6"  y1="6" x2="18" y2="18"/>
-                </svg>
+                x
               </button>
             </div>
 
@@ -186,17 +179,13 @@ function TicketModal({ doctor, onClose }) {
             <div className="tm-modal__header tm-modal__header--warning">
               <h2 className="tm-modal__title">Already in Queue</h2>
               <button className="tm-modal__close" onClick={onClose}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth="2.5">
-                  <line x1="18" y1="6" x2="6" y2="18"/>
-                  <line x1="6"  y1="6" x2="18" y2="18"/>
-                </svg>
+                x
               </button>
             </div>
 
             <div className="tm-body">
               <div className="tm-duplicate">
-                <div className="tm-duplicate__icon">⚠️</div>
+                <div className="tm-duplicate__icon"> <Ban /></div>
                 <h3>You already have a ticket</h3>
                <p>
                   You already have an active ticket today.
