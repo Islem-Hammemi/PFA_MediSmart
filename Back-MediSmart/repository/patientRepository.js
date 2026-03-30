@@ -115,7 +115,7 @@ const getPatientIdByUserId = async (userId) => {
   return patient?.patient_id ?? null;
 };
 
-// ── NOUVEAU : Stats dashboard ─────────────────────────────────
+// ── Stats dashboard ───────────────────────────────────────────
 const getDashboardStats = async (patientId) => {
   // Upcoming appointments (statut planifie ou confirme, date future)
   const [[{ upcoming }]] = await pool.execute(
@@ -136,22 +136,24 @@ const getDashboardStats = async (patientId) => {
     [patientId]
   );
 
-  // Past visits (dossiers medicaux = consultations terminées)
+  // Past visits — same logic as getPastByPatient in rendezVousRepository:
+  // any RDV that is terminated/cancelled OR whose date has already passed
   const [[{ pastVisits }]] = await pool.execute(
     `SELECT COUNT(*) AS pastVisits
-     FROM DOSSIERS_MEDICAUX
-     WHERE patient_id = ?`,
+     FROM RENDEZ_VOUS
+     WHERE patient_id = ?
+       AND (statut IN ('termine', 'annule') OR date_heure < NOW())`,
     [patientId]
   );
 
   return {
-    upcoming:     Number(upcoming),
+    upcoming:      Number(upcoming),
     activeTickets: Number(activeTickets),
-    pastVisits:   Number(pastVisits),
+    pastVisits:    Number(pastVisits),
   };
 };
 
-// ── NOUVEAU : Prochain rendez-vous ────────────────────────────
+// ── Prochain rendez-vous ──────────────────────────────────────
 const getNextAppointment = async (patientId) => {
   const [rows] = await pool.execute(
     `SELECT
@@ -185,6 +187,6 @@ module.exports = {
   getDossiersByPatient,
   deleteSession,
   getPatientIdByUserId,
-  getDashboardStats,    // nouveau
-  getNextAppointment,   // nouveau
+  getDashboardStats,
+  getNextAppointment,
 };
