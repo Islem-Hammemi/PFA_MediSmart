@@ -297,6 +297,7 @@
 .auth-btn {
   width: 100%;
   padding: 13px;
+  padding-left: 4cm;
   background: #2563eb;
   color: #fff;
   border: none;
@@ -336,7 +337,7 @@
 }
 
 /* ══════════════════════════════════
-   RESPONSIVE — mobile first
+   RESPONSIVE — mobile 
 ══════════════════════════════════ */
 @media (max-width: 768px) {
   .auth-container {

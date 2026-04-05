@@ -27,10 +27,10 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // ── Routes (order matters!) ───────────────────────────────────
 app.use("/api/auth",        authRoutes);
 app.use("/api/medecins",    medecinRoutes);
-app.use("/api/tickets",     ticketRoutes);      // ✅ before patientRoutes
+app.use("/api/tickets",     ticketRoutes);      
 app.use("/api/evaluations", evaluationRoutes);
 app.use('/api/rendez-vous', rendezVousRoutes);
-app.use("/api",             patientRoutes);     // ✅ last — catches /api/patient/...
+app.use("/api",             patientRoutes);     /
 
 // ── Health check ──────────────────────────────────────────────
 app.get("/", (req, res) => {
