@@ -307,6 +307,7 @@
   font-family: inherit;
   transition: background .2s, transform .1s;
   margin-top: 4px;
+  text-align: center;
 }
 .auth-btn:hover { background: #1d4ed8; }
 .auth-btn:active { transform: scale(.98); }

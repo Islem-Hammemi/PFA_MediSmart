@@ -1,4 +1,3 @@
-
 const pool                 = require("../config/db");
 const patientRepository    = require("../repository/patientRepository");
 const rendezVousRepository = require("../repository/rendezVousRepository");
