@@ -22,7 +22,7 @@ function Patientdashboard() {
            Welcome back , <span className='hero-title-two'>{user?.prenom} {user?.nom} !</span>
           </h1>
           <p className='hero-subtitle' >
-            Your care, at a glance
+            Manage your health journey with easy access to appointments, tickets, and visit history.
           </p>
         </div>
       </section>

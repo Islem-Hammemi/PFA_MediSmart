@@ -30,7 +30,7 @@ export default function Login() {
     setLoading(true);
     try {
       const data = await login({ email: form.email, password: form.password });
-      if (data.role === "MEDECIN") navigate("/dashboard-medecin");
+      if (data.role === "medecin") navigate("/dashboard-medecin");
       else navigate("/dashboard-patient");
     } catch (err) {
       setError(err.message);
