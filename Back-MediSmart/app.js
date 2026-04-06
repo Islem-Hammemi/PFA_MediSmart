@@ -30,7 +30,7 @@ app.use("/api/medecins",    medecinRoutes);
 app.use("/api/tickets",     ticketRoutes);      
 app.use("/api/evaluations", evaluationRoutes);
 app.use('/api/rendez-vous', rendezVousRoutes);
-app.use("/api",             patientRoutes);     /
+app.use("/api",             patientRoutes);     
 
 // ── Health check ──────────────────────────────────────────────
 app.get("/", (req, res) => {
