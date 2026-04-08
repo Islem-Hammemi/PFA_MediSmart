@@ -1,7 +1,4 @@
-
 const rendezVousService = require("../business/rendezVousService");
-
-
 
 // ─── GET /api/rendez-vous/upcoming ───────────────────────────
 const getUpcoming = async (req, res) => {
@@ -36,8 +33,7 @@ const getOne = async (req, res) => {
   }
 };
 
-// ─── POST /api/rendez-vous ───────────────────────────────────
-// Body : { medecinId, dateHeure, motif? }  ← ancien mode sans créneau
+// ─── POST /api/rendez-vous (patient) ─────────────────────────
 const reserver = async (req, res) => {
   try {
     const result = await rendezVousService.reserver(
@@ -75,18 +71,12 @@ const getEvaluationEnAttente = async (req, res) => {
   }
 };
 
-
 // ─── GET /api/rendez-vous/creneaux/:medecinId ────────────────
-// US17 – créneaux disponibles d'un médecin
-// Accessible : patient authentifié
 const getCreneaux = async (req, res) => {
   try {
     const medecinId = Number(req.params.medecinId);
     if (!medecinId || isNaN(medecinId)) {
-      return res.status(400).json({
-        success: false,
-        message: "medecinId invalide.",
-      });
+      return res.status(400).json({ success: false, message: "medecinId invalide." });
     }
     const data = await rendezVousService.getCreneaux(medecinId);
     res.json({ success: true, count: data.length, data });
@@ -96,45 +86,29 @@ const getCreneaux = async (req, res) => {
 };
 
 // ─── POST /api/rendez-vous/creneau ───────────────────────────
-// US18 – prise de RDV via créneau (avec validation + transaction)
-// Body : { medecinId: int, creneauId: int, motif?: string }
 const reserverViaCreneau = async (req, res) => {
   try {
     const { medecinId, creneauId, motif } = req.body;
-
     if (!medecinId || !creneauId) {
-      return res.status(400).json({
-        success: false,
-        message: "medecinId et creneauId sont requis.",
-      });
+      return res.status(400).json({ success: false, message: "medecinId et creneauId sont requis." });
     }
-
     const result = await rendezVousService.reserverViaCreneau(
       req.utilisateur.user_id,
       { medecinId: Number(medecinId), creneauId: Number(creneauId), motif }
     );
-
     res.status(201).json(result);
   } catch (err) {
-    // Conflit = 409
-    const status =
-      err.message.includes("déjà réservé") || err.message.includes("Conflit")
-        ? 409
-        : 400;
+    const status = err.message.includes("déjà réservé") || err.message.includes("Conflit") ? 409 : 400;
     res.status(status).json({ success: false, message: err.message });
   }
 };
 
 // ─── GET /api/rendez-vous/medecin/planning ───────────────────
-// US13 – planning complet du médecin connecté
 const getPlanningMedecin = async (req, res) => {
   try {
     const medecinId = req.utilisateur.medecin_id;
     if (!medecinId) {
-      return res.status(403).json({
-        success: false,
-        message: "Accès réservé aux médecins.",
-      });
+      return res.status(403).json({ success: false, message: "Accès réservé aux médecins." });
     }
     const data = await rendezVousService.getPlanningMedecin(medecinId);
     res.json({ success: true, count: data.length, data });
@@ -144,15 +118,11 @@ const getPlanningMedecin = async (req, res) => {
 };
 
 // ─── GET /api/rendez-vous/medecin/upcoming ───────────────────
-// US19 – prochains RDV du médecin connecté
 const getUpcomingMedecin = async (req, res) => {
   try {
     const medecinId = req.utilisateur.medecin_id;
     if (!medecinId) {
-      return res.status(403).json({
-        success: false,
-        message: "Accès réservé aux médecins.",
-      });
+      return res.status(403).json({ success: false, message: "Accès réservé aux médecins." });
     }
     const data = await rendezVousService.getUpcomingMedecin(medecinId);
     res.json({ success: true, count: data.length, data });
@@ -161,17 +131,49 @@ const getUpcomingMedecin = async (req, res) => {
   }
 };
 
+// ─── POST /api/rendez-vous/medecin/reserver ──────────────────
+// ✅ NOUVEAU — médecin crée un RDV directement pour un patient
+// Body : { patientId, dateHeure, motif?, statut? }
+const reserverParMedecin = async (req, res) => {
+  try {
+    const medecinId = req.utilisateur.medecin_id;
+    if (!medecinId) {
+      return res.status(403).json({ success: false, message: "Accès réservé aux médecins." });
+    }
+
+    const { patientId, dateHeure, motif, statut } = req.body;
+
+    if (!patientId || !dateHeure) {
+      return res.status(400).json({
+        success: false,
+        message: "patientId et dateHeure sont requis.",
+      });
+    }
+
+    const result = await rendezVousService.reserverParMedecin({
+      medecinId,
+      patientId: Number(patientId),
+      dateHeure,
+      motif,
+      statut: statut || "confirme",
+    });
+
+    res.status(201).json({ success: true, ...result });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
 module.exports = {
-  
   getUpcoming,
   getPast,
   getOne,
   reserver,
   annuler,
   getEvaluationEnAttente,
-  // ── Nouveaux Sprint 3 – Backend 1 ──
   getCreneaux,
   reserverViaCreneau,
   getPlanningMedecin,
   getUpcomingMedecin,
+  reserverParMedecin,   // ✅ nouveau
 };
