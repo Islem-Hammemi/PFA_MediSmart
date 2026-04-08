@@ -8,7 +8,6 @@ const db = require('../config/db');
 
 const ticketRepository = {
 
-  // Récupère le prochain numéro de ticket disponible pour un médecin donné.
   async getNextNumero(medecin_id) {
     const [rows] = await db.query(
       `SELECT COALESCE(MAX(numero), 0) + 1 AS next_numero
@@ -20,7 +19,6 @@ const ticketRepository = {
     return rows[0].next_numero;
   },
 
-  // Récupère la prochaine position disponible dans la file d'attente.
   async getNextPosition(medecin_id) {
     const [rows] = await db.query(
       `SELECT COALESCE(MAX(position), 0) + 1 AS next_position
@@ -32,7 +30,6 @@ const ticketRepository = {
     return rows[0].next_position;
   },
 
-  // Crée un nouveau ticket en base.
   async createTicket({ patient_id, medecin_id, numero, position }) {
     const [result] = await db.query(
       `INSERT INTO TICKETS (patient_id, medecin_id, numero, position, statut)
@@ -42,7 +39,6 @@ const ticketRepository = {
     return result.insertId;
   },
 
-  // Récupère les détails complets d'un ticket (avec infos médecin).
   async getTicketById(ticket_id) {
     const [rows] = await db.query(
       `SELECT
@@ -63,7 +59,6 @@ const ticketRepository = {
     return rows[0] || null;
   },
 
-  // Vérifie si le médecin existe et récupère son statut.
   async getMedecinById(medecin_id) {
     const [rows] = await db.query(
       `SELECT m.id, m.statut, CONCAT(u.prenom, ' ', u.nom) AS nom, m.specialite
@@ -75,7 +70,6 @@ const ticketRepository = {
     return rows[0] || null;
   },
 
-  // Récupère le profil patient depuis user_id.
   async getPatientByUserId(user_id) {
     const [rows] = await db.query(
       `SELECT p.id, p.user_id
@@ -87,7 +81,6 @@ const ticketRepository = {
     return rows[0] || null;
   },
 
-  // Retourne tous les tickets d'un patient avec les infos du médecin.
   async getTicketsByPatientId(patient_id) {
     const [rows] = await db.query(
       `SELECT
@@ -95,7 +88,7 @@ const ticketRepository = {
          t.numero,
          t.position,
          t.statut,
-         t.medecin_id,                                           -- ✅ ajouté
+         t.medecin_id,
          DATE_FORMAT(t.created_at, '%d/%m/%Y à %H:%i') AS date_creation,
          DATE_FORMAT(t.updated_at, '%d/%m/%Y à %H:%i') AS derniere_maj,
          CONCAT(um.prenom, ' ', um.nom) AS medecin_nom,
@@ -110,7 +103,6 @@ const ticketRepository = {
     return rows;
   },
 
-  // Statut en temps réel de la file d'attente d'un médecin.
   async getQueueStatus(medecin_id) {
     const [rows] = await db.query(
       `SELECT
@@ -125,6 +117,29 @@ const ticketRepository = {
     return rows[0];
   },
 
+  async serveTicket(ticket_id, medecin_id) {
+    const [result] = await db.query(
+      `UPDATE TICKETS
+       SET statut = 'en_cours'
+       WHERE id = ? AND medecin_id = ? AND statut = 'en_attente'`,
+      [ticket_id, medecin_id]
+    );
+    if (!result.affectedRows) return null;
+    return await this.getTicketById(ticket_id);
+  },
+  async doneTicket(ticket_id, medecin_id) {
+  const [result] = await db.query(
+    `UPDATE TICKETS
+     SET statut = 'termine'
+     WHERE id = ? AND medecin_id = ? AND statut = 'en_cours'`,
+    [ticket_id, medecin_id]
+  );
+  if (!result.affectedRows) return null;
+  return await this.getTicketById(ticket_id);
+},
+
 };
+
+
 
 module.exports = ticketRepository;
