@@ -23,10 +23,6 @@ const verifierRelation = async (medecin_id, patient_id) => {
   return rows[0].nb > 0;
 };
 
-/**
- * Récupère la liste de tous les patients
- * ayant eu un RDV avec ce médecin.
- */
 const getMesPatientsListe = async (medecin_id) => {
   const [rows] = await db.query(
     `SELECT DISTINCT
@@ -48,9 +44,6 @@ const getMesPatientsListe = async (medecin_id) => {
   return rows;
 };
 
-/**
- * Récupère le profil complet d'un patient.
- */
 const getPatientProfil = async (patient_id) => {
   const [rows] = await db.query(
     `SELECT
@@ -67,10 +60,6 @@ const getPatientProfil = async (patient_id) => {
   return rows[0] || null;
 };
 
-/**
- * Récupère les dossiers médicaux d'un patient
- * créés par ce médecin uniquement.
- */
 const getDossiersPatient = async (medecin_id, patient_id) => {
   const [rows] = await db.query(
     `SELECT
@@ -88,9 +77,6 @@ const getDossiersPatient = async (medecin_id, patient_id) => {
   return rows;
 };
 
-/**
- * Récupère les RDV entre ce médecin et ce patient.
- */
 const getRDVPatient = async (medecin_id, patient_id) => {
   const [rows] = await db.query(
     `SELECT
@@ -106,9 +92,6 @@ const getRDVPatient = async (medecin_id, patient_id) => {
   return rows;
 };
 
-/**
- * Récupère le profil médecin depuis user_id.
- */
 const getMedecinByUserId = async (user_id) => {
   const [rows] = await db.query(
     `SELECT id AS medecin_id FROM MEDECINS WHERE user_id = ?`,
@@ -166,6 +149,35 @@ const creerPatient = async ({ prenom, nom, email, date_naissance, telephone }) =
   } finally {
     conn.release();
   }
+const creerDossier = async ({ patientId, medecinId, diagnostic, traitement, notes }) => {
+  const [result] = await db.query(
+    `INSERT INTO DOSSIERS_MEDICAUX
+       (patient_id, medecin_id, date_consultation, diagnostic, traitement, notes)
+     VALUES (?, ?, CURDATE(), ?, ?, ?)`,
+    [patientId, medecinId, diagnostic || null, traitement || null, notes || null]
+  );
+  return result.insertId;
+};
+
+const getDossiersByPatientForMedecin = async (patientId) => {
+  const [rows] = await db.query(
+    `SELECT
+       d.id AS dossier_id,
+       DATE_FORMAT(d.date_consultation, '%d/%m/%Y') AS date_consultation,
+       d.diagnostic,
+       d.traitement,
+       d.notes,
+       DATE_FORMAT(d.created_at, '%d/%m/%Y à %H:%i') AS created_at,
+       CONCAT(u.prenom, ' ', u.nom) AS nom_medecin,
+       m.specialite
+     FROM DOSSIERS_MEDICAUX d
+     JOIN MEDECINS m ON m.id = d.medecin_id
+     JOIN USERS    u ON u.id = m.user_id
+     WHERE d.patient_id = ?
+     ORDER BY d.date_consultation DESC`,
+    [patientId]
+  );
+  return rows;
 };
 
 module.exports = {
@@ -177,4 +189,6 @@ module.exports = {
   getMedecinByUserId,
   emailExiste,
   creerPatient,
+  creerDossier,
+  getDossiersByPatientForMedecin,
 };

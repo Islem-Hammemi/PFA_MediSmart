@@ -8,13 +8,12 @@ const medecinRoutes    = require("./routes/medecinRoutes");
 const patientRoutes    = require("./routes/patientRoutes");
 const ticketRoutes     = require("./routes/ticketRoutes");
 const evaluationRoutes = require("./routes/evaluationRoutes");
-const rendezVousRoutes = require('./routes/rendezVousRoutes');
-const planningRoutes = require('./routes/planningRoutes');
-const dossierRoutes = require('./routes/dossierRoutes');
+const rendezVousRoutes = require("./routes/rendezVousRoutes");
+const planningRoutes   = require("./routes/planningRoutes");
+const dossierRoutes    = require("./routes/dossierRoutes");
+const consultationRoutes = require('./routes/consultationRoutes');
 
 const app = express();
-
-
 
 // ── Middlewares ───────────────────────────────────────────────
 app.use(cors({
@@ -29,12 +28,13 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // ── Routes (order matters!) ───────────────────────────────────
 app.use("/api/auth",        authRoutes);
 app.use("/api/medecins",    medecinRoutes);
-app.use("/api/tickets",     ticketRoutes);      // ✅ before patientRoutes
+app.use("/api/tickets",     ticketRoutes);
 app.use("/api/evaluations", evaluationRoutes);
-app.use('/api/rendez-vous', rendezVousRoutes);
-app.use("/api",             patientRoutes);     // ✅ last — catches /api/patient/...
-app.use('/api/planning', planningRoutes);
-app.use('/api/dossiers', dossierRoutes); 
+app.use("/api/rendez-vous", rendezVousRoutes);
+app.use("/api/planning",    planningRoutes);
+app.use("/api/dossiers",    dossierRoutes);
+app.use('/api/consultations', consultationRoutes);
+app.use("/api",             patientRoutes); 
 
 // ── Health check ──────────────────────────────────────────────
 app.get("/", (req, res) => {

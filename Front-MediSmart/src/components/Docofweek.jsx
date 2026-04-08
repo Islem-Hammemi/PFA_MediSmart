@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import "./cmp.css";
+import BookingModal from "./BookingModal";
 
-const API_BASE = "http://localhost:5000/api";  // ✅ fixed
+const API_BASE = "http://localhost:5000/api";
 
 const StarRating = ({ note }) => {
   const stars = [];
   const full  = Math.floor(note || 0);
   const half  = (note - full) >= 0.5;
-
   for (let i = 1; i <= 5; i++) {
     if (i <= full)                   stars.push(<span key={i} className="dow-star dow-star--full">★</span>);
     else if (i === full + 1 && half) stars.push(<span key={i} className="dow-star dow-star--half">★</span>);
@@ -17,9 +17,10 @@ const StarRating = ({ note }) => {
 };
 
 const Docofweek = () => {
-  const [doctor,  setDoctor]  = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState(null);
+  const [doctor,     setDoctor]     = useState(null);
+  const [loading,    setLoading]    = useState(true);
+  const [error,      setError]      = useState(null);
+  const [bookingDoc, setBookingDoc] = useState(null);
 
   useEffect(() => {
     const fetch_ = async () => {
@@ -71,24 +72,15 @@ const Docofweek = () => {
 
       {!loading && !error && doctor && (
         <div className="dow-card">
-
           <div className="dow-card__left">
             <div className="dow-card__circle" />
-
             <div className="dow-card__photo-wrap">
               {photoUrl ? (
-                <img
-                  src={photoUrl}
-                  alt={`Dr. ${doctor.prenom} ${doctor.nom}`}
-                  className="dow-card__photo"
-                />
+                <img src={photoUrl} alt={`Dr. ${doctor.prenom} ${doctor.nom}`} className="dow-card__photo" />
               ) : (
-                <div className="dow-card__photo dow-card__photo--initials">
-                  {initials}
-                </div>
+                <div className="dow-card__photo dow-card__photo--initials">{initials}</div>
               )}
             </div>
-
             <div className="dow-card__identity">
               <h3 className="dow-card__name">Dr. {doctor.prenom} {doctor.nom}</h3>
               <p className="dow-card__specialty">{doctor.specialite}</p>
@@ -137,11 +129,20 @@ const Docofweek = () => {
               </div>
             </div>
 
-            <button className="dow-btn">Book Appointment &nbsp;→</button>
+            <button className="dow-btn" onClick={() => setBookingDoc(doctor)}>
+              Book Appointment &nbsp;→
+            </button>
           </div>
-
         </div>
       )}
+
+      {bookingDoc && (
+        <BookingModal
+          doctor={bookingDoc}
+          onClose={() => setBookingDoc(null)}
+        />
+      )}
+
     </section>
   );
 };
