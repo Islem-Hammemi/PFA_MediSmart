@@ -3,15 +3,15 @@ const cors    = require("cors");
 const path    = require("path");
 require("dotenv").config();
 
-const authRoutes       = require("./routes/authRoutes");
-const medecinRoutes    = require("./routes/medecinRoutes");
-const patientRoutes    = require("./routes/patientRoutes");
-const ticketRoutes     = require("./routes/ticketRoutes");
-const evaluationRoutes = require("./routes/evaluationRoutes");
-const rendezVousRoutes = require("./routes/rendezVousRoutes");
-const planningRoutes   = require("./routes/planningRoutes");
-const dossierRoutes    = require("./routes/dossierRoutes");
-const consultationRoutes = require('./routes/consultationRoutes');
+const authRoutes          = require("./routes/authRoutes");
+const medecinRoutes       = require("./routes/medecinRoutes");
+const patientRoutes       = require("./routes/patientRoutes");
+const ticketRoutes        = require("./routes/ticketRoutes");
+const evaluationRoutes    = require("./routes/evaluationRoutes");
+const rendezVousRoutes    = require("./routes/rendezVousRoutes");
+const dossierRoutes       = require("./routes/dossierRoutes");
+const planningRoutes      = require("./routes/planningRoutes");
+const consultationRoutes  = require("./routes/consultationRoutes"); // ✅ NEW
 
 const app = express();
 
@@ -22,23 +22,23 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// ── Static files (doctor photos) ─────────────────────────────
+// ── Static files ──────────────────────────────────────────────
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ── Routes (order matters!) ───────────────────────────────────
-app.use("/api/auth",        authRoutes);
-app.use("/api/medecins",    medecinRoutes);
-app.use("/api/tickets",     ticketRoutes);
-app.use("/api/evaluations", evaluationRoutes);
-app.use("/api/rendez-vous", rendezVousRoutes);
-app.use("/api/planning",    planningRoutes);
-app.use("/api/dossiers",    dossierRoutes);
-app.use('/api/consultations', consultationRoutes);
-app.use("/api",             patientRoutes); 
+app.use("/api/auth",          authRoutes);
+app.use("/api/medecins",      medecinRoutes);
+app.use("/api/tickets",       ticketRoutes);        // before /api
+app.use("/api/evaluations",   evaluationRoutes);
+app.use("/api/rendez-vous",   rendezVousRoutes);
+app.use("/api/dossiers",      dossierRoutes);
+app.use("/api/planning",      planningRoutes);
+app.use("/api/consultations", consultationRoutes);  // ✅ NEW
+app.use("/api",               patientRoutes);       // last — catches /api/patient/...
 
 // ── Health check ──────────────────────────────────────────────
 app.get("/", (req, res) => {
-  res.json({ message: "MediSmart API is running " });
+  res.json({ message: "MediSmart API is running 🚀" });
 });
 
 // ── 404 handler ───────────────────────────────────────────────

@@ -2788,3 +2788,406 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============================================================
+   ADD THIS TO THE BOTTOM OF doctorspage.css
+   ============================================================ */
+
+/* ── PendingRequests avatar initials ── */
+.pr-avatar-initials {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dbe8ff, #c7d7f5);
+  color: #1e3a6e;
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 2px solid #e2e8f0;
+  letter-spacing: 0.5px;
+}
+
+/* ── PendingRequests disabled button state ── */
+.pr-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+
+
+
+
+
+
+
+
+/*todaysappointments css exactly the scroll barre and the details popup*/
+
+
+
+
+
+
+
+/* ============================================================
+   TodaysAppointments — append these rules to doctorspage.css
+   ============================================================ */
+
+/* ── Card wrapper ────────────────────────────────────────────── */
+.ta-wrapper {
+  width: 100%;
+}
+
+.ta-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+.ta-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ta-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.ta-count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #4a90d9;
+  background: #eaf2fd;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+/* ── Scrollable list ─────────────────────────────────────────── */
+.ta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 320px;          /* show ~4 items, scroll for more  */
+  overflow-y: auto;
+  padding-right: 4px;         /* room for scrollbar               */
+  scrollbar-width: thin;
+  scrollbar-color: #c5d8f0 transparent;
+}
+
+.ta-list::-webkit-scrollbar        { width: 5px; }
+.ta-list::-webkit-scrollbar-track  { background: transparent; }
+.ta-list::-webkit-scrollbar-thumb  { background: #c5d8f0; border-radius: 4px; }
+
+/* ── Single appointment row ──────────────────────────────────── */
+.ta-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f7fafd;
+  transition: background 0.2s;
+}
+
+.ta-item:hover {
+  background: #eaf2fd;
+}
+
+/* ── Avatar ──────────────────────────────────────────────────── */
+.ta-item-avatar {
+  flex-shrink: 0;
+}
+
+.ta-avatar-img,
+.ta-avatar-initials {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.ta-avatar-initials {
+  background: linear-gradient(135deg, #4a90d9, #6db8f7);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.5px;
+}
+
+/* ── Name / time ─────────────────────────────────────────────── */
+.ta-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ta-name {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ta-time {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  color: #7a8ba0;
+}
+
+/* ── Status badge ────────────────────────────────────────────── */
+.ta-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ta-badge--confirme {
+  background: #e6f9f0;
+  color: #1a9e5c;
+}
+
+.ta-badge--planifie {
+  background: #fff8e1;
+  color: #c68a00;
+}
+
+.ta-badge--annule {
+  background: #fdecea;
+  color: #d32f2f;
+}
+
+/* ── Details button ──────────────────────────────────────────── */
+.ta-details-btn {
+  flex-shrink: 0;
+  background: none;
+  border: 1.5px solid #4a90d9;
+  color: #4a90d9;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 13px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.ta-details-btn:hover {
+  background: #4a90d9;
+  color: #fff;
+}
+
+/* ── States (loading / error / empty) ───────────────────────── */
+.ta-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 0;
+  color: #7a8ba0;
+  font-size: 0.88rem;
+}
+
+.ta-state--error { color: #d32f2f; }
+.ta-state--empty { color: #a0b0c0; }
+
+.ta-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #e0ecf8;
+  border-top-color: #4a90d9;
+  border-radius: 50%;
+  animation: ta-spin 0.75s linear infinite;
+}
+
+@keyframes ta-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   Details Modal
+   ============================================================ */
+.ta-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 40, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  animation: ta-fade-in 0.18s ease;
+}
+
+@keyframes ta-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.ta-modal {
+  position: relative;
+  background: #fff;
+  border-radius: 20px;
+  padding: 36px 32px 32px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: ta-slide-up 0.22s ease;
+}
+
+@keyframes ta-slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ta-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: #f0f4f8;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #5a6a7a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s;
+}
+
+.ta-modal-close:hover { background: #e0e8f0; }
+
+.ta-modal-avatar .ta-avatar-img,
+.ta-modal-avatar .ta-avatar-initials {
+  width: 72px;
+  height: 72px;
+  font-size: 1.4rem;
+}
+
+.ta-modal-name {
+  margin: 4px 0 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  text-align: center;
+}
+
+/* ── Info grid ───────────────────────────────────────────────── */
+.ta-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.ta-modal-item {
+  background: #f7fafd;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ta-modal-item--full {
+  grid-column: 1 / -1;
+}
+
+.ta-modal-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #7a8ba0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ta-modal-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.ta-modal-motif {
+  font-weight: 400;
+  color: #3a4a5a;
+  line-height: 1.5;
+}
+
+
+
+
+
+
+
+/* ============================================================
+   ADD THESE STYLES TO THE BOTTOM OF doctorspage.css
+   ============================================================ */
+
+/* ── TodaysAppointments – avatar initials ── */
+.ta-avatar-initials {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dbe8ff, #c7d7f5);
+  color: #1e3a6e;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.5px;
+}
+
+/* ── TodaysAppointments – motif badge ── */
+.ta-motif {
+  font-size: 12px;
+  color: #6b7a99;
+  background: #f0f4ff;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  border: 1px solid #e2e8f0;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

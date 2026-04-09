@@ -1,22 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { isAuthenticated } from "../services/authService";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import "./doccmp.css";
+import { isAuthenticated } from "../services/authService";
 import BookingModal from "./BookingModal";
 import TicketModal from "./TicketModal";
+import "./doccmp.css";
 
 const API_BASE = "http://localhost:5000/api";
 const PER_PAGE = 9;
+const POLL_MS  = 30000;
 
-// ── Status Badge ──────────────────────────────────────────────
+// ── Status Badge — only Available or Absent ───────────────────
 const StatusBadge = ({ statut }) => {
-  const config = {
-    disponible:      { label: "Available", className: "dg-badge dg-badge--available" },
-    en_consultation: { label: "Busy",      className: "dg-badge dg-badge--busy"      },
-    absent:          { label: "Absent",    className: "dg-badge dg-badge--absent"     },
-  };
-  const { label, className } = config[statut] || config.absent;
-  return <span className={className}>{label}</span>;
+  const isOnline = statut === "disponible" || statut === "en_consultation";
+  return isOnline
+    ? <span className="dg-badge dg-badge--available">Available</span>
+    : <span className="dg-badge dg-badge--absent">Absent</span>;
 };
 
 // ── Star Rating ───────────────────────────────────────────────
@@ -38,19 +36,15 @@ const StarRating = ({ note }) => {
 };
 
 // ── Doctor Card ───────────────────────────────────────────────
-// Receives onBook and onTicket as props from DoctorsGrid
 const DoctorCard = ({ doctor, index, onBook, onTicket }) => {
   const photoUrl = doctor.photo ? `http://localhost:5000${doctor.photo}` : null;
   const initials = `${doctor.prenom?.[0] ?? ""}${doctor.nom?.[0] ?? ""}`.toUpperCase();
 
   return (
     <div className="dg-card" style={{ animationDelay: `${index * 60}ms` }}>
-
       <div className="dg-overlay">
-        <button
-          className="dg-overlay__btn dg-overlay__btn--appointment"
-          onClick={() => onBook(doctor)}
-        >
+        <button className="dg-overlay__btn dg-overlay__btn--appointment"
+          onClick={() => onBook(doctor)}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2">
             <rect x="3" y="4" width="18" height="18" rx="2"/>
@@ -60,11 +54,8 @@ const DoctorCard = ({ doctor, index, onBook, onTicket }) => {
           </svg>
           Book Appointment
         </button>
-
-        <button
-          className="dg-overlay__btn dg-overlay__btn--ticket"
-          onClick={() => onTicket(doctor)}   // ✅ clean — handled in parent
-        >
+        <button className="dg-overlay__btn dg-overlay__btn--ticket"
+          onClick={() => onTicket(doctor)}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2">
             <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/>
@@ -89,7 +80,6 @@ const DoctorCard = ({ doctor, index, onBook, onTicket }) => {
             <StarRating note={doctor.evaluation} />
           </div>
         </div>
-
         <div className="dg-footer">
           <span className="dg-meta dg-meta--patients">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
@@ -120,30 +110,23 @@ const Pagination = ({ current, total, onChange }) => {
   if (total <= 1) return null;
   return (
     <div className="dg-pagination">
-      <button
-        className="dg-page-btn dg-page-btn--arrow"
-        onClick={() => onChange(current - 1)}
-        disabled={current === 1}
-      >‹</button>
+      <button className="dg-page-btn dg-page-btn--arrow"
+        onClick={() => onChange(current - 1)} disabled={current === 1}>‹</button>
       {Array.from({ length: total }, (_, i) => i + 1).map((p) => (
-        <button
-          key={p}
+        <button key={p}
           className={`dg-page-btn ${current === p ? "dg-page-btn--active" : ""}`}
-          onClick={() => onChange(p)}
-        >{p}</button>
+          onClick={() => onChange(p)}>{p}</button>
       ))}
-      <button
-        className="dg-page-btn dg-page-btn--arrow"
-        onClick={() => onChange(current + 1)}
-        disabled={current === total}
-      >›</button>
+      <button className="dg-page-btn dg-page-btn--arrow"
+        onClick={() => onChange(current + 1)} disabled={current === total}>›</button>
     </div>
   );
 };
 
 // ── Main DoctorsGrid ──────────────────────────────────────────
 function DoctorsGrid({ search = "", specialty = "" }) {
-  const navigate = useNavigate();
+  const navigate    = useNavigate();
+  const intervalRef = useRef(null);
 
   const [showModal,       setShowModal]       = useState(false);
   const [showTicketModal, setShowTicketModal] = useState(false);
@@ -154,20 +137,25 @@ function DoctorsGrid({ search = "", specialty = "" }) {
   const [error,           setError]           = useState(null);
   const [page,            setPage]            = useState(1);
 
+  const fetchDoctors = async (isInitial = false) => {
+    if (isInitial) setLoading(true);
+    try {
+      const res  = await fetch(`${API_BASE}/medecins`);
+      if (!res.ok) throw new Error("Erreur serveur");
+      const json = await res.json();
+      setAllDoctors(json.data || []);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      if (isInitial) setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        const res  = await fetch(`${API_BASE}/medecins`);
-        if (!res.ok) throw new Error("Erreur serveur");
-        const json = await res.json();
-        setAllDoctors(json.data || []);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDoctors();
+    fetchDoctors(true);
+    intervalRef.current = setInterval(() => fetchDoctors(false), POLL_MS);
+    return () => clearInterval(intervalRef.current);
   }, []);
 
   useEffect(() => {
@@ -181,14 +169,11 @@ function DoctorsGrid({ search = "", specialty = "" }) {
           d.specialite.toLowerCase().includes(kw)
       );
     }
-    if (specialty) {
-      result = result.filter((d) => d.specialite === specialty);
-    }
+    if (specialty) result = result.filter((d) => d.specialite === specialty);
     setFiltered(result);
     setPage(1);
   }, [search, specialty, allDoctors]);
 
-  // ── Handlers (auth check lives here) ─────────────────────
   const handleBook = (doc) => {
     if (!isAuthenticated()) navigate("/login");
     else { setDoctor(doc); setShowModal(true); }
@@ -205,7 +190,6 @@ function DoctorsGrid({ search = "", specialty = "" }) {
   return (
     <>
       <div className="dg-wrap">
-
         <p className="dg-count">
           <span className="dg-count__num">{filtered.length}</span> doctors found
         </p>
@@ -226,33 +210,22 @@ function DoctorsGrid({ search = "", specialty = "" }) {
           <>
             <div className="dg-grid">
               {visible.map((doc, i) => (
-                <DoctorCard
-                  key={doc.id}
-                  doctor={doc}
-                  index={i}
-                  onBook={handleBook}
-                  onTicket={handleTicket}
-                />
+                <DoctorCard key={doc.id} doctor={doc} index={i}
+                  onBook={handleBook} onTicket={handleTicket} />
               ))}
             </div>
             <Pagination current={page} total={totalPages} onChange={setPage} />
           </>
         )}
-
       </div>
 
       {showModal && doctor && (
-        <BookingModal
-          doctor={doctor}
-          onClose={() => { setShowModal(false); setDoctor(null); }}
-        />
+        <BookingModal doctor={doctor}
+          onClose={() => { setShowModal(false); setDoctor(null); }} />
       )}
-
       {showTicketModal && doctor && (
-        <TicketModal
-          doctor={doctor}
-          onClose={() => { setShowTicketModal(false); setDoctor(null); }}
-        />
+        <TicketModal doctor={doctor}
+          onClose={() => { setShowTicketModal(false); setDoctor(null); }} />
       )}
     </>
   );

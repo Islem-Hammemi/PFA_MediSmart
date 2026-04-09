@@ -122,33 +122,37 @@ const creerPatient = async ({ prenom, nom, email, date_naissance, telephone }) =
   try {
     await conn.beginTransaction();
 
-    // Mot de passe temporaire hashé
     const tempPassword = await bcrypt.hash('Medismart2026!', 10);
 
-    // 1. Créer le compte USERS
     const [userResult] = await conn.query(
       `INSERT INTO USERS (email, password_hash, nom, prenom, role)
        VALUES (?, ?, ?, ?, 'patient')`,
       [email, tempPassword, nom, prenom]
     );
+
     const user_id = userResult.insertId;
 
-    // 2. Créer le profil PATIENTS
     const [patientResult] = await conn.query(
       `INSERT INTO PATIENTS (user_id, date_naissance, telephone)
        VALUES (?, ?, ?)`,
       [user_id, date_naissance || null, telephone || null]
     );
+
     const patient_id = patientResult.insertId;
 
     await conn.commit();
     return patient_id;
+
   } catch (err) {
     await conn.rollback();
     throw err;
   } finally {
     conn.release();
   }
+}; // ✅ THIS WAS MISSING
+
+// ───────────────────────────────────────────────
+// NOW THIS IS OUTSIDE (correct place)
 const creerDossier = async ({ patientId, medecinId, diagnostic, traitement, notes }) => {
   const [result] = await db.query(
     `INSERT INTO DOSSIERS_MEDICAUX
