@@ -16,15 +16,17 @@ const verifierRelation = async (medecin_id, patient_id) => {
   return rows[0].nb > 0;
 };
 
+// ── MODIFIÉ : ajout age + date_naissance formatée ─────────────
 const getMesPatientsListe = async (medecin_id) => {
   const [rows] = await db.query(
     `SELECT DISTINCT
-       pa.id                              AS patient_id,
-       CONCAT(u.prenom, ' ', u.nom)       AS nom_complet,
+       pa.id                                          AS patient_id,
+       CONCAT(u.prenom, ' ', u.nom)                   AS nom_complet,
        u.email,
        pa.telephone,
-       pa.date_naissance,
-       COUNT(r.id)                        AS nb_rdv,
+       DATE_FORMAT(pa.date_naissance, '%d/%m/%Y')     AS date_naissance,
+       TIMESTAMPDIFF(YEAR, pa.date_naissance, NOW())  AS age,
+       COUNT(r.id)                                    AS nb_rdv,
        MAX(DATE_FORMAT(r.date_heure, '%d/%m/%Y à %H:%i')) AS dernier_rdv
      FROM RENDEZ_VOUS r
      JOIN PATIENTS pa ON pa.id = r.patient_id
@@ -37,14 +39,16 @@ const getMesPatientsListe = async (medecin_id) => {
   return rows;
 };
 
+// ── MODIFIÉ : ajout age ───────────────────────────────────────
 const getPatientProfil = async (patient_id) => {
   const [rows] = await db.query(
     `SELECT
-       pa.id                        AS patient_id,
-       CONCAT(u.prenom, ' ', u.nom) AS nom_complet,
+       pa.id                                          AS patient_id,
+       CONCAT(u.prenom, ' ', u.nom)                   AS nom_complet,
        u.email,
        pa.telephone,
-       DATE_FORMAT(pa.date_naissance, '%d/%m/%Y') AS date_naissance
+       DATE_FORMAT(pa.date_naissance, '%d/%m/%Y')     AS date_naissance,
+       TIMESTAMPDIFF(YEAR, pa.date_naissance, NOW())  AS age
      FROM PATIENTS pa
      JOIN USERS u ON u.id = pa.user_id
      WHERE pa.id = ?`,

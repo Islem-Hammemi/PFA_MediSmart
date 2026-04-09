@@ -49,8 +49,7 @@ const ticketService = {
   },
 
   async consulterTickets(patient_id) {
-    const tickets = await ticketRepository.getTicketsByPatientId(patient_id);
-    return tickets;
+    return await ticketRepository.getTicketsByPatientId(patient_id);
   },
 
   async getQueueStatus(medecin_id) {
@@ -71,21 +70,30 @@ const ticketService = {
     }
     return ticket;
   },
-  
+
   async doneTicket(ticket_id, medecin_id) {
-  if (!ticket_id || !medecin_id) {
-    const err = new Error('ticket_id et medecin_id sont requis.');
-    err.statusCode = 400;
-    throw err;
-  }
-  const ticket = await ticketRepository.doneTicket(ticket_id, medecin_id);
-  if (!ticket) {
-    const err = new Error('Ticket introuvable, pas en cours, ou accès refusé.');
-    err.statusCode = 404;
-    throw err;
-  }
-  return ticket;
-},
+    if (!ticket_id || !medecin_id) {
+      const err = new Error('ticket_id et medecin_id sont requis.');
+      err.statusCode = 400;
+      throw err;
+    }
+    const ticket = await ticketRepository.doneTicket(ticket_id, medecin_id);
+    if (!ticket) {
+      const err = new Error('Ticket introuvable, pas en cours, ou accès refusé.');
+      err.statusCode = 404;
+      throw err;
+    }
+    return ticket;
+  },
+
+  async getTodayQueue(medecin_id) {
+    if (!medecin_id) {
+      const err = new Error('medecin_id requis.');
+      err.statusCode = 400;
+      throw err;
+    }
+    return await ticketRepository.getTodayQueueByMedecin(medecin_id);
+  },
 
 };
 

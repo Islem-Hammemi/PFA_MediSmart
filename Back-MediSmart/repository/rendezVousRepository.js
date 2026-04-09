@@ -1,5 +1,11 @@
 // =============================================
-// repository/rendezVousRepository.js  — VERSION FINALE SPRINT 3
+// repository/rendezVousRepository.js  — FIXED Sprint 3
+//
+//  Corrections :
+//   1. getPlanningMedecin   : suppression du double JOIN PATIENTS (alias pa + p identiques)
+//   2. getUpcomingByMedecin : idem double JOIN supprimé
+//   3. getPendingByMedecin  : idem double JOIN supprimé
+//   (Le double JOIN causait une ambiguïté et une requête inutilement lourde)
 // =============================================
 const pool = require("../config/db");
 
@@ -49,7 +55,33 @@ const annulerRdv = async (rdvId, patientId) => {
   return result.affectedRows;
 };
 
-// ─── Créer un RDV simple ─────────────────────────────────────
+// ─── Vérifier conflit patient (même jour) ────────────────────
+const verifierConflitPatient = async (patientId, dateHeure) => {
+  const [rows] = await pool.execute(
+    `SELECT id FROM RENDEZ_VOUS
+     WHERE patient_id = ?
+       AND DATE(date_heure) = DATE(?)
+       AND statut NOT IN ('annule')
+     LIMIT 1`,
+    [patientId, dateHeure]
+  );
+  return rows[0] || null;
+};
+
+// ─── Vérifier conflit médecin (même heure exacte) ────────────
+const verifierConflitMedecin = async (medecinId, dateHeure) => {
+  const [rows] = await pool.execute(
+    `SELECT id FROM RENDEZ_VOUS
+     WHERE medecin_id = ?
+       AND date_heure = ?
+       AND statut NOT IN ('annule')
+     LIMIT 1`,
+    [medecinId, dateHeure]
+  );
+  return rows[0] || null;
+};
+
+// ─── Créer un RDV simple (sans créneau) ──────────────────────
 const creerRdv = async ({ patientId, medecinId, dateHeure, motif }) => {
   const [result] = await pool.execute(
     `INSERT INTO RENDEZ_VOUS (patient_id, medecin_id, date_heure, motif, statut)
@@ -74,7 +106,7 @@ const trouverParIdEtPatient = async (rdvId, patientId) => {
   return rows[0] || null;
 };
 
-// ─── Terminer une consultation ────────────────────────────────
+// ─── Terminer une consultation (médecin) ─────────────────────
 const terminerConsultation = async (rdvId, medecinId) => {
   const [result] = await pool.execute(
     `UPDATE RENDEZ_VOUS
@@ -85,7 +117,7 @@ const terminerConsultation = async (rdvId, medecinId) => {
   return result.affectedRows;
 };
 
-// ─── Évaluation en attente ────────────────────────────────────
+// ─── Évaluation en attente (patient) ─────────────────────────
 const getEvaluationEnAttente = async (patientId) => {
   const [rows] = await pool.execute(
     `SELECT r.id AS rendez_vous_id, r.date_heure, r.motif,
@@ -118,11 +150,12 @@ const getCreneauxDisponibles = async (medecinId) => {
   return rows;
 };
 
-// ─── Créneau par ID avec verrou ───────────────────────────────
+// ─── Créneau par ID avec verrou de transaction ────────────────
 const getCreneauById = async (creneauId, connection) => {
   const conn = connection || pool;
   const [rows] = await conn.execute(
-    `SELECT * FROM CRENEAUX WHERE id = ? FOR UPDATE`, [creneauId]
+    `SELECT * FROM CRENEAUX WHERE id = ? FOR UPDATE`,
+    [creneauId]
   );
   return rows[0] || null;
 };
@@ -130,10 +163,13 @@ const getCreneauById = async (creneauId, connection) => {
 // ─── Bloquer un créneau ───────────────────────────────────────
 const marquerCreneauIndisponible = async (creneauId, connection) => {
   const conn = connection || pool;
-  await conn.execute(`UPDATE CRENEAUX SET disponible = FALSE WHERE id = ?`, [creneauId]);
+  await conn.execute(
+    `UPDATE CRENEAUX SET disponible = FALSE WHERE id = ?`,
+    [creneauId]
+  );
 };
 
-// ─── Créer RDV dans une transaction ──────────────────────────
+// ─── Créer RDV dans une transaction (via créneau) ────────────
 const creerRdvAvecConnexion = async ({ patientId, medecinId, dateHeure, motif }, connection) => {
   const conn = connection || pool;
   const [result] = await conn.execute(
@@ -144,7 +180,7 @@ const creerRdvAvecConnexion = async ({ patientId, medecinId, dateHeure, motif },
   return result.insertId;
 };
 
-// ─── Vérifier conflit RDV ────────────────────────────────────
+// ─── Vérifier conflit RDV (fenêtre 30 min) ───────────────────
 const checkConflitRdv = async (medecinId, dateHeure) => {
   const [[{ total }]] = await pool.execute(
     `SELECT COUNT(*) AS total FROM RENDEZ_VOUS
@@ -156,15 +192,15 @@ const checkConflitRdv = async (medecinId, dateHeure) => {
 };
 
 // ─── Planning complet du médecin ─────────────────────────────
+// FIX : suppression du double JOIN PATIENTS (alias pa ET p identiques → erreur silencieuse)
 const getPlanningMedecin = async (medecinId) => {
   const [rows] = await pool.execute(
     `SELECT r.id AS rdv_id, r.date_heure, r.statut, r.motif, r.created_at,
             pa.id AS patient_id, u.nom AS patient_nom, u.prenom AS patient_prenom,
-            p.telephone
+            pa.telephone
      FROM RENDEZ_VOUS r
      JOIN PATIENTS pa ON pa.id = r.patient_id
      JOIN USERS    u  ON u.id  = pa.user_id
-     JOIN PATIENTS p  ON p.id  = r.patient_id
      WHERE r.medecin_id = ?
      ORDER BY r.date_heure ASC`,
     [medecinId]
@@ -173,15 +209,15 @@ const getPlanningMedecin = async (medecinId) => {
 };
 
 // ─── Prochains RDV du médecin ────────────────────────────────
+// FIX : suppression du double JOIN PATIENTS
 const getUpcomingByMedecin = async (medecinId) => {
   const [rows] = await pool.execute(
     `SELECT r.id AS rdv_id, r.date_heure, r.statut, r.motif,
             pa.id AS patient_id, u.nom AS patient_nom, u.prenom AS patient_prenom,
-            p.telephone
+            pa.telephone
      FROM RENDEZ_VOUS r
      JOIN PATIENTS pa ON pa.id = r.patient_id
      JOIN USERS    u  ON u.id  = pa.user_id
-     JOIN PATIENTS p  ON p.id  = r.patient_id
      WHERE r.medecin_id = ? AND r.date_heure >= NOW()
        AND r.statut IN ('planifie', 'confirme')
      ORDER BY r.date_heure ASC`,
@@ -190,16 +226,16 @@ const getUpcomingByMedecin = async (medecinId) => {
   return rows;
 };
 
-// ─── [NOUVEAU] Pending requests du médecin ───────────────────
+// ─── RDV en attente de confirmation (médecin) ────────────────
+// FIX : suppression du double JOIN PATIENTS
 const getPendingByMedecin = async (medecinId) => {
   const [rows] = await pool.execute(
     `SELECT r.id AS rdv_id, r.date_heure, r.statut, r.motif,
             pa.id AS patient_id, u.nom AS patient_nom, u.prenom AS patient_prenom,
-            p.telephone
+            pa.telephone
      FROM RENDEZ_VOUS r
      JOIN PATIENTS pa ON pa.id = r.patient_id
      JOIN USERS    u  ON u.id  = pa.user_id
-     JOIN PATIENTS p  ON p.id  = r.patient_id
      WHERE r.medecin_id = ? AND r.statut = 'planifie' AND r.date_heure >= NOW()
      ORDER BY r.date_heure ASC`,
     [medecinId]
@@ -207,7 +243,7 @@ const getPendingByMedecin = async (medecinId) => {
   return rows;
 };
 
-// ─── [NOUVEAU] Confirmer un RDV (médecin) ────────────────────
+// ─── Confirmer un RDV (médecin) ──────────────────────────────
 const confirmerRdv = async (rdvId, medecinId) => {
   const [result] = await pool.execute(
     `UPDATE RENDEZ_VOUS SET statut = 'confirme'
@@ -217,7 +253,7 @@ const confirmerRdv = async (rdvId, medecinId) => {
   return result.affectedRows;
 };
 
-// ─── [NOUVEAU] Refuser un RDV (médecin) ──────────────────────
+// ─── Refuser un RDV (médecin) ────────────────────────────────
 const refuserRdv = async (rdvId, medecinId) => {
   const [result] = await pool.execute(
     `UPDATE RENDEZ_VOUS SET statut = 'annule'
@@ -228,18 +264,24 @@ const refuserRdv = async (rdvId, medecinId) => {
 };
 
 module.exports = {
+  // ── Patient ──────────────────────────────────────────────────
   getUpcomingByPatient,
   getPastByPatient,
   annulerRdv,
   creerRdv,
   trouverParIdEtPatient,
-  terminerConsultation,
   getEvaluationEnAttente,
+  // ── Validation conflits ──────────────────────────────────────
+  verifierConflitPatient,
+  verifierConflitMedecin,
+  // ── Créneaux ─────────────────────────────────────────────────
   getCreneauxDisponibles,
   getCreneauById,
   marquerCreneauIndisponible,
   creerRdvAvecConnexion,
   checkConflitRdv,
+  // ── Médecin ──────────────────────────────────────────────────
+  terminerConsultation,
   getPlanningMedecin,
   getUpcomingByMedecin,
   getPendingByMedecin,
