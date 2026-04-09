@@ -1,10 +1,15 @@
 // ============================================================
 //  repository/consultationRepository.js
-//  File fusionnée du jour : tickets + RDV triés par heure
+//  FIXED — Sprint 3
+//  Corrections :
+//   1. Ajout de getRdvMedecin()  — utilisé par consultationService
+//   2. Ajout de creerDossier()   — utilisé par consultationService
+//   3. Ajout de getDossierById() — utilisé par consultationService
 // ============================================================
 
 const db = require('../config/db');
 
+// ─── File du jour (RDV + Tickets fusionnés) ──────────────────
 /**
  * Retourne la file du jour pour un médecin :
  * - Patients avec RDV aujourd'hui (planifie/confirme)
@@ -73,15 +78,6 @@ const getTodayQueue = async (medecin_id) => {
   const ticketsFiltres = tickets.filter(t => !rdvPatientIds.has(t.patient_id));
 
   // ── 4. Tri intercalé ──────────────────────────────────────
-  // On intercale les tickets entre les RDV selon l'heure d'arrivée.
-  // Un ticket "entre" juste avant le prochain RDV dont l'heure n'est pas encore passée.
-  //
-  // Algorithme :
-  // - Parcourir les RDV triés par heure
-  // - Pour chaque "trou" entre deux RDV, insérer les tickets arrivés dans ce créneau
-  // - Les tickets arrivés avant le 1er RDV passent en premier
-  // - Les tickets arrivés après le dernier RDV passent en dernier
-
   const result = [];
   let ticketIdx = 0;
   const sortedTickets = [...ticketsFiltres].sort(
@@ -100,17 +96,16 @@ const getTodayQueue = async (medecin_id) => {
       ticketIdx++;
     }
 
-    // Ajouter le RDV
     result.push({ ...rdvs[i], ordre: result.length });
   }
 
-  // Ajouter les tickets restants (après tous les RDV)
+  // Tickets restants (après tous les RDV)
   while (ticketIdx < sortedTickets.length) {
     result.push({ ...sortedTickets[ticketIdx], ordre: result.length });
     ticketIdx++;
   }
 
-  // ── 5. Mettre le patient "en_cours" en premier ────────────
+  // ── 5. Patient "en_cours" en premier ──────────────────────
   const enCours = result.filter(
     r => r.ticket_statut === 'en_cours' || r.rdv_statut === 'en_cours'
   );
@@ -124,4 +119,84 @@ const getTodayQueue = async (medecin_id) => {
   }));
 };
 
-module.exports = { getTodayQueue };
+// ─── Vérifier qu'un RDV appartient bien au médecin ───────────
+/**
+ * FIX : cette fonction était appelée dans consultationService.sauvegarderNotes
+ * mais n'existait pas dans le repository → erreur runtime "getRdvMedecin is not a function"
+ *
+ * @param {number} rdv_id
+ * @param {number} medecin_id
+ * @returns {object|null} ligne RDV ou null
+ */
+const getRdvMedecin = async (rdv_id, medecin_id) => {
+  const [rows] = await db.query(
+    `SELECT id AS rdv_id, patient_id, date_heure, statut, motif
+     FROM RENDEZ_VOUS
+     WHERE id = ? AND medecin_id = ?
+     LIMIT 1`,
+    [rdv_id, medecin_id]
+  );
+  return rows[0] || null;
+};
+
+// ─── Créer un dossier médical ─────────────────────────────────
+/**
+ * FIX : utilisé par consultationService.sauvegarderNotes mais absent.
+ *
+ * @returns {number} dossier_id (insertId)
+ */
+const creerDossier = async ({ medecin_id, patient_id, date_consultation, diagnostic, traitement, notes }) => {
+  const [result] = await db.query(
+    `INSERT INTO DOSSIERS_MEDICAUX
+       (medecin_id, patient_id, date_consultation, diagnostic, traitement, notes)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [
+      medecin_id,
+      patient_id,
+      date_consultation,
+      diagnostic || null,
+      traitement || null,
+      notes      || null,
+    ]
+  );
+  return result.insertId;
+};
+
+// ─── Récupérer un dossier par son ID ─────────────────────────
+/**
+ * FIX : utilisé par consultationService après creerDossier mais absent.
+ *
+ * @param {number} dossier_id
+ * @returns {object|null}
+ */
+const getDossierById = async (dossier_id) => {
+  const [rows] = await db.query(
+    `SELECT
+       d.id              AS dossier_id,
+       d.medecin_id,
+       d.patient_id,
+       d.date_consultation,
+       d.diagnostic,
+       d.traitement,
+       d.notes,
+       d.created_at,
+       CONCAT(um.prenom, ' ', um.nom) AS medecin_nom,
+       CONCAT(up.prenom, ' ', up.nom) AS patient_nom
+     FROM DOSSIERS_MEDICAUX d
+     JOIN MEDECINS me ON me.id    = d.medecin_id
+     JOIN USERS    um ON um.id    = me.user_id
+     JOIN PATIENTS pa ON pa.id    = d.patient_id
+     JOIN USERS    up ON up.id    = pa.user_id
+     WHERE d.id = ?
+     LIMIT 1`,
+    [dossier_id]
+  );
+  return rows[0] || null;
+};
+
+module.exports = {
+  getTodayQueue,
+  getRdvMedecin,   // ← NOUVEAU
+  creerDossier,    // ← NOUVEAU
+  getDossierById,  // ← NOUVEAU
+};

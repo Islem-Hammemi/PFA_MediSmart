@@ -8,9 +8,6 @@ const db = require('../config/db');
 
 const planningRepository = {
 
-  /**
-   * Récupère le profil médecin à partir du user_id (session).
-   */
   async getMedecinByUserId(user_id) {
     const [rows] = await db.query(
       `SELECT m.id AS medecin_id, m.specialite, m.statut,
@@ -24,22 +21,17 @@ const planningRepository = {
     return rows[0] || null;
   },
 
-  /**
-   * Récupère les RDV à venir du médecin (upcoming).
-   * Statut : planifie ou confirme
-   * Triés par date croissante
-   */
   async getUpcomingRDV(medecin_id) {
     const [rows] = await db.query(
       `SELECT
          r.id,
          r.statut,
          r.motif,
-         DATE_FORMAT(r.date_heure, '%d/%m/%Y')    AS date,
-         DATE_FORMAT(r.date_heure, '%H:%i')        AS heure,
+         DATE_FORMAT(r.date_heure, '%d/%m/%Y')         AS date,
+         DATE_FORMAT(r.date_heure, '%H:%i')             AS heure,
          DATE_FORMAT(r.date_heure, '%d/%m/%Y à %H:%i') AS date_heure_formatee,
-         CONCAT(up.prenom, ' ', up.nom)            AS patient_nom,
-         p.telephone                                AS patient_telephone,
+         CONCAT(up.prenom, ' ', up.nom)                 AS patient_nom,
+         p.telephone                                     AS patient_telephone,
          r.evaluation_demandee
        FROM RENDEZ_VOUS r
        JOIN PATIENTS pa ON pa.id = r.patient_id
@@ -54,22 +46,17 @@ const planningRepository = {
     return rows;
   },
 
-  /**
-   * Récupère les RDV passés du médecin (past).
-   * Statut : termine ou annule
-   * Triés par date décroissante
-   */
   async getPastRDV(medecin_id) {
     const [rows] = await db.query(
       `SELECT
          r.id,
          r.statut,
          r.motif,
-         DATE_FORMAT(r.date_heure, '%d/%m/%Y')    AS date,
-         DATE_FORMAT(r.date_heure, '%H:%i')        AS heure,
+         DATE_FORMAT(r.date_heure, '%d/%m/%Y')         AS date,
+         DATE_FORMAT(r.date_heure, '%H:%i')             AS heure,
          DATE_FORMAT(r.date_heure, '%d/%m/%Y à %H:%i') AS date_heure_formatee,
-         CONCAT(up.prenom, ' ', up.nom)            AS patient_nom,
-         p.telephone                                AS patient_telephone,
+         CONCAT(up.prenom, ' ', up.nom)                 AS patient_nom,
+         p.telephone                                     AS patient_telephone,
          r.evaluation_demandee
        FROM RENDEZ_VOUS r
        JOIN PATIENTS pa ON pa.id = r.patient_id
@@ -83,9 +70,6 @@ const planningRepository = {
     return rows;
   },
 
-  /**
-   * Récupère les créneaux disponibles du médecin.
-   */
   async getCreneaux(medecin_id) {
     const [rows] = await db.query(
       `SELECT
@@ -103,21 +87,61 @@ const planningRepository = {
     return rows;
   },
 
-  /**
-   * Statistiques rapides du médecin pour le dashboard.
-   */
+  // ── MODIFIÉ : ajout avg_consult_time + in_queue + today + pending ──
   async getStats(medecin_id) {
-    const [rows] = await db.query(
+
+    // 1. Stats RDV
+    const [rdvRows] = await db.query(
       `SELECT
-         COUNT(CASE WHEN statut IN ('planifie','confirme') AND date_heure >= NOW() THEN 1 END) AS rdv_a_venir,
-         COUNT(CASE WHEN statut = 'termine'  THEN 1 END) AS rdv_termines,
-         COUNT(CASE WHEN statut = 'annule'   THEN 1 END) AS rdv_annules,
-         COUNT(*)                                          AS rdv_total
+         COUNT(CASE WHEN statut IN ('planifie','confirme')
+                    AND date_heure >= NOW()               THEN 1 END) AS rdv_a_venir,
+         COUNT(CASE WHEN statut = 'termine'               THEN 1 END) AS rdv_termines,
+         COUNT(CASE WHEN statut = 'annule'                THEN 1 END) AS rdv_annules,
+         COUNT(*)                                                       AS rdv_total,
+         COUNT(CASE WHEN DATE(date_heure) = CURDATE()
+                    AND statut IN ('planifie','confirme',
+                                   'en_cours')            THEN 1 END) AS rdv_aujourd_hui,
+         COUNT(CASE WHEN statut = 'planifie'
+                    AND date_heure >= NOW()               THEN 1 END) AS pending_requests
        FROM RENDEZ_VOUS
        WHERE medecin_id = ?`,
       [medecin_id]
     );
-    return rows[0];
+
+    // 2. Temps moyen de consultation (minutes)
+    //    Basé sur les dossiers médicaux liés à des RDV terminés.
+    //    Fallback = 18 min si données insuffisantes.
+    const [consultRows] = await db.query(
+      `SELECT ROUND(COALESCE(
+         AVG(
+           TIMESTAMPDIFF(MINUTE, r.date_heure,
+             TIMESTAMP(d.date_consultation, '23:59:59'))
+         ), 18
+       )) AS avg_consult_time_minutes
+       FROM DOSSIERS_MEDICAUX d
+       JOIN RENDEZ_VOUS r
+         ON r.patient_id  = d.patient_id
+        AND r.medecin_id  = d.medecin_id
+        AND DATE(r.date_heure) = d.date_consultation
+        AND r.statut = 'termine'
+       WHERE d.medecin_id = ?`,
+      [medecin_id]
+    );
+
+    // 3. Tickets actifs en file d'attente
+    const [ticketRows] = await db.query(
+      `SELECT COUNT(*) AS in_queue
+       FROM TICKETS
+       WHERE medecin_id = ?
+         AND statut IN ('en_attente', 'en_cours')`,
+      [medecin_id]
+    );
+
+    return {
+      ...rdvRows[0],
+      avg_consult_time_minutes: consultRows[0].avg_consult_time_minutes || 18,
+      in_queue                : ticketRows[0].in_queue || 0,
+    };
   },
 
 };
