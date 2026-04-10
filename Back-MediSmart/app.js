@@ -1,45 +1,63 @@
+// =============================================
+// app.js  — VERSION FUSIONNÉE SPRINT 3
+// =============================================
+require("dotenv").config();
+
 const express = require("express");
 const cors    = require("cors");
 const path    = require("path");
-require("dotenv").config();
 
-const authRoutes       = require("./routes/authRoutes");
-const medecinRoutes    = require("./routes/medecinRoutes");
-const patientRoutes    = require("./routes/patientRoutes");
-const ticketRoutes     = require("./routes/ticketRoutes");
-const evaluationRoutes = require("./routes/evaluationRoutes");
-const rendezVousRoutes = require('./routes/rendezVousRoutes');
+// ── Import des routes ─────────────────────────
+const authRoutes          = require("./routes/authRoutes");
+const medecinRoutes       = require("./routes/medecinRoutes");
+const patientRoutes       = require("./routes/patientRoutes");
+const ticketRoutes        = require("./routes/ticketRoutes");
+const evaluationRoutes    = require("./routes/evaluationRoutes");
+const rendezVousRoutes    = require("./routes/rendezVousRoutes");
+const dossierRoutes       = require("./routes/dossierRoutes");
+const planningRoutes      = require("./routes/planningRoutes");
+const consultationRoutes  = require("./routes/consultationRoutes");
 
 const app = express();
 
-
-
-// ── Middlewares ───────────────────────────────────────────────
+// ── Middlewares ───────────────────────────────
 app.use(cors({
   origin: ["http://localhost:5173", "http://localhost:5174"],
   credentials: true,
 }));
 app.use(express.json());
 
-// ── Static files (doctor photos) ─────────────────────────────
+// ── Fichiers statiques ────────────────────────
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// ── Routes (order matters!) ───────────────────────────────────
-app.use("/api/auth",        authRoutes);
-app.use("/api/medecins",    medecinRoutes);
-app.use("/api/tickets",     ticketRoutes);      // ✅ before patientRoutes
-app.use("/api/evaluations", evaluationRoutes);
-app.use('/api/rendez-vous', rendezVousRoutes);
-app.use("/api",             patientRoutes);     // ✅ last — catches /api/patient/...
+// ── Enregistrement des routes ─────────────────
+app.use("/api/auth",          authRoutes);
+app.use("/api/medecins",      medecinRoutes);
+app.use("/api/tickets",       ticketRoutes);
+app.use("/api/evaluations",   evaluationRoutes);
+app.use("/api/rendez-vous",   rendezVousRoutes);
+app.use("/api/planning",      planningRoutes);
+app.use("/api/dossiers",      dossierRoutes);
+app.use("/api/consultations", consultationRoutes);
+app.use("/api",               patientRoutes); // toujours en dernier
 
-// ── Health check ──────────────────────────────────────────────
+// ── Health check ──────────────────────────────
 app.get("/", (req, res) => {
-  res.json({ message: "MediSmart API is running " });
+  res.json({ message: "MediSmart API is running 🚀" });
 });
 
 // ── 404 handler ───────────────────────────────────────────────
 app.use((req, res) => {
   res.status(404).json({ success: false, message: "Route introuvable." });
+});
+
+// ── Global error handler ──────────────────────────────────────
+app.use((err, req, res, next) => {
+  console.error("[Global Error]", err);
+  res.status(err.statusCode || 500).json({
+    success: false,
+    message: err.message || "Erreur interne du serveur.",
+  });
 });
 
 // ── Start server ──────────────────────────────────────────────

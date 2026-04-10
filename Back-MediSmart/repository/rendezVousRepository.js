@@ -1,26 +1,21 @@
 // =============================================
-// repository/rendezVousRepository.js
+// repository/rendezVousRepository.js — MERGED CLEAN
 // =============================================
+
 const pool = require("../config/db");
 
-// ─── Rendez-vous à venir ──────────────────────────────────────
+// ─── Patient ─────────────────────────────────
+
 const getUpcomingByPatient = async (patientId) => {
   const [rows] = await pool.execute(
-    `SELECT
-        r.id              AS rdv_id,
-        r.date_heure,
-        r.statut,
-        r.motif,
-        m.id              AS medecin_id,
-        u.nom             AS medecin_nom,
-        u.prenom          AS medecin_prenom,
-        m.specialite,
-        m.photo
+    `SELECT r.id AS rdv_id, r.date_heure, r.statut, r.motif,
+            m.id AS medecin_id, u.nom AS medecin_nom, u.prenom AS medecin_prenom,
+            m.specialite, m.photo
      FROM RENDEZ_VOUS r
      JOIN MEDECINS m ON m.id = r.medecin_id
-     JOIN USERS    u ON u.id = m.user_id
+     JOIN USERS u ON u.id = m.user_id
      WHERE r.patient_id = ?
-       AND r.statut IN ('planifie', 'confirme')
+       AND r.statut IN ('planifie','confirme')
        AND r.date_heure >= NOW()
      ORDER BY r.date_heure ASC`,
     [patientId]
@@ -28,46 +23,61 @@ const getUpcomingByPatient = async (patientId) => {
   return rows;
 };
 
-// ─── Rendez-vous passés / terminés / annulés ─────────────────
 const getPastByPatient = async (patientId) => {
   const [rows] = await pool.execute(
-    `SELECT
-        r.id              AS rdv_id,
-        r.date_heure,
-        r.statut,
-        r.motif,
-        m.id              AS medecin_id,
-        u.nom             AS medecin_nom,
-        u.prenom          AS medecin_prenom,
-        m.specialite,
-        m.photo,
-        (SELECT COUNT(*) FROM EVALUATIONS e WHERE e.rendez_vous_id = r.id) AS has_evaluation
+    `SELECT r.id AS rdv_id, r.date_heure, r.statut, r.motif,
+            m.id AS medecin_id, u.nom AS medecin_nom, u.prenom AS medecin_prenom,
+            m.specialite, m.photo,
+            (SELECT COUNT(*) FROM EVALUATIONS e WHERE e.rendez_vous_id = r.id) AS has_evaluation
      FROM RENDEZ_VOUS r
      JOIN MEDECINS m ON m.id = r.medecin_id
-     JOIN USERS    u ON u.id = m.user_id
+     JOIN USERS u ON u.id = m.user_id
      WHERE r.patient_id = ?
-       AND (r.statut IN ('termine', 'annule') OR r.date_heure < NOW())
+       AND (r.statut IN ('termine','annule') OR r.date_heure < NOW())
      ORDER BY r.date_heure DESC`,
     [patientId]
   );
   return rows;
 };
 
-// ─── Annuler un RDV ──────────────────────────────────────────
 const annulerRdv = async (rdvId, patientId) => {
   const [result] = await pool.execute(
-    `UPDATE RENDEZ_VOUS
-     SET statut = 'annule'
-     WHERE id = ?
-       AND patient_id = ?
-       AND statut IN ('planifie', 'confirme')
-       AND date_heure > NOW()`,
+    `UPDATE RENDEZ_VOUS SET statut = 'annule'
+     WHERE id = ? AND patient_id = ?
+       AND statut IN ('planifie','confirme') AND date_heure > NOW()`,
     [rdvId, patientId]
   );
   return result.affectedRows;
 };
 
-// ─── Créer un RDV ────────────────────────────────────────────
+// ─── Conflits ────────────────────────────────
+
+const verifierConflitPatient = async (patientId, dateHeure) => {
+  const [rows] = await pool.execute(
+    `SELECT id FROM RENDEZ_VOUS
+     WHERE patient_id = ?
+       AND DATE(date_heure) = DATE(?)
+       AND statut NOT IN ('annule')
+     LIMIT 1`,
+    [patientId, dateHeure]
+  );
+  return rows[0] || null;
+};
+
+const verifierConflitMedecin = async (medecinId, dateHeure) => {
+  const [rows] = await pool.execute(
+    `SELECT id FROM RENDEZ_VOUS
+     WHERE medecin_id = ?
+       AND date_heure = ?
+       AND statut NOT IN ('annule')
+     LIMIT 1`,
+    [medecinId, dateHeure]
+  );
+  return rows[0] || null;
+};
+
+// ─── Création ───────────────────────────────
+
 const creerRdv = async ({ patientId, medecinId, dateHeure, motif }) => {
   const [result] = await pool.execute(
     `INSERT INTO RENDEZ_VOUS (patient_id, medecin_id, date_heure, motif, statut)
@@ -77,69 +87,158 @@ const creerRdv = async ({ patientId, medecinId, dateHeure, motif }) => {
   return result.insertId;
 };
 
-// ─── Détail d'un seul RDV ─────────────────────────────────────
 const trouverParIdEtPatient = async (rdvId, patientId) => {
   const [rows] = await pool.execute(
-    `SELECT
-        r.id              AS rdv_id,
-        r.date_heure,
-        r.statut,
-        r.motif,
-        m.id              AS medecin_id,
-        u.nom             AS medecin_nom,
-        u.prenom          AS medecin_prenom,
-        m.specialite,
-        m.photo
+    `SELECT r.id AS rdv_id, r.date_heure, r.statut, r.motif,
+            m.id AS medecin_id, u.nom AS medecin_nom, u.prenom AS medecin_prenom,
+            m.specialite, m.photo
      FROM RENDEZ_VOUS r
      JOIN MEDECINS m ON m.id = r.medecin_id
-     JOIN USERS    u ON u.id = m.user_id
-     WHERE r.id = ? AND r.patient_id = ?
-     LIMIT 1`,
+     JOIN USERS u ON u.id = m.user_id
+     WHERE r.id = ? AND r.patient_id = ? LIMIT 1`,
     [rdvId, patientId]
   );
   return rows[0] || null;
 };
 
-// ─── (Médecin) Terminer une consultation ─────────────────────
+// ─── Évaluation ─────────────────────────────
+
+const getEvaluationEnAttente = async (patientId) => {
+  const [rows] = await pool.execute(
+    `SELECT r.id AS rendez_vous_id, r.date_heure, r.motif,
+            m.id AS medecin_id, u.nom AS medecin_nom, u.prenom AS medecin_prenom,
+            m.specialite, m.photo
+     FROM RENDEZ_VOUS r
+     JOIN MEDECINS m ON m.id = r.medecin_id
+     JOIN USERS u ON u.id = m.user_id
+     WHERE r.patient_id = ? AND r.statut = 'termine'
+       AND r.evaluation_demandee = TRUE
+       AND NOT EXISTS (SELECT 1 FROM EVALUATIONS e WHERE e.rendez_vous_id = r.id)
+     ORDER BY r.date_heure DESC LIMIT 1`,
+    [patientId]
+  );
+  return rows[0] || null;
+};
+
+// ─── Créneaux ───────────────────────────────
+
+const getCreneauxDisponibles = async (medecinId) => {
+  const [rows] = await pool.execute(
+    `SELECT c.id, c.medecin_id, c.date_heure_debut, c.date_heure_fin, c.disponible,
+            CONCAT(u.prenom,' ',u.nom) AS nom_medecin, m.specialite
+     FROM CRENEAUX c
+     JOIN MEDECINS m ON m.id = c.medecin_id
+     JOIN USERS u ON u.id = m.user_id
+     WHERE c.medecin_id = ? AND c.disponible = TRUE AND c.date_heure_debut > NOW()
+     ORDER BY c.date_heure_debut ASC`,
+    [medecinId]
+  );
+  return rows;
+};
+
+const getCreneauById = async (creneauId, connection) => {
+  const conn = connection || pool;
+  const [rows] = await conn.execute(
+    `SELECT * FROM CRENEAUX WHERE id = ? FOR UPDATE`,
+    [creneauId]
+  );
+  return rows[0] || null;
+};
+
+const marquerCreneauIndisponible = async (creneauId, connection) => {
+  const conn = connection || pool;
+  await conn.execute(
+    `UPDATE CRENEAUX SET disponible = FALSE WHERE id = ?`,
+    [creneauId]
+  );
+};
+
+const creerRdvAvecConnexion = async ({ patientId, medecinId, dateHeure, motif }, connection) => {
+  const conn = connection || pool;
+  const [result] = await conn.execute(
+    `INSERT INTO RENDEZ_VOUS (patient_id, medecin_id, date_heure, motif, statut)
+     VALUES (?, ?, ?, ?, 'planifie')`,
+    [patientId, medecinId, dateHeure, motif || null]
+  );
+  return result.insertId;
+};
+
+const checkConflitRdv = async (medecinId, dateHeure) => {
+  const [[{ total }]] = await pool.execute(
+    `SELECT COUNT(*) AS total FROM RENDEZ_VOUS
+     WHERE medecin_id = ? AND statut NOT IN ('annule')
+       AND ABS(TIMESTAMPDIFF(MINUTE, date_heure, ?)) < 30`,
+    [medecinId, dateHeure]
+  );
+  return Number(total) > 0;
+};
+
+// ─── Médecin ───────────────────────────────
+
 const terminerConsultation = async (rdvId, medecinId) => {
   const [result] = await pool.execute(
-    `UPDATE RENDEZ_VOUS
-     SET statut = 'termine',
-         evaluation_demandee = TRUE
-     WHERE id = ?
-       AND medecin_id = ?
-       AND statut = 'confirme'`,
+    `UPDATE RENDEZ_VOUS SET statut = 'termine', evaluation_demandee = TRUE
+     WHERE id = ? AND medecin_id = ? AND statut = 'confirme'`,
     [rdvId, medecinId]
   );
   return result.affectedRows;
 };
 
-// ─── Évaluation en attente pour un patient ───────────────────
-const getEvaluationEnAttente = async (patientId) => {
+const getPlanningMedecin = async (medecinId) => {
   const [rows] = await pool.execute(
-    `SELECT
-        r.id              AS rendez_vous_id,
-        r.date_heure,
-        r.motif,
-        m.id              AS medecin_id,
-        u.nom             AS medecin_nom,
-        u.prenom          AS medecin_prenom,
-        m.specialite,
-        m.photo
+    `SELECT r.id AS rdv_id, r.date_heure, r.statut, r.motif, r.created_at,
+            pa.id AS patient_id, u.nom AS patient_nom, u.prenom AS patient_prenom,
+            pa.telephone
      FROM RENDEZ_VOUS r
-     JOIN MEDECINS m ON m.id = r.medecin_id
-     JOIN USERS    u ON u.id = m.user_id
-     WHERE r.patient_id = ?
-       AND r.statut = 'termine'
-       AND r.evaluation_demandee = TRUE
-       AND NOT EXISTS (
-           SELECT 1 FROM EVALUATIONS e WHERE e.rendez_vous_id = r.id
-       )
-     ORDER BY r.date_heure DESC
-     LIMIT 1`,
-    [patientId]
+     JOIN PATIENTS pa ON pa.id = r.patient_id
+     JOIN USERS u ON u.id = pa.user_id
+     WHERE r.medecin_id = ?
+     ORDER BY r.date_heure ASC`,
+    [medecinId]
   );
-  return rows[0] || null;
+  return rows;
+};
+
+const getUpcomingByMedecin = async (medecinId) => {
+  const [rows] = await pool.execute(
+    `SELECT r.id AS rdv_id, r.date_heure, r.statut, r.motif,
+            pa.id AS patient_id, u.nom AS patient_nom, u.prenom AS patient_prenom,
+            pa.telephone
+     FROM RENDEZ_VOUS r
+     JOIN PATIENTS pa ON pa.id = r.patient_id
+     JOIN USERS u ON u.id = pa.user_id
+     WHERE r.medecin_id = ? AND r.date_heure >= NOW()
+       AND r.statut IN ('planifie','confirme')
+     ORDER BY r.date_heure ASC`,
+    [medecinId]
+  );
+  return rows;
+};
+
+const getPendingByMedecin = async (medecinId) => {
+  const [rows] = await pool.execute(
+    `SELECT r.id AS rdv_id, r.date_heure, r.statut, r.motif,
+            pa.id AS patient_id, u.nom AS patient_nom, u.prenom AS patient_prenom,
+            pa.telephone
+     FROM RENDEZ_VOUS r
+     JOIN PATIENTS pa ON pa.id = r.patient_id
+     JOIN USERS u ON u.id = pa.user_id
+     WHERE r.medecin_id = ? AND r.statut = 'planifie' AND r.date_heure >= NOW()
+     ORDER BY r.date_heure ASC`,
+    [medecinId]
+  );
+  return rows;
+};
+
+// ✅ YOUR KEY FUNCTION
+const changerStatutRdv = async (rdvId, medecinId, nouveauStatut, statutsAutorises) => {
+  const placeholders = statutsAutorises.map(() => "?").join(",");
+  const [result] = await pool.execute(
+    `UPDATE RENDEZ_VOUS SET statut = ?
+     WHERE id = ? AND medecin_id = ? AND statut IN (${placeholders})`,
+    [nouveauStatut, rdvId, medecinId, ...statutsAutorises]
+  );
+  return result.affectedRows;
 };
 
 module.exports = {
@@ -148,6 +247,17 @@ module.exports = {
   annulerRdv,
   creerRdv,
   trouverParIdEtPatient,
-  terminerConsultation,
   getEvaluationEnAttente,
+  verifierConflitPatient,
+  verifierConflitMedecin,
+  getCreneauxDisponibles,
+  getCreneauById,
+  marquerCreneauIndisponible,
+  creerRdvAvecConnexion,
+  checkConflitRdv,
+  terminerConsultation,
+  getPlanningMedecin,
+  getUpcomingByMedecin,
+  getPendingByMedecin,
+  changerStatutRdv,
 };

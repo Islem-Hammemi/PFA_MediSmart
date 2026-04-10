@@ -9,6 +9,11 @@ import Specialities from "./pages/Specialities"
 import PrivateRoute from "./components/PrivateRoute";
 import Queue from './pages/Queue';
 import Appointments from './pages/Appointments';
+import Medecindashboard from "./pages/Medecindashboard";
+import Patients from "./pages/Patients";
+import Schedule from "./pages/schedule";
+import Tickets from "./pages/Tickets";    
+import Reviews from "./pages/Reviews";
 
 function App() {
   return (
@@ -20,6 +25,10 @@ function App() {
       <Route path="/specialities" element={<Specialities />} />
       <Route path="/queue" element={<Queue />} />
       <Route path="/appointments" element={<Appointments />} />
+      <Route path="/patients" element={<Patients />} />
+      <Route path="/schedule" element={<Schedule />} />
+      <Route path="/tickets" element={<Tickets />} />
+      <Route path="/reviews" element={<Reviews />} />
 
       
       <Route
@@ -30,6 +39,16 @@ function App() {
           </PrivateRoute>
         }
       />
+
+      <Route
+        path="/dashboard-medecin"
+        element={
+          <PrivateRoute allowedRole="medecin">
+            <Medecindashboard />
+          </PrivateRoute>
+        }
+      />
+
     </Routes>
     
   );

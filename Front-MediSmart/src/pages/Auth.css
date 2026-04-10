@@ -297,6 +297,7 @@
 .auth-btn {
   width: 100%;
   padding: 13px;
+  padding-left: 4cm;
   background: #2563eb;
   color: #fff;
   border: none;
@@ -307,6 +308,7 @@
   font-family: inherit;
   transition: background .2s, transform .1s;
   margin-top: 4px;
+  text-align: center;
 }
 .auth-btn:hover { background: #1d4ed8; }
 .auth-btn:active { transform: scale(.98); }
@@ -336,7 +338,7 @@
 }
 
 /* ══════════════════════════════════
-   RESPONSIVE — mobile first
+   RESPONSIVE — mobile 
 ══════════════════════════════════ */
 @media (max-width: 768px) {
   .auth-container {
