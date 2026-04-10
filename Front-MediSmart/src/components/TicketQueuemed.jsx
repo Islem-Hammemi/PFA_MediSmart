@@ -1,12 +1,9 @@
-// TicketQueue.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { getToken } from "../services/authService";
 import "./doctorspage.css";
 
-const initialTickets = [
-  { id: "T-004", name: "Leila Haddad", checkedIn: "09:55 AM", avatar: null },
-  { id: "T-005", name: "Karim Bouzid", checkedIn: "10:15 AM", avatar: null },
-  { id: "T-006", name: "Amina Ferhat", checkedIn: "10:40 AM", avatar: null },
-];
+const API_BASE = "http://localhost:5000/api";
 
 const PlayIcon = () => (
   <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
@@ -21,24 +18,95 @@ const ArrowIcon = () => (
   </svg>
 );
 
-export default function TicketQueuemed() {
-  const [tickets, setTickets] = useState(initialTickets);
+// Initials avatar
+const getInitials = (name = "") =>
+  name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
 
-  const handleServe = (id) => {
-    setTickets((prev) => prev.filter((t) => t.id !== id));
+const AVATAR_COLORS = [
+  ["#4a7aff", "#7c5cfc"],
+  ["#10b981", "#059669"],
+  ["#f59e0b", "#d97706"],
+  ["#ec4899", "#db2777"],
+  ["#06b6d4", "#0891b2"],
+];
+
+const getGradient = (name = "") => {
+  const idx = (name.charCodeAt(0) || 0) % AVATAR_COLORS.length;
+  const [from, to] = AVATAR_COLORS[idx];
+  return `linear-gradient(135deg, ${from}, ${to})`;
+};
+
+export default function TicketQueuemed() {
+  const navigate = useNavigate();
+  const [tickets,  setTickets]  = useState([]);
+  const [loading,  setLoading]  = useState(true);
+  const [actioning, setActioning] = useState({}); // { [ticketId]: true }
+
+  // ── Fetch today's queue ────────────────────────────────────
+  const fetchQueue = async () => {
+    try {
+      const res  = await fetch(`${API_BASE}/tickets/today`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      const json = await res.json();
+      console.log("Today queue response:", json); // 👈
+
+      if (json.success) {
+        // Show only en_attente tickets in this widget
+          console.log("All tickets:", json.queue);  // 👈
+
+        setTickets(json.queue.filter((t) => t.statut === "en_attente"));
+        
+      }
+    } catch (err) {
+      console.error("TicketQueuemed fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchQueue(); }, []);
+
+  // ── Serve a ticket ─────────────────────────────────────────
+  const handleServe = async (ticketId) => {
+    setActioning((prev) => ({ ...prev, [ticketId]: true }));
+    try {
+      const res  = await fetch(`${API_BASE}/tickets/${ticketId}/serve`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      const json = await res.json();
+      if (json.success) {
+        // Remove served ticket from list
+        setTickets((prev) => prev.filter((t) => t.id !== ticketId));
+      }
+    } catch (err) {
+      console.error("Serve ticket error:", err);
+    } finally {
+      setActioning((prev) => ({ ...prev, [ticketId]: false }));
+    }
   };
 
   return (
     <div className="tq-wrapper">
       <div className="tq-card">
+
+        {/* Header */}
         <div className="tq-header">
           <div className="tq-header-left">
             <h2 className="tq-title">Today's Ticket Queue</h2>
-            <span className="tq-badge">{tickets.length} Patients</span>
+            {/* ✅ Dynamic patient count badge */}
+            <span className="tq-badge">
+              {loading ? "..." : `${tickets.length} Patient${tickets.length !== 1 ? "s" : ""}`}
+            </span>
           </div>
-          <button className="tq-manage">Manage <ArrowIcon /></button>
+          {/* ✅ Navigate to Tickets page */}
+          <button className="tq-manage" onClick={() => navigate("/tickets")}>
+            Manage <ArrowIcon />
+          </button>
         </div>
 
+        {/* Column headers */}
         <div className="tq-table-header">
           <span>Ticket</span>
           <span>Patient</span>
@@ -46,27 +114,50 @@ export default function TicketQueuemed() {
           <span>Action</span>
         </div>
 
+        {/* Rows */}
         <div className="tq-list">
-          {tickets.length === 0 && (
-            <p className="tq-empty">No patients in queue.</p>
+
+          {loading && (
+            <p className="tq-empty">Loading...</p>
           )}
-          {tickets.map((ticket) => (
+
+          {!loading && tickets.length === 0 && (
+            <p className="tq-empty">No patients in queue today.</p>
+          )}
+
+          {!loading && tickets.map((ticket) => (
             <div className="tq-row" key={ticket.id}>
-              <span className="tq-ticket-id">{ticket.id}</span>
+
+              {/* Ticket ID */}
+              <span className="tq-ticket-id">{ticket.ticket}</span>
+
+              {/* Patient */}
               <div className="tq-patient">
-                <div className="tq-avatar">
-                  {ticket.avatar
-                    ? <img src={ticket.avatar} alt={ticket.name} />
-                    : <span className="tq-avatar-placeholder" />}
+                <div
+                  className="tq-avatar-initials"
+                  style={{ background: getGradient(ticket.patient_nom) }}
+                >
+                  {getInitials(ticket.patient_nom)}
                 </div>
-                <span className="tq-name">{ticket.name}</span>
+                <span className="tq-name">{ticket.patient_nom}</span>
               </div>
-              <span className="tq-time">{ticket.checkedIn}</span>
-              <button className="tq-serve-btn" onClick={() => handleServe(ticket.id)}>
-                <PlayIcon /> Serve
+
+              {/* Check-in time */}
+              <span className="tq-time">{ticket.checked_in}</span>
+
+              {/* Serve button */}
+              <button
+                className="tq-serve-btn"
+                onClick={() => handleServe(ticket.id)}
+                disabled={actioning[ticket.id]}
+              >
+                <PlayIcon />
+                {actioning[ticket.id] ? "..." : "Serve"}
               </button>
+
             </div>
           ))}
+
         </div>
       </div>
     </div>

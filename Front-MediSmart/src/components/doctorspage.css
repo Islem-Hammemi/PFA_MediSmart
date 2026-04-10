@@ -3191,3 +3191,82 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ── PatientReviews — empty state ── */
+
+
+
+
+.reviews-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.reviews-empty p {
+  font-size: 15px;
+  font-weight: 600;
+  color: #4a5568;
+  margin: 0;
+}
+
+.reviews-empty span {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ */
+
+/* ── TicketQueuemed – avatar initials ── */
+
+
+.tq-avatar-initials {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+
+/* ── TicketQueuemed – disabled serve button ── */
+.tq-serve-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}

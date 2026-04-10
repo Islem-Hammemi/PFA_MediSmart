@@ -143,45 +143,85 @@ const ticketController = {
     }
   },
 
+  // PATCH /api/tickets/:id/done
   async doneTicket(req, res) {
-  try {
-    const ticket_id  = Number(req.params.id);
-    const medecin_id = req.utilisateur.medecin_id;
+    try {
+      const ticket_id  = Number(req.params.id);
+      const medecin_id = req.utilisateur.medecin_id;
 
-    if (!medecin_id) {
-      return res.status(403).json({
+      if (!medecin_id) {
+        return res.status(403).json({
+          success: false,
+          message: 'Accès réservé aux médecins.',
+        });
+      }
+
+      if (!ticket_id || isNaN(ticket_id)) {
+        return res.status(400).json({
+          success: false,
+          message: 'ticket_id invalide.',
+        });
+      }
+
+      const ticket = await ticketService.doneTicket(ticket_id, medecin_id);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Consultation terminée.',
+        ticket,
+      });
+
+    } catch (err) {
+      if (err.statusCode) {
+        return res.status(err.statusCode).json({
+          success: false,
+          message: err.message,
+        });
+      }
+      console.error('[ticketController.doneTicket]', err);
+      return res.status(500).json({
         success: false,
-        message: 'Accès réservé aux médecins.',
+        message: 'Erreur interne du serveur.',
       });
     }
-    if (!ticket_id || isNaN(ticket_id)) {
-      return res.status(400).json({
+  },
+
+  // GET /api/tickets/today
+  async getTodayQueue(req, res) {
+    console.log("getTodayQueue → medecin_id:", req.utilisateur.medecin_id); // 👈
+    console.log("getTodayQueue → utilisateur:", req.utilisateur);   
+    try {
+      const medecin_id = req.utilisateur.medecin_id;
+
+      if (!medecin_id) {
+        return res.status(403).json({
+          success: false,
+          message: 'Accès réservé aux médecins.',
+        });
+      }
+
+      const queue = await ticketService.getTodayQueue(medecin_id);
+
+      return res.status(200).json({
+        success: true,
+        count: queue.length,
+        queue,
+      });
+
+    } catch (err) {
+      if (err.statusCode) {
+        return res.status(err.statusCode).json({
+          success: false,
+          message: err.message,
+        });
+      }
+      console.error('[ticketController.getTodayQueue]', err);
+      return res.status(500).json({
         success: false,
-        message: 'ticket_id invalide.',
+        message: 'Erreur interne du serveur.',
       });
     }
-
-    const ticket = await ticketService.doneTicket(ticket_id, medecin_id);
-    return res.status(200).json({
-      success: true,
-      message: 'Consultation terminée.',
-      ticket,
-    });
-  } catch (err) {
-    if (err.statusCode) {
-      return res.status(err.statusCode).json({
-        success: false,
-        message: err.message,
-      });
-    }
-    console.error('[ticketController.doneTicket]', err);
-    return res.status(500).json({
-      success: false,
-      message: 'Erreur interne du serveur.',
-    });
-  }
-},
-
+  },
 
 };
 

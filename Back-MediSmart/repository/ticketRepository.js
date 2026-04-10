@@ -13,7 +13,8 @@ const ticketRepository = {
       `SELECT COALESCE(MAX(numero), 0) + 1 AS next_numero
        FROM TICKETS
        WHERE medecin_id = ?
-         AND statut IN ('en_attente', 'en_cours')`,
+         AND statut IN ('en_attente', 'en_cours')
+         AND DATE(created_at) = CURDATE()`,
       [medecin_id]
     );
     return rows[0].next_numero;
@@ -24,7 +25,8 @@ const ticketRepository = {
       `SELECT COALESCE(MAX(position), 0) + 1 AS next_position
        FROM TICKETS
        WHERE medecin_id = ?
-         AND statut IN ('en_attente', 'en_cours')`,
+         AND statut IN ('en_attente', 'en_cours')
+         AND DATE(created_at) = CURDATE()`,
       [medecin_id]
     );
     return rows[0].next_position;
@@ -107,11 +109,12 @@ const ticketRepository = {
     const [rows] = await db.query(
       `SELECT
          COUNT(*)                                                    AS total_queue,
-         MIN(CASE WHEN statut = 'en_cours' THEN position END)       AS serving_position,
+         MIN(CASE WHEN statut = 'en_cours'   THEN position END)     AS serving_position,
          MIN(CASE WHEN statut = 'en_attente' THEN position END)     AS next_position
        FROM TICKETS
        WHERE medecin_id = ?
-         AND statut IN ('en_attente', 'en_cours')`,
+         AND statut IN ('en_attente', 'en_cours')
+         AND DATE(created_at) = CURDATE()`,
       [medecin_id]
     );
     return rows[0];
@@ -127,19 +130,37 @@ const ticketRepository = {
     if (!result.affectedRows) return null;
     return await this.getTicketById(ticket_id);
   },
+
   async doneTicket(ticket_id, medecin_id) {
-  const [result] = await db.query(
-    `UPDATE TICKETS
-     SET statut = 'termine'
-     WHERE id = ? AND medecin_id = ? AND statut = 'en_cours'`,
-    [ticket_id, medecin_id]
-  );
-  if (!result.affectedRows) return null;
-  return await this.getTicketById(ticket_id);
-},
+    const [result] = await db.query(
+      `UPDATE TICKETS
+       SET statut = 'termine'
+       WHERE id = ? AND medecin_id = ? AND statut = 'en_cours'`,
+      [ticket_id, medecin_id]
+    );
+    if (!result.affectedRows) return null;
+    return await this.getTicketById(ticket_id);
+  },
 
+  async getTodayQueueByMedecin(medecin_id) {
+    const [rows] = await db.query(
+      `SELECT
+         t.id,
+         CONCAT('T-', LPAD(t.numero, 3, '0'))     AS ticket,
+         CONCAT(up.prenom, ' ', up.nom)            AS patient_nom,
+         NULL                                       AS patient_photo,
+         DATE_FORMAT(t.created_at, '%h:%i %p')     AS checked_in,
+         t.statut
+       FROM TICKETS t
+       JOIN PATIENTS  p  ON p.id  = t.patient_id
+       JOIN USERS     up ON up.id = p.user_id
+       WHERE t.medecin_id = ?
+         AND DATE(t.created_at) = CURDATE()
+       ORDER BY t.numero ASC`,
+      [medecin_id]
+    );
+    return rows;
+  },
 };
-
-
 
 module.exports = ticketRepository;

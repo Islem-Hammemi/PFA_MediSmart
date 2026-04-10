@@ -1,25 +1,26 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { getCurrentUser, getToken } from "../services/authService";
 import "./doctorspage.css";
 
-const StarRating = ({ rating = 5 }) => {
-  return (
-    <div className="review-stars">
-      {Array.from({ length: 5 }, (_, i) => (
-        <svg
-          key={i}
-          className={`review-star-icon ${i < rating ? "star-filled" : "star-empty"}`}
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-        </svg>
-      ))}
-    </div>
-  );
-};
+const API_BASE = "http://localhost:5000/api";
 
-const ReviewCard = ({ name, date, rating, text }) => {
-  const initials = name
+const StarRating = ({ rating = 0 }) => (
+  <div className="review-stars">
+    {Array.from({ length: 5 }, (_, i) => (
+      <svg
+        key={i}
+        className={`review-star-icon ${i < rating ? "star-filled" : "star-empty"}`}
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+      </svg>
+    ))}
+  </div>
+);
+
+const ReviewCard = ({ review }) => {
+  const initials = (review.patient_nom || "?")
     .split(" ")
     .map((n) => n[0])
     .join("")
@@ -30,69 +31,74 @@ const ReviewCard = ({ name, date, rating, text }) => {
     <div className="review-card">
       <div className="review-card-header">
         <div className="reviewer-info">
-          <div className="doc-avatar">{initials}</div>
+          <div className="avatar">{initials}</div>
           <div className="reviewer-meta">
-            <span className="reviewer-name">{name}</span>
-            <span className="review-date">{date}</span>
+            <span className="reviewer-name">{review.patient_nom}</span>
+            <span className="review-date">{review.date_evaluation}</span>
           </div>
         </div>
-        <StarRating rating={rating} />
+        <StarRating rating={review.note} />
       </div>
-      <p className="review-text">{text}</p>
+      {review.commentaire && (
+        <p className="review-text">{review.commentaire}</p>
+      )}
     </div>
   );
 };
 
-const defaultReviews = [
-  {
-    id: 1,
-    name: "Omar K.",
-    date: "October 22, 2023",
-    rating: 5,
-    text: "Dr. Farhat is incredibly professional and attentive. He took the time to listen to all my concerns and explained the treatment plan clearly. Highly recommend!",
-  },
-  {
-    id: 2,
-    name: "Omar K.",
-    date: "October 22, 2023",
-    rating: 5,
-    text: "Dr. Farhat is incredibly professional and attentive. He took the time to listen to all my concerns and explained the treatment plan clearly. Highly recommend!",
-  },
-  {
-    id: 3,
-    name: "Omar K.",
-    date: "October 22, 2023",
-    rating: 5,
-    text: "Dr. Farhat is incredibly professional and attentive. He took the time to listen to all my concerns and explained the treatment plan clearly. Highly recommend!",
-  },
-  {
-    id: 4,
-    name: "Omar K.",
-    date: "October 22, 2023",
-    rating: 5,
-    text: "Dr. Farhat is incredibly professional and attentive. He took the time to listen to all my concerns and explained the treatment plan clearly. Highly recommend!",
-  },
-];
+export default function PatientReviews() {
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-const PatientReviews = ({ reviews = defaultReviews }) => {
+  const user = getCurrentUser();
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!user?.medecin_id) { setLoading(false); return; }
+      try {
+        const res  = await fetch(
+          `${API_BASE}/evaluations/medecin/${user.medecin_id}?limit=20`,
+          { headers: { Authorization: `Bearer ${getToken()}` } }
+        );
+        const json = await res.json();
+        if (json.success) setReviews(json.evaluations || []);
+      } catch (err) {
+        console.error("PatientReviews fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReviews();
+  }, [user?.medecin_id]);
+
   return (
     <div className="patient-reviews-wrapper">
       <div className="patient-reviews-inner">
         <h2 className="section-title">Patient Reviews</h2>
-        <div className="reviews-list">
-          {reviews.map((review) => (
-            <ReviewCard
-              key={review.id}
-              name={review.name}
-              date={review.date}
-              rating={review.rating}
-              text={review.text}
-            />
-          ))}
-        </div>
+
+        {loading && (
+          <p style={{ color: "#94a3b8", fontSize: "14px" }}>Loading...</p>
+        )}
+
+        {!loading && reviews.length === 0 && (
+          <div className="reviews-empty">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+              stroke="#cbd5e1" strokeWidth="1.5">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <p>No reviews available yet.</p>
+            <span>Patient reviews will appear here after completed appointments.</span>
+          </div>
+        )}
+
+        {!loading && reviews.length > 0 && (
+          <div className="reviews-list">
+            {reviews.map((review) => (
+              <ReviewCard key={review.id} review={review} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
-};
-
-export default PatientReviews;
+}

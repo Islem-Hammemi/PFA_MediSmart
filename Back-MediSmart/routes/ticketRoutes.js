@@ -9,13 +9,16 @@ const medecinAuth = [proteger, autoriserRole('medecin')];
 // US8 : Générer un ticket numérique
 router.post('/', patientAuth, ticketController.genererTicket);
 
-// US9 : Consulter ses tickets
+// US9 : Consulter ses tickets (patient)
 router.get('/patient', patientAuth, ticketController.consulterTickets);
 
-// Public — no auth needed to view queue
+// File d'attente du jour (médecin) — doit être AVANT /:id
+router.get('/today', medecinAuth, ticketController.getTodayQueue);
+
+// Public — état de la file
 router.get('/queue/:medecin_id', ticketController.getQueueStatus);
 
-// Médecin — passer un ticket en cours
+// Médecin — actions sur un ticket
 router.patch('/:id/serve', medecinAuth, ticketController.serveTicket);
 router.patch('/:id/done',  medecinAuth, ticketController.doneTicket);
 
