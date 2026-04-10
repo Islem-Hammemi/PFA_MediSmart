@@ -127,7 +127,13 @@ const getDossiersByPatientForMedecin = async (patientId) => {
   );
   return rows;
 };
-
+const getByPatientId = async (patientId) => {
+  const [rows] = await db.query(
+    `SELECT * FROM dossiers_medicaux WHERE patient_id = ? ORDER BY date_consultation DESC`,
+    [patientId]
+  );
+  return rows;
+};
 module.exports = {
   verifierRelation,
   getMesPatientsListe,
@@ -137,4 +143,7 @@ module.exports = {
   getMedecinByUserId,
   creerDossier,
   getDossiersByPatientForMedecin,
+  getByPatientId,
+
+  
 };

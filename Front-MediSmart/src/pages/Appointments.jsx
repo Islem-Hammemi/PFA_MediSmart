@@ -7,7 +7,6 @@ import { Calendar, Clock2 } from 'lucide-react';
 
 const API_BASE = 'http://localhost:5000/api';
 
-// ── helpers ──────────────────────────────────────────────────────────────────
 const authHeaders = () => ({
   'Content-Type': 'application/json',
   Authorization: `Bearer ${getToken()}`,
@@ -53,11 +52,7 @@ function CancelModal({ appointment, onConfirm, onClose, loading }) {
           <button className="modal-btn modal-btn--back" onClick={onClose} disabled={loading}>
             Keep it
           </button>
-          <button
-            className="modal-btn modal-btn--confirm"
-            onClick={onConfirm}
-            disabled={loading}
-          >
+          <button className="modal-btn modal-btn--confirm" onClick={onConfirm} disabled={loading}>
             {loading ? 'Cancelling…' : 'Yes, cancel'}
           </button>
         </div>
@@ -86,17 +81,59 @@ function EmptyState({ tab }) {
   );
 }
 
+// ── DossierPopup ──────────────────────────────────────────────────────────────
+function DossierPopup({ dossiers, medecinId, dateHeure, onClose }) {
+  const d = dossiers.find(
+    (dos) =>
+      dos.medecin_id === medecinId &&
+      new Date(dos.date_consultation).toDateString() === new Date(dateHeure).toDateString()
+  ) || dossiers.find((dos) => dos.medecin_id === medecinId)
+    || dossiers[0];
+
+  return (
+    <div className="dossier-overlay" onClick={onClose}>
+      <div className="dossier-popup" onClick={(e) => e.stopPropagation()}>
+        <button className="dossier-popup-close" onClick={onClose}>✕</button>
+        <p className="dossier-popup-title">📋 Dossier Médical</p>
+        {!d ? (
+          <p className="dossier-popup-empty">Aucun dossier trouvé.</p>
+        ) : (
+          <>
+            <div className="dossier-popup-row">
+              <span className="dossier-popup-label">Date</span>
+              <span className="dossier-popup-value">{formatDate(d.date_consultation)}</span>
+            </div>
+            <div className="dossier-popup-row">
+              <span className="dossier-popup-label">Diagnostic</span>
+              <span className="dossier-popup-value">{d.diagnostic || '—'}</span>
+            </div>
+            <div className="dossier-popup-row">
+              <span className="dossier-popup-label">Traitement</span>
+              <span className="dossier-popup-value">{d.traitement || '—'}</span>
+            </div>
+            <div className="dossier-popup-row">
+              <span className="dossier-popup-label">Notes</span>
+              <span className="dossier-popup-value">{d.notes || '—'}</span>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 function Appointments() {
-  const [tab, setTab]                 = useState('upcoming');
-  const [upcoming, setUpcoming]       = useState([]);
-  const [past, setPast]               = useState([]);
-  const [loadingList, setLoadingList] = useState(false);
-  const [toCancel, setToCancel]       = useState(null);
-  const [cancelling, setCancelling]   = useState(false);
-  const [error, setError]             = useState(null);
+  const [tab, setTab]                     = useState('upcoming');
+  const [upcoming, setUpcoming]           = useState([]);
+  const [past, setPast]                   = useState([]);
+  const [loadingList, setLoadingList]     = useState(false);
+  const [toCancel, setToCancel]           = useState(null);
+  const [cancelling, setCancelling]       = useState(false);
+  const [error, setError]                 = useState(null);
+  const [dossiers, setDossiers]           = useState([]);
+  const [openDossierId, setOpenDossierId] = useState(null);
 
-  // ── fetch helpers ────────────────────────────────────────────────────────
   const fetchUpcoming = useCallback(async () => {
     setLoadingList(true);
     setError(null);
@@ -127,16 +164,21 @@ function Appointments() {
     }
   }, []);
 
-  // Load both on mount so stats are always fresh
-  // Also listen for booking / cancellation events from other components
+  const fetchDossiers = useCallback(async () => {
+    try {
+      const res  = await fetch(`${API_BASE}/dossiers/me`, { headers: authHeaders() });
+      const json = await res.json();
+      if (json.success) setDossiers(json.data);
+    } catch (_) {}
+  }, []);
+
   useEffect(() => {
     fetchUpcoming();
     fetchPast();
+    fetchDossiers();
 
     const onCancelled = () => fetchUpcoming();
-    const onBooked    = () => {
-      fetchUpcoming(); // add the new appointment to the list immediately
-    };
+    const onBooked    = () => fetchUpcoming();
 
     window.addEventListener('appointment-cancelled', onCancelled);
     window.addEventListener('appointment-booked',    onBooked);
@@ -145,9 +187,8 @@ function Appointments() {
       window.removeEventListener('appointment-cancelled', onCancelled);
       window.removeEventListener('appointment-booked',    onBooked);
     };
-  }, [fetchUpcoming, fetchPast]);
+  }, [fetchUpcoming, fetchPast, fetchDossiers]);
 
-  // ── cancel flow ──────────────────────────────────────────────────────────
   const handleCancelConfirm = async () => {
     if (!toCancel) return;
     setCancelling(true);
@@ -158,12 +199,8 @@ function Appointments() {
       });
       const json = await res.json();
       if (!json.success) throw new Error(json.message);
-
-      // Optimistically remove from upcoming list
       setUpcoming((prev) => prev.filter((a) => a.rdv_id !== toCancel.rdv_id));
       setToCancel(null);
-
-      // Notify Stats component that the count changed
       window.dispatchEvent(new Event('appointment-cancelled'));
     } catch (err) {
       alert(err.message || 'Could not cancel appointment.');
@@ -178,7 +215,6 @@ function Appointments() {
     <div className={`appt-list${toCancel ? ' appt-blurred' : ''}`}>
       <NavBarpatient upcomingCount={upcoming.length} />
 
-      {/* ── Hero ── */}
       <section className="hero">
         <div className="hero-content">
           <h1 className="hero-title">
@@ -191,10 +227,7 @@ function Appointments() {
         </div>
       </section>
 
-      {/* ── Body ── */}
       <div className="appt-body">
-
-        {/* Tabs */}
         <div className="appt-tabs">
           <button
             className={`appt-tab${tab === 'upcoming' ? ' appt-tab--active' : ''}`}
@@ -210,7 +243,6 @@ function Appointments() {
           </button>
         </div>
 
-        {/* List */}
         {loadingList ? (
           <div className="appt-loading">
             <span className="appt-spinner" />
@@ -228,7 +260,6 @@ function Appointments() {
 
               return (
                 <div className="appt-card" key={item.rdv_id}>
-
                   <div className="appt-card-left">
                     <div className={`appt-avatar${isPast ? ' appt-avatar--past' : ''}`}>
                       {avatarText}
@@ -256,9 +287,17 @@ function Appointments() {
                         <span className="appt-time">{formatTime(item.date_heure)}</span>
                       )}
                       {isPast && (
-                        <span className="appt-completed">
-                          {item.statut === 'annule' ? 'Cancelled' : 'Completed'}
-                        </span>
+                        <>
+                          <span className="appt-completed">
+                            {item.statut === 'annule' ? 'Cancelled' : 'Completed'}
+                          </span>
+                          <button
+                            className="appt-btn-dossier"
+                            onClick={() => setOpenDossierId(item.rdv_id)}
+                          >
+                            📋 Dossier médical
+                          </button>
+                        </>
                       )}
                     </div>
 
@@ -273,7 +312,6 @@ function Appointments() {
                       </div>
                     )}
                   </div>
-
                 </div>
               );
             })}
@@ -283,7 +321,6 @@ function Appointments() {
 
       <Footerr />
 
-      {/* ── Cancel Modal ── */}
       {toCancel && (
         <CancelModal
           appointment={toCancel}
@@ -292,6 +329,18 @@ function Appointments() {
           loading={cancelling}
         />
       )}
+
+      {openDossierId && (() => {
+        const item = past.find((a) => a.rdv_id === openDossierId);
+        return item ? (
+          <DossierPopup
+            dossiers={dossiers}
+            medecinId={item.medecin.medecin_id}
+            dateHeure={item.date_heure}
+            onClose={() => setOpenDossierId(null)}
+          />
+        ) : null;
+      })()}
     </div>
   );
 }
