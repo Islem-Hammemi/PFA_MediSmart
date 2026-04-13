@@ -8,10 +8,9 @@ import TicketModal from "./TicketModal";
 // ── Status Badge ─────────────────────────────────────────────
 const StatusBadge = ({ statut }) => {
   const config = {
-    disponible:      { label: "Available", className: "badge badge--available" },
-    en_consultation: { label: "Busy",      className: "badge badge--busy"      },
-    absent:          { label: "Absent",    className: "badge badge--absent"     },
-  };
+  disponible: { label: "Online", className: "badge badge--available" },
+  absent:     { label: "Absent", className: "badge badge--absent"    },
+};
   const { label, className } = config[statut] || config.absent;
   return <span className={className}>{label}</span>;
 };
