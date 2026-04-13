@@ -53,7 +53,7 @@ const findPresents = async () => {
       v.nb_evaluations,
       v.statut
     FROM VW_NOTE_MEDECIN v
-    WHERE v.statut IN ('disponible', 'en_consultation')
+    WHERE v.statut ='disponible'
     ORDER BY v.nom ASC
   `);
   return rows;

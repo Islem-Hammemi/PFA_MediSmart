@@ -167,7 +167,10 @@ function DoctorsGrid({ search = "", specialty = "" }) {
         setLoading(false);
       }
     };
-    fetchDoctors();
+
+    fetchDoctors(); // initial load
+    const interval = setInterval(fetchDoctors, 10000); // refresh every 10s
+    return () => clearInterval(interval); // cleanup on unmount
   }, []);
 
   useEffect(() => {
