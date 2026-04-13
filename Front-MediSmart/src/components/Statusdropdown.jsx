@@ -90,12 +90,14 @@ export default function Statusdropdown() {
           viewBox="0 0 12 12"
           fill="none"
         >
+          
           <path
             d="M2 4L6 8L10 4"
             stroke="currentColor"
             strokeWidth="1.8"
             strokeLinecap="round"
             strokeLinejoin="round"
+
           />
         </svg>
       </button>

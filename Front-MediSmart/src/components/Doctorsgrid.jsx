@@ -10,11 +10,13 @@ const PER_PAGE = 9;
 
 // ── Status Badge ──────────────────────────────────────────────
 const StatusBadge = ({ statut }) => {
+  
   const config = {
     disponible:      { label: "Available", className: "dg-badge dg-badge--available" },
     en_consultation: { label: "Busy",      className: "dg-badge dg-badge--busy"      },
     absent:          { label: "Absent",    className: "dg-badge dg-badge--absent"     },
   };
+
   const { label, className } = config[statut] || config.absent;
   return <span className={className}>{label}</span>;
 };

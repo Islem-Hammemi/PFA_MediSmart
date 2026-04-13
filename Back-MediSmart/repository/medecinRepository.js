@@ -17,6 +17,7 @@ const findAll = async () => {
     ORDER BY nom ASC
   `);
   return rows;
+  
 };
 
 const findBySearch = async (keyword) => {
@@ -39,6 +40,8 @@ const findBySearch = async (keyword) => {
     [keyword, keyword, keyword]
   );
   return rows;
+
+
 };
 
 const findPresents = async () => {
@@ -57,6 +60,9 @@ const findPresents = async () => {
     ORDER BY v.nom ASC
   `);
   return rows;
+
+
+
 };
 
 const checkIn = async (userId) => {
