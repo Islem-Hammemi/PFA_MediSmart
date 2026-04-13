@@ -1,5 +1,5 @@
 // =============================================
-// app.js  — VERSION FUSIONNÉE SPRINT 3
+// app.js  — with global friendly error handler
 // =============================================
 require("dotenv").config();
 
@@ -7,7 +7,6 @@ const express = require("express");
 const cors    = require("cors");
 const path    = require("path");
 
-// ── Import des routes ─────────────────────────
 const authRoutes          = require("./routes/authRoutes");
 const medecinRoutes       = require("./routes/medecinRoutes");
 const patientRoutes       = require("./routes/patientRoutes");
@@ -18,19 +17,18 @@ const dossierRoutes       = require("./routes/dossierRoutes");
 const planningRoutes      = require("./routes/planningRoutes");
 const consultationRoutes  = require("./routes/consultationRoutes");
 
+// ── Centralized error handler ─────────────────────────────────
+const { globalErrorHandler } = require("./middleware/errorHandler");
+
 const app = express();
 
-// ── Middlewares ───────────────────────────────
 app.use(cors({
   origin: ["http://localhost:5173", "http://localhost:5174"],
   credentials: true,
 }));
 app.use(express.json());
-
-// ── Fichiers statiques ────────────────────────
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// ── Enregistrement des routes ─────────────────
 app.use("/api/auth",          authRoutes);
 app.use("/api/medecins",      medecinRoutes);
 app.use("/api/tickets",       ticketRoutes);
@@ -39,31 +37,19 @@ app.use("/api/rendez-vous",   rendezVousRoutes);
 app.use("/api/planning",      planningRoutes);
 app.use("/api/dossiers",      dossierRoutes);
 app.use("/api/consultations", consultationRoutes);
-app.use("/api",               patientRoutes); // toujours en dernier
+app.use("/api",               patientRoutes);
 
-// ── Health check ──────────────────────────────
-app.get("/", (req, res) => {
-  res.json({ message: "MediSmart API is running 🚀" });
-});
+app.get("/", (req, res) => res.json({ message: "MediSmart API is running." }));
 
-// ── 404 handler ───────────────────────────────────────────────
+// ── 404 ───────────────────────────────────────────────────────
 app.use((req, res) => {
-  res.status(404).json({ success: false, message: "Route introuvable." });
+  res.status(404).json({ success: false, message: "This page does not exist." });
 });
 
-// ── Global error handler ──────────────────────────────────────
-app.use((err, req, res, next) => {
-  console.error("[Global Error]", err);
-  res.status(err.statusCode || 500).json({
-    success: false,
-    message: err.message || "Erreur interne du serveur.",
-  });
-});
+// ── Global error handler (catches anything that slips through) ─
+app.use(globalErrorHandler);
 
-// ── Start server ──────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Serveur démarré sur http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
 
 module.exports = app;

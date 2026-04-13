@@ -1,19 +1,25 @@
 // ============================================================
-//  routes/consultationRoutes.js
+//  routes/consultationRoutes.js  — COMPLETE
 // ============================================================
-const express                    = require('express');
-const router                     = express.Router();
+const express                     = require('express');
+const router                      = express.Router();
 const { proteger, autoriserRole } = require('../middleware/authMiddleware');
-const consultationController     = require('../presentation/consultationController');
+const ctrl                        = require('../presentation/consultationController');
 
 const medecinAuth = [proteger, autoriserRole('medecin')];
 
-// GET /api/consultations/today-queue
-// File fusionnée du jour : RDV + Tickets intercalés par heure
-router.get('/today-queue', medecinAuth, consultationController.getTodayQueue);
+// GET  /api/consultations/today-queue  — merged queue (tickets + RDV) for today
+router.get('/today-queue', medecinAuth, ctrl.getTodayQueue);
 
-// POST /api/consultations/notes
-// Sauvegarder les notes de consultation dans DOSSIERS_MEDICAUX
-router.post('/notes', medecinAuth, consultationController.sauvegarderNotes);
+// PATCH /api/consultations/serve/:id   — mark patient as en_cours
+// Body: { type: "ticket" | "rdv" }
+router.patch('/serve/:id', medecinAuth, ctrl.servePatient);
+
+// PATCH /api/consultations/finish/:id  — mark as done + save notes
+// Body: { type: "ticket" | "rdv", notes?, patientId? }
+router.patch('/finish/:id', medecinAuth, ctrl.finishPatient);
+
+// POST  /api/consultations/notes       — save detailed notes (diagnostic/traitement)
+router.post('/notes', medecinAuth, ctrl.sauvegarderNotes);
 
 module.exports = router;

@@ -49,17 +49,16 @@ export default function TicketQueuemed() {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
       const json = await res.json();
-      console.log("Today queue response:", json); // 👈
+   
 
       if (json.success) {
-        // Show only en_attente tickets in this widget
-          console.log("All tickets:", json.queue);  // 👈
+        // Only keep "en_attente" tickets for display
 
         setTickets(json.queue.filter((t) => t.statut === "en_attente"));
         
       }
     } catch (err) {
-      console.error("TicketQueuemed fetch error:", err);
+    
     } finally {
       setLoading(false);
     }
@@ -81,7 +80,7 @@ export default function TicketQueuemed() {
         setTickets((prev) => prev.filter((t) => t.id !== ticketId));
       }
     } catch (err) {
-      console.error("Serve ticket error:", err);
+      console.error("Serve error:", err);
     } finally {
       setActioning((prev) => ({ ...prev, [ticketId]: false }));
     }

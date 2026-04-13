@@ -161,6 +161,17 @@ const ticketRepository = {
     );
     return rows;
   },
+  async getActiveTicketToday(patient_id) {
+  const [rows] = await db.query(
+    `SELECT id FROM TICKETS
+     WHERE patient_id = ?
+       AND DATE(created_at) = CURDATE()
+       AND statut IN ('en_attente', 'en_cours')
+     LIMIT 1`,
+    [patient_id]
+  );
+  return rows[0] || null;
+},
 };
 
 module.exports = ticketRepository;

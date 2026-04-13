@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./doctorspage.css";
+
+const API_BASE = "http://localhost:5000";
 
 const PlayIcon = ({ size = 14 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
@@ -11,6 +13,14 @@ function NowServingBadge() {
   return <span className="now-serving-badge">NOW SERVING</span>;
 }
 
+function TypeBadge({ type }) {
+  return (
+    <span className={`type-badge type-badge--${type}`}>
+      {type === "ticket" ? " Ticket" : " RDV"}
+    </span>
+  );
+}
+
 function ServeButton({ onClick }) {
   return (
     <button className="serve-btn" onClick={onClick}>
@@ -20,62 +30,185 @@ function ServeButton({ onClick }) {
   );
 }
 
-export default function TicketQueue({
-  currentPatient = {
-    ticket: "T-003",
-    name: "Youssef Tariq",
-    checkedInAt: "09:30 AM",
-    avatar: "https://i.pravatar.cc/80?img=33",
-  },
-  queue = [
-    { ticket: "T-004", name: "Leila Haddad",  checkedIn: "09:55 AM", avatar: "https://i.pravatar.cc/80?img=47", next: true },
-    { ticket: "T-005", name: "Karim Bouzid",  checkedIn: "10:15 AM", avatar: "https://i.pravatar.cc/80?img=15" },
-    { ticket: "T-006", name: "Amina Ferhat",  checkedIn: "10:40 AM", avatar: "https://i.pravatar.cc/80?img=22" },
-  ],
-  onServe,
-}) {
+function Avatar({ patient, size = "current" }) {
+  const photoUrl = patient?.photo ? `${API_BASE}${patient.photo}` : null;
+  const initials = `${patient?.patient_nom?.split(" ")[0]?.[0] ?? ""}${patient?.patient_nom?.split(" ")[1]?.[0] ?? ""}`;
+  const className = size === "current" ? "current-avatar" : "queue-avatar";
+  return photoUrl ? (
+    <img src={photoUrl} alt={patient.patient_nom} className={className} />
+  ) : (
+    <div className={`${className} avatar-initials`}>{initials}</div>
+  );
+}
+
+const pillStyle = {
+  display: "flex", alignItems: "center", gap: "7px",
+  background: "#f7f8fc", borderRadius: "10px", padding: "10px 16px",
+  fontSize: "12px", color: "#5f6880",
+};
+
+const strongStyle = { color: "#1a1f36", fontWeight: 500 };
+
+function EmptyQueue({ lastFetched }) {
+  const [secondsAgo, setSecondsAgo] = useState(0);
+
+  useEffect(() => {
+    if (!lastFetched) return;
+    setSecondsAgo(0);
+    const tick = setInterval(() => {
+      setSecondsAgo(Math.floor((Date.now() - lastFetched) / 1000));
+    }, 1000);
+    return () => clearInterval(tick);
+  }, [lastFetched]);
+
+  const timeLabel =
+    secondsAgo < 5  ? "just now" :
+    secondsAgo < 60 ? `${secondsAgo}s ago` :
+                      `${Math.floor(secondsAgo / 60)}m ago`;
+
+  const nextRefresh = Math.max(0, 2 - secondsAgo);
+
   return (
-    <div className="ticket-queue-wrapper">
-      {/* Currently serving */}
-      <div className="current-patient">
-        <div className="current-left">
-          <span className="current-ticket">{currentPatient.ticket}</span>
-          <img src={currentPatient.avatar} alt={currentPatient.name} className="current-avatar" />
-          <div className="current-info">
-            <span className="current-name">{currentPatient.name}</span>
-            <span className="current-checkin">
-              • Checked in at &nbsp;<strong>{currentPatient.checkedInAt}</strong>
-            </span>
-          </div>
-        </div>
-        <NowServingBadge />
+    <div style={{
+      display: "flex", flexDirection: "column",
+      alignItems: "center", gap: "20px",
+      padding: "56px 32px",
+    }}>
+      {/* Icon */}
+      <div style={{
+        width: "72px", height: "72px", borderRadius: "50%",
+        background: "#f0f4ff",
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none"
+          stroke="#4a7aff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
       </div>
 
-      {/* Queue table */}
-      <div className="queue-table">
-        <div className="queue-header">
-          <span>Ticket</span>
-          <span>Patient</span>
-          <span>Checked In</span>
-          <span>Action</span>
-        </div>
-        {queue.map((patient) => (
-          <div key={patient.ticket} className={`queue-row ${patient.next ? "next-row" : ""}`}>
-            <div className="queue-ticket-cell">
-              <span className={`queue-ticket ${patient.next ? "ticket-orange" : "ticket-gray"}`}>
-                {patient.ticket}
-              </span>
-              {patient.next && <span className="next-badge">NEXT</span>}
-            </div>
-            <div className="queue-patient-cell">
-              <img src={patient.avatar} alt={patient.name} className="queue-avatar" />
-              <span className="queue-name">{patient.name}</span>
-            </div>
-            <span className="queue-checkin">{patient.checkedIn}</span>
-            <ServeButton onClick={() => onServe && onServe(patient)} />
-          </div>
-        ))}
+      {/* Text */}
+      <div style={{ textAlign: "center" }}>
+        <p style={{ fontSize: "17px", fontWeight: 500, color: "#1a1f36", margin: "0 0 8px" }}>
+          Queue is clear
+        </p>
+        <p style={{ fontSize: "13px", color: "#8a90aa", maxWidth: "320px", lineHeight: 1.6, margin: 0 }}>
+          No patients are waiting right now. New patients will appear here when
+          they check in or book an appointment.
+        </p>
       </div>
+
+      {/* Live pills */}
+      <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center" }}>
+        <div style={pillStyle}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+          Last updated&nbsp;<strong style={strongStyle}>{timeLabel}</strong>
+        </div>
+
+        <div style={pillStyle}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="23 4 23 10 17 10"/>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
+          Next refresh in&nbsp;<strong style={strongStyle}>{nextRefresh}s</strong>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function TicketQueue({
+  currentPatient = null,
+  queue = [],
+  loading = false,
+  onServe,
+  lastFetched = null,
+}) {
+  if (loading) {
+    return (
+      <div className="ticket-queue-wrapper">
+        <div className="queue-table">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="queue-row" style={{ opacity: 0.4 }}>
+              <span>—</span><span>Loading...</span><span>—</span><span>—</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="ticket-queue-wrapper">
+
+      {/* ── Currently serving ── */}
+      {currentPatient ? (
+        <div className="current-patient">
+          <div className="current-left">
+            <span className="current-ticket">
+              {currentPatient.source_type === "ticket" && currentPatient.ticket_numero
+                ? `T-${String(currentPatient.ticket_numero).padStart(3, "0")}`
+                : "RDV"}
+            </span>
+            <Avatar patient={currentPatient} size="current" />
+            <div className="current-info">
+              <span className="current-name">{currentPatient.patient_nom}</span>
+              <span className="current-checkin">
+                • Checked in at &nbsp;<strong>{currentPatient.heure_affichee}</strong>
+              </span>
+            </div>
+          </div>
+          <NowServingBadge />
+        </div>
+      )  : null}
+
+      {/* ── Waiting queue or empty state ── */}
+      {queue.length === 0 ? (
+        <EmptyQueue lastFetched={lastFetched} />
+      ) : (
+        <div className="queue-table">
+          <div className="queue-header">
+            <span>Ticket</span>
+            <span>Patient</span>
+            <span>Type</span>
+            <span>Checked In</span>
+            <span>Action</span>
+          </div>
+
+          {queue.map((patient, index) => (
+            <div
+              key={`${patient.source_type}-${patient.source_id}`}
+              className={`queue-row ${index === 0 ? "next-row" : ""}`}
+            >
+              <div className="queue-ticket-cell">
+                <span className={`queue-ticket ${index === 0 ? "ticket-orange" : "ticket-gray"}`}>
+                  {patient.source_type === "ticket" && patient.ticket_numero
+                    ? `T-${String(patient.ticket_numero).padStart(3, "0")}`
+                    : "RDV"}
+                </span>
+                {index === 0 && <span className="next-badge">NEXT</span>}
+              </div>
+
+              <div className="queue-patient-cell">
+                <Avatar patient={patient} size="queue" />
+                <span className="queue-name">{patient.patient_nom}</span>
+              </div>
+
+              <TypeBadge type={patient.source_type} />
+
+              <span className="queue-checkin">{patient.heure_affichee}</span>
+
+              <ServeButton onClick={() => onServe && onServe(patient)} />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

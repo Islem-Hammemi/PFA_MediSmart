@@ -108,28 +108,31 @@ const updatePhoto = async (userId, photoPath) => {
 
 const getMedecinSemaine = async () => {
   const [rows] = await pool.query(
-     `SELECT * FROM VW_MEDECIN_SEMAINE LIMIT 1`
+    `SELECT
+       medecin_id      AS id,
+       nom,
+       prenom,
+       specialite,
+       photo,
+       note_moyenne,
+       nb_evaluations,
+       nb_patients_semaine
+     FROM VW_MEDECIN_SEMAINE
+     LIMIT 1`
   );
   const doc = rows[0];
- 
   if (!doc) return null;
 
   const [comments] = await pool.query(
-    `SELECT commentaire 
-     FROM EVALUATIONS
-     WHERE medecin_id = ? 
-       AND commentaire IS NOT NULL 
-       AND commentaire != ''
-     ORDER BY note DESC
-     LIMIT 1`,
-    [doc.medecin_id ?? doc.id]
+    `SELECT commentaire FROM EVALUATIONS
+     WHERE medecin_id = ? AND commentaire IS NOT NULL AND commentaire != ''
+     ORDER BY note DESC LIMIT 1`,
+    [doc.id]
   );
-
 
   doc.commentaire = comments[0]?.commentaire || null;
   return doc;
 };
-
 // =============================================
 // repository/medecinRepository.js
 // Accès base de données MySQL - Table medecin

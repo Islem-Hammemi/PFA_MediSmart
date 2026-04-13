@@ -15,6 +15,13 @@ const PlayIcon = () => (
   </svg>
 );
 
+const CheckIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+
 const UserIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
     stroke="#4a7aff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -30,7 +37,6 @@ const NoteIcon = () => (
     <polyline points="14 2 14 8 20 8" />
     <line x1="16" y1="13" x2="8" y2="13" />
     <line x1="16" y1="17" x2="8" y2="17" />
-    <polyline points="10 9 9 9 8 9" />
   </svg>
 );
 
@@ -38,18 +44,29 @@ function pad(n) {
   return String(n).padStart(2, "0");
 }
 
-export default function ConsultationTimer({
-  patient = { name: "Sarah Mansour" },
-  onStart,
-}) {
-  const [seconds, setSeconds] = useState(0);
-  const [running, setRunning] = useState(false);
-  const [notes, setNotes] = useState("");
+export default function ConsultationTimer({ currentPatient = null, onFinish }) {
+  const [seconds,    setSeconds]    = useState(0);
+  const [running,    setRunning]    = useState(false);
+  const [diagnostic, setDiagnostic] = useState("");
+  const [traitement, setTraitement] = useState("");
+  const [notes,      setNotes]      = useState("");
+  const [saving,     setSaving]     = useState(false);
+  const [saved,      setSaved]      = useState(false);
   const intervalRef = useRef(null);
 
   useEffect(() => {
+    setSeconds(0);
+    setDiagnostic("");
+    setTraitement("");
+    setNotes("");
+    setSaved(false);
+    if (currentPatient) setRunning(true);
+    else setRunning(false);
+  }, [currentPatient?.source_id, currentPatient?.source_type]);
+
+  useEffect(() => {
     if (running) {
-      intervalRef.current = setInterval(() => setSeconds((s) => s + 1), 1000);
+      intervalRef.current = setInterval(() => setSeconds(s => s + 1), 1000);
     } else {
       clearInterval(intervalRef.current);
     }
@@ -60,54 +77,119 @@ export default function ConsultationTimer({
   const mins  = pad(Math.floor((seconds % 3600) / 60));
   const secs  = pad(seconds % 60);
 
-  const handleStart = () => {
-    setRunning(true);
-    setSeconds(0);
-    if (onStart) onStart();
+  const handleFinish = async () => {
+    if (!currentPatient || saving) return;
+    setSaving(true);
+    try {
+      await onFinish(currentPatient, { notes, diagnostic, traitement });
+      setRunning(false);
+      setSaved(true);
+      setDiagnostic("");
+      setTraitement("");
+      setNotes("");
+      setSeconds(0);
+    } catch (err) {
+      alert("Erreur: " + err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
+  const isActive    = !!currentPatient;
+  const patientName = currentPatient?.patient_nom ?? "No active patient";
+
   return (
-    <div className="consultation-wrapper">
-      {/* Header row */}
+    <div className={`consultation-wrapper ${isActive ? "consultation-wrapper--active" : ""}`}>
+
+      {/* Header */}
       <div className="consultation-header">
         <div className="consultation-patient">
           <div className="patient-icon-circle">
             <UserIcon />
           </div>
-          <span className="consultation-patient-name">{patient.name}</span>
+          <div>
+            <span className="consultation-patient-name">{patientName}</span>
+            {isActive
+              ? <span className="consultation-patient-sub">In consultation</span>
+              : <span className="consultation-patient-sub">Serve a patient to begin</span>
+            }
+          </div>
         </div>
         <div className="consultation-timer-display">
           <span className="timer-clock-icon"><ClockIcon /></span>
-          <span className="timer-digits">
+          <span className={`timer-digits ${isActive ? "timer-digits--active" : ""}`}>
             {hours}:{mins}:{secs}
           </span>
           <span className="timer-label">Session Timer</span>
         </div>
       </div>
 
-      {/* Notes area */}
+      {/* Notes fields */}
       <div className="consultation-notes-section">
-        <div className="notes-label-row">
+
+        {/* Diagnostic */}
+        <div className="notes-label-row" style={{ marginBottom: "6px" }}>
+          <NoteIcon />
+          <span className="notes-label">Diagnostic</span>
+        </div>
+        <textarea
+          className="notes-textarea"
+          placeholder={isActive ? "Enter diagnosis..." : "Select a patient first..."}
+          value={diagnostic}
+          onChange={e => setDiagnostic(e.target.value)}
+          disabled={!isActive}
+          rows={2}
+          style={{ marginBottom: "14px" }}
+        />
+
+        {/* Traitement */}
+        <div className="notes-label-row" style={{ marginBottom: "6px" }}>
+          <NoteIcon />
+          <span className="notes-label">Traitement</span>
+        </div>
+        <textarea
+          className="notes-textarea"
+          placeholder={isActive ? "Enter treatment plan..." : "Select a patient first..."}
+          value={traitement}
+          onChange={e => setTraitement(e.target.value)}
+          disabled={!isActive}
+          rows={2}
+          style={{ marginBottom: "14px" }}
+        />
+
+        {/* Notes */}
+        <div className="notes-label-row" style={{ marginBottom: "6px" }}>
           <NoteIcon />
           <span className="notes-label">Consultation Notes</span>
         </div>
         <textarea
           className="notes-textarea"
-          placeholder="Type clinical notes, prescriptions, and observations here...."
+          placeholder={isActive ? "Type clinical notes, prescriptions, and observations here..." : "Select a patient to start writing notes..."}
           value={notes}
-          onChange={(e) => setNotes(e.target.value)}
+          onChange={e => setNotes(e.target.value)}
+          disabled={!isActive}
+          rows={3}
         />
       </div>
 
-      {/* Start button */}
+      {/* Action button */}
       <div className="consultation-footer">
-        <button
-          className={`start-consultation-btn ${running ? "running" : ""}`}
-          onClick={handleStart}
-        >
-          <PlayIcon />
-          {running ? "Restart Consultation" : "Start Consultation"}
-        </button>
+        {isActive ? (
+          <button
+            className={`start-consultation-btn finish-btn ${saving ? "running" : ""}`}
+            onClick={handleFinish}
+            disabled={saving}
+          >
+            {saving ? <>Saving…</> : <><CheckIcon /> End &amp; Save Consultation</>}
+          </button>
+        ) : (
+          <button className="start-consultation-btn" disabled>
+            <PlayIcon /> Start Consultation
+          </button>
+        )}
+        {saved && (
+          <p className="save-confirmation">Consultation saved successfully.</p>
+        )}
       </div>
     </div>
   );

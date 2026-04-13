@@ -77,6 +77,10 @@ const annuler = async (rdvId, userId) => {
 const reserver = async (userId, { medecinId, dateHeure, motif }) => {
   if (!medecinId || !dateHeure)
     throw new Error("medecinId et dateHeure sont obligatoires.");
+  const rdvDate = new Date(dateHeure);
+  if (rdvDate <= new Date()) {
+    throw new Error("La date et l'heure du rendez-vous doivent être dans le futur.");
+  }
 
   const patientId = await _getPatientId(userId);
 
@@ -129,6 +133,9 @@ const reserverViaCreneau = async (userId, { medecinId, creneauId, motif }) => {
     if (!creneau.disponible) throw new Error("Créneau déjà réservé.");
 
     const { date_heure_debut: dateHeure } = creneau;
+    if (new Date(dateHeure) <= new Date()) {
+  throw new Error("Ce créneau est déjà passé.");
+}
 
     const rdvId = await rendezVousRepository.creerRdvAvecConnexion(
       { patientId, medecinId, dateHeure, motif }, connection

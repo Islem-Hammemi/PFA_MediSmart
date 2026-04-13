@@ -4,59 +4,67 @@ import Acceuil from "./pages/Acceuil";
 import Patientdashboard from "./pages/patientdashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Doctors from "./pages/Doctors"; 
-import Specialities from "./pages/Specialities"
+import Doctors from "./pages/Doctors";
+import Specialities from "./pages/Specialities";
 import PrivateRoute from "./components/PrivateRoute";
 import Queue from './pages/Queue';
 import Appointments from './pages/Appointments';
 import Medecindashboard from "./pages/Medecindashboard";
 import Patients from "./pages/Patients";
 import Schedule from "./pages/schedule";
-import Tickets from "./pages/Tickets";    
+import Tickets from "./pages/Tickets";
 import Reviews from "./pages/Reviews";
+import { useEvaluationPoller } from "./hooks/useEvaluationPoller";  // ✅ NEW
+import RatingModal from "./components/RatingModal";                  // ✅ NEW
 
 function App() {
+  // ✅ Global evaluation poller — works for BOTH ticket and RDV patients
+  const { showRating, evaluationData, handleSubmit } = useEvaluationPoller();
+
   return (
-    <Routes>
-      <Route path="/" element={<Acceuil />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/doctors" element={<Doctors />} />
-      <Route path="/specialities" element={<Specialities />} />
-      <Route path="/queue" element={<Queue />} />
-      <Route path="/appointments" element={<Appointments />} />
-      <Route path="/patients" element={<Patients />} />
-      <Route path="/schedule" element={<Schedule />} />
-      <Route path="/tickets" element={<Tickets />} />
-      <Route path="/reviews" element={<Reviews />} />
+    <>
+      {/* ✅ Global rating modal — appears on ANY page when consultation ends */}
+      {showRating && evaluationData && (
+        <RatingModal
+          medecinNom={evaluationData.medecin_nom}
+          specialite={evaluationData.specialite}
+          onSubmit={handleSubmit}
+        />
+      )}
 
-      
-      <Route
-        path="/dashboard-patient"
-        element={
-          <PrivateRoute allowedRole="patient">
-            <Patientdashboard />
-          </PrivateRoute>
-        }
-      />
+      <Routes>
+        <Route path="/" element={<Acceuil />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/doctors" element={<Doctors />} />
+        <Route path="/specialities" element={<Specialities />} />
+        <Route path="/queue" element={<Queue />} />
+        <Route path="/appointments" element={<Appointments />} />
+        <Route path="/patients" element={<Patients />} />
+        <Route path="/schedule" element={<Schedule />} />
+        <Route path="/tickets" element={<Tickets />} />
+        <Route path="/reviews" element={<Reviews />} />
 
-      <Route
-        path="/dashboard-medecin"
-        element={
-          <PrivateRoute allowedRole="medecin">
-            <Medecindashboard />
-          </PrivateRoute>
-        }
-      />
+        <Route
+          path="/dashboard-patient"
+          element={
+            <PrivateRoute allowedRole="patient">
+              <Patientdashboard />
+            </PrivateRoute>
+          }
+        />
 
-    </Routes>
-    
+        <Route
+          path="/dashboard-medecin"
+          element={
+            <PrivateRoute allowedRole="medecin">
+              <Medecindashboard />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+    </>
   );
 }
 
 export default App;
-
-
-
-
-

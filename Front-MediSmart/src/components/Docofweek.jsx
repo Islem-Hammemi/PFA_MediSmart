@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./cmp.css";
 import BookingModal from "./BookingModal";
+import { isAuthenticated } from "../services/authService";
 
 const API_BASE = "http://localhost:5000/api";
 
@@ -17,6 +19,7 @@ const StarRating = ({ note }) => {
 };
 
 const Docofweek = () => {
+  const navigate = useNavigate();
   const [doctor,     setDoctor]     = useState(null);
   const [loading,    setLoading]    = useState(true);
   const [error,      setError]      = useState(null);
@@ -64,7 +67,7 @@ const Docofweek = () => {
         </div>
       )}
 
-      {error && <div className="dow-error">⚠️ {error}</div>}
+      {error && <div className="dow-error"> {error}</div>}
 
       {!loading && !error && !doctor && (
         <div className="dow-error">No doctor of the week found.</div>
@@ -129,7 +132,13 @@ const Docofweek = () => {
               </div>
             </div>
 
-            <button className="dow-btn" onClick={() => setBookingDoc(doctor)}>
+            <button
+              className="dow-btn"
+              onClick={() => {
+                if (!isAuthenticated()) navigate("/login");
+                else setBookingDoc(doctor);
+              }}
+            >
               Book Appointment &nbsp;→
             </button>
           </div>

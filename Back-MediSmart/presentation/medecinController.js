@@ -1,133 +1,57 @@
+// ============================================================
+//  presentation/medecinController.js
+// ============================================================
 const medecinService = require("../business/medecinService");
-
-
+const { sendError }  = require("../middleware/errorHandler");
 
 const getMedecins = async (req, res) => {
   try {
-    const { search } = req.query;
-    const data = await medecinService.getMedecins(search);
-    return res.status(200).json({
-      success: true,
-      count: data.length,
-      search: search || null,
-      data,
-    });
-  } catch (error) {
-    console.error("Erreur getMedecins:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Erreur serveur lors de la récupération des médecins.",
-    });
-  }
+    const data = await medecinService.getMedecins(req.query.search);
+    return res.status(200).json({ success: true, count: data.length, search: req.query.search || null, data });
+  } catch (err) { return sendError(res, err); }
 };
 
 const getMedecinsPresents = async (req, res) => {
   try {
     const data = await medecinService.getMedecinsPresents();
-    return res.status(200).json({
-      success: true,
-      count: data.length,
-      data,
-    });
-  } catch (error) {
-    console.error("Erreur getMedecinsPresents:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Erreur serveur lors de la récupération des médecins présents.",
-    });
-  }
+    return res.status(200).json({ success: true, count: data.length, data });
+  } catch (err) { return sendError(res, err); }
 };
 
 const checkIn = async (req, res) => {
   try {
-    const { userId } = req.body;
-    const medecin = await medecinService.checkInMedecin(userId);
-    return res.status(200).json({
-      success: true,
-      message: "Présence marquée ✅",
-      data: medecin,
-    });
-  } catch (error) {
-    console.error("Erreur checkIn:", error);
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
+    const medecin = await medecinService.checkInMedecin(req.body.userId);
+    return res.status(200).json({ success: true, message: "Availability marked.", data: medecin });
+  } catch (err) { return sendError(res, err); }
 };
 
 const checkOut = async (req, res) => {
   try {
-    const { userId } = req.body;
-    const medecin = await medecinService.checkOutMedecin(userId);
-    return res.status(200).json({
-      success: true,
-      message: "Départ enregistré 🚪",
-      data: medecin,
-    });
-  } catch (error) {
-    console.error("Erreur checkOut:", error);
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
+    const medecin = await medecinService.checkOutMedecin(req.body.userId);
+    return res.status(200).json({ success: true, message: "Departure recorded.", data: medecin });
+  } catch (err) { return sendError(res, err); }
 };
 
-
-
-// GET /medecins/semaine
 const getMedecinSemaine = async (req, res) => {
   try {
     const data = await medecinService.getMedecinSemaine();
-    return res.status(200).json({
-      success: true,
-      data,
-    });
-  } catch (error) {
-    console.error("Erreur getMedecinSemaine:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Erreur serveur lors de la récupération du médecin de la semaine.",
-    });
-  }
+    return res.status(200).json({ success: true, data });
+  } catch (err) { return sendError(res, err); }
 };
 
-// POST /medecins/photo
 const uploadPhoto = async (req, res) => {
   try {
-    // Vérifier que le fichier existe
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "Aucun fichier envoyé.",
-      });
-    }
-
-    const { userId } = req.body;
+    if (!req.file)
+      return res.status(400).json({ success: false, message: "No file was uploaded." });
     const photoPath = `/uploads/medecins/${req.file.filename}`;
-    const medecin = await medecinService.updatePhoto(userId, photoPath);
-
+    const medecin   = await medecinService.updatePhoto(req.body.userId, photoPath);
     return res.status(200).json({
       success: true,
-      message: "Photo mise à jour ✅",
+      message: "Photo updated successfully.",
       photoUrl: `http://localhost:5000${photoPath}`,
       data: medecin,
     });
-  } catch (error) {
-    console.error("Erreur uploadPhoto:", error);
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
-module.exports = {
-  getMedecins,
-  getMedecinsPresents,
-  checkIn,
-  checkOut,
-  getMedecinSemaine,  
-  uploadPhoto,        
-};
+module.exports = { getMedecins, getMedecinsPresents, checkIn, checkOut, getMedecinSemaine, uploadPhoto };

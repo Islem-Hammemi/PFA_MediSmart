@@ -1,62 +1,42 @@
-// =============================================
-// presentation/patientController.js
-// =============================================
+// ============================================================
+//  presentation/patientController.js  — standalone, no other controllers bundled
+// ============================================================
 const patientService = require('../business/patientService');
+const { sendError }  = require('../middleware/errorHandler');
 
-// ─── US9 : GET /api/tickets/patient ──────────────────────────
 const getMyTickets = async (req, res) => {
   try {
     const data = await patientService.getMyTickets(req.utilisateur.user_id);
     res.status(200).json({ success: true, count: data.length, data });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
-// ─── US10 : GET /api/dossiers/patient ────────────────────────
 const getMyDossiers = async (req, res) => {
   try {
     const data = await patientService.getMyDossiers(req.utilisateur.user_id);
     res.status(200).json({ success: true, count: data.length, data });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
-// ─── US12 : POST /api/logout ─────────────────────────────────
 const logout = async (req, res) => {
   try {
     await patientService.logout(req.token);
-    res.status(200).json({ success: true, message: 'Déconnexion réussie.' });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+    res.status(200).json({ success: true, message: "Logged out successfully." });
+  } catch (err) { return sendError(res, err); }
 };
 
-// ─── NOUVEAU : GET /api/patient/dashboard/stats ───────────────
 const getDashboardStats = async (req, res) => {
   try {
     const data = await patientService.getDashboardStats(req.utilisateur.user_id);
     res.status(200).json({ success: true, data });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
-// ─── NOUVEAU : GET /api/patient/dashboard/next-appointment ────
 const getNextAppointment = async (req, res) => {
   try {
     const data = await patientService.getNextAppointment(req.utilisateur.user_id);
-    res.status(200).json({ success: true, data }); // data = null si aucun RDV
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+    res.status(200).json({ success: true, data });
+  } catch (err) { return sendError(res, err); }
 };
 
-module.exports = {
-  getMyTickets,
-  getMyDossiers,
-  logout,
-  getDashboardStats,   // nouveau
-  getNextAppointment,  // nouveau
-};
+module.exports = { getMyTickets, getMyDossiers, logout, getDashboardStats, getNextAppointment };

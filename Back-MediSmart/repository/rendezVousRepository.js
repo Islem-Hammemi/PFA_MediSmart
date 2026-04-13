@@ -81,12 +81,24 @@ const verifierConflitMedecin = async (medecinId, dateHeure) => {
 const creerRdv = async ({ patientId, medecinId, dateHeure, motif }) => {
   const [result] = await pool.execute(
     `INSERT INTO RENDEZ_VOUS (patient_id, medecin_id, date_heure, motif, statut)
-     VALUES (?, ?, ?, ?, 'planifie')`,
+     VALUES (?, ?, ?, ?, 'planifie')
+     ON DUPLICATE KEY UPDATE
+       patient_id          = VALUES(patient_id),
+       motif               = VALUES(motif),
+       statut              = 'planifie',
+       evaluation_demandee = FALSE`,
     [patientId, medecinId, dateHeure, motif || null]
   );
-  return result.insertId;
-};
 
+  if (result.insertId) return result.insertId;
+
+  const [rows] = await pool.execute(
+    `SELECT id FROM RENDEZ_VOUS
+     WHERE medecin_id = ? AND date_heure = ? LIMIT 1`,
+    [medecinId, dateHeure]
+  );
+  return rows[0].id;
+};
 const trouverParIdEtPatient = async (rdvId, patientId) => {
   const [rows] = await pool.execute(
     `SELECT r.id AS rdv_id, r.date_heure, r.statut, r.motif,

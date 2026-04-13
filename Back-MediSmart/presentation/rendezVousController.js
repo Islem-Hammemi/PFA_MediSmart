@@ -1,247 +1,151 @@
 // =============================================
-// presentation/rendezVousController.js — MERGED CLEAN
+// presentation/rendezVousController.js
 // =============================================
-
 const rendezVousService = require("../business/rendezVousService");
+const { sendError }     = require("../middleware/errorHandler");
 
-// ══════════════════════════════════════════════
-// PATIENT
-// ══════════════════════════════════════════════
+// ── PATIENT ──────────────────────────────────────────────────
 
 const getUpcoming = async (req, res) => {
   try {
     const data = await rendezVousService.getUpcoming(req.utilisateur.user_id);
     res.json({ success: true, data });
-  } catch (err) {
-    res.status(err.statusCode || 500).json({ success: false, message: err.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
 const getPast = async (req, res) => {
   try {
     const data = await rendezVousService.getPast(req.utilisateur.user_id);
     res.json({ success: true, data });
-  } catch (err) {
-    res.status(err.statusCode || 500).json({ success: false, message: err.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
 const getOne = async (req, res) => {
   try {
-    const data = await rendezVousService.getOne(
-      Number(req.params.id),
-      req.utilisateur.user_id
-    );
+    const data = await rendezVousService.getOne(Number(req.params.id), req.utilisateur.user_id);
     res.json({ success: true, data });
-  } catch (err) {
-    res.status(err.statusCode || 404).json({ success: false, message: err.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
 const reserver = async (req, res) => {
   try {
-    const result = await rendezVousService.reserver(
-      req.utilisateur.user_id,
-      req.body
-    );
+    const result = await rendezVousService.reserver(req.utilisateur.user_id, req.body);
     res.status(201).json({ success: true, ...result });
-  } catch (err) {
-    const isConflict = err.message.includes("déjà");
-    res.status(isConflict ? 409 : 400).json({ success: false, message: err.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
 const annuler = async (req, res) => {
   try {
-    const result = await rendezVousService.annuler(
-      Number(req.params.id),
-      req.utilisateur.user_id
-    );
+    const result = await rendezVousService.annuler(Number(req.params.id), req.utilisateur.user_id);
     res.json({ success: true, ...result });
-  } catch (err) {
-    res.status(err.statusCode || 400).json({ success: false, message: err.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
 const getEvaluationEnAttente = async (req, res) => {
   try {
-    const data = await rendezVousService.getEvaluationEnAttente(
-      req.utilisateur.user_id
-    );
+    const data = await rendezVousService.getEvaluationEnAttente(req.utilisateur.user_id);
     res.json({ success: true, data });
-  } catch (err) {
-    res.status(err.statusCode || 500).json({ success: false, message: err.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
-// ══════════════════════════════════════════════
-// CRÉNEAUX
-// ══════════════════════════════════════════════
+// ── CRÉNEAUX ─────────────────────────────────────────────────
 
 const getCreneaux = async (req, res) => {
   try {
     const medecinId = Number(req.params.medecinId);
     if (!medecinId || isNaN(medecinId))
-      return res.status(400).json({ success: false, message: "medecinId invalide." });
-
+      return res.status(400).json({ success: false, message: "Invalid doctor ID." });
     const data = await rendezVousService.getCreneaux(medecinId);
     res.json({ success: true, count: data.length, data });
-  } catch (err) {
-    res.status(err.statusCode || 500).json({ success: false, message: err.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
 const reserverViaCreneau = async (req, res) => {
   try {
     const { medecinId, creneauId, motif } = req.body;
-
     if (!medecinId || !creneauId)
-      return res.status(400).json({ success: false, message: "medecinId et creneauId requis." });
-
+      return res.status(400).json({ success: false, message: "Doctor and time slot are required." });
     const result = await rendezVousService.reserverViaCreneau(
       req.utilisateur.user_id,
       { medecinId: Number(medecinId), creneauId: Number(creneauId), motif }
     );
-
     res.status(201).json(result);
-  } catch (err) {
-    const status = err.message.includes("Conflit") ? 409 : 400;
-    res.status(status).json({ success: false, message: err.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
-// ══════════════════════════════════════════════
-// MÉDECIN
-// ══════════════════════════════════════════════
+// ── MÉDECIN ──────────────────────────────────────────────────
 
 const getPlanningMedecin = async (req, res) => {
   try {
     const { medecin_id: medecinId } = req.utilisateur;
-
     if (!medecinId)
-      return res.status(403).json({ success: false, message: "Accès réservé aux médecins." });
-
+      return res.status(403).json({ success: false, message: "Access reserved for doctors." });
     const data = await rendezVousService.getPlanningMedecin(medecinId);
     res.json({ success: true, count: data.length, data });
-  } catch (err) {
-    res.status(err.statusCode || 500).json({ success: false, message: err.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
 const getUpcomingMedecin = async (req, res) => {
   try {
     const { medecin_id: medecinId } = req.utilisateur;
-
     if (!medecinId)
-      return res.status(403).json({ success: false, message: "Accès réservé aux médecins." });
-
+      return res.status(403).json({ success: false, message: "Access reserved for doctors." });
     const data = await rendezVousService.getUpcomingMedecin(medecinId);
     res.json({ success: true, count: data.length, data });
-  } catch (err) {
-    res.status(err.statusCode || 500).json({ success: false, message: err.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
 const getPendingMedecin = async (req, res) => {
   try {
     const { medecin_id: medecinId } = req.utilisateur;
-
     if (!medecinId)
-      return res.status(403).json({ success: false, message: "Accès réservé aux médecins." });
-
+      return res.status(403).json({ success: false, message: "Access reserved for doctors." });
     const data = await rendezVousService.getPendingMedecin(medecinId);
     res.json({ success: true, count: data.length, data });
-  } catch (err) {
-    res.status(err.statusCode || 500).json({ success: false, message: err.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
-// ✅ using your service logic
 const confirmer = async (req, res) => {
   try {
-    const { medecin_id: medecinId } = req.utilisateur;
-
     const result = await rendezVousService.changerStatut(
-      Number(req.params.id),
-      medecinId,
-      "confirme",
-      ["planifie"]
+      Number(req.params.id), req.utilisateur.medecin_id, "confirme", ["planifie"]
     );
-
     res.json({ success: true, ...result });
-  } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
 const refuser = async (req, res) => {
   try {
-    const { medecin_id: medecinId } = req.utilisateur;
-
     const result = await rendezVousService.changerStatut(
-      Number(req.params.id),
-      medecinId,
-      "annule",
-      ["planifie", "confirme"]
+      Number(req.params.id), req.utilisateur.medecin_id, "annule", ["planifie", "confirme"]
     );
-
     res.json({ success: true, ...result });
-  } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
 const terminer = async (req, res) => {
   try {
-    const { medecin_id: medecinId } = req.utilisateur;
-
     const result = await rendezVousService.changerStatut(
-      Number(req.params.id),
-      medecinId,
-      "termine",
-      ["confirme"]
+      Number(req.params.id), req.utilisateur.medecin_id, "termine", ["confirme"]
     );
-
     res.json({ success: true, ...result });
-  } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
-// ✅ your feature
 const reserverParMedecin = async (req, res) => {
   try {
     const { medecin_id: medecinId } = req.utilisateur;
-
     const { patientId, dateHeure, motif } = req.body;
-
     const result = await rendezVousService.reserverParMedecin({
-      medecinId,
-      patientId: Number(patientId),
-      dateHeure,
-      motif,
+      medecinId, patientId: Number(patientId), dateHeure, motif,
     });
-
     res.status(201).json({ success: true, ...result });
-  } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
-  }
+  } catch (err) { return sendError(res, err); }
 };
 
 module.exports = {
-  getUpcoming,
-  getPast,
-  getOne,
-  reserver,
-  annuler,
-  getEvaluationEnAttente,
-  getCreneaux,
-  reserverViaCreneau,
-  getPlanningMedecin,
-  getUpcomingMedecin,
-  getPendingMedecin,
-  confirmer,
-  refuser,
-  terminer,
-  reserverParMedecin,
+  getUpcoming, getPast, getOne, reserver, annuler, getEvaluationEnAttente,
+  getCreneaux, reserverViaCreneau,
+  getPlanningMedecin, getUpcomingMedecin, getPendingMedecin,
+  confirmer, refuser, terminer, reserverParMedecin,
 };

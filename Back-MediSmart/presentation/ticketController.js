@@ -1,87 +1,34 @@
 // ============================================================
-//  ticketController.js  –  Couche Présentation (Controller)
-//  Sprint 2 – US8 : Génération de ticket numérique
-//  Responsable : Sarra Othmani
+//  presentation/ticketController.js
 // ============================================================
-
-const ticketService = require('../business/ticketService');
+const ticketService  = require('../business/ticketService');
+const { sendError }  = require('../middleware/errorHandler');
 
 const ticketController = {
 
-  // POST /api/tickets
   async genererTicket(req, res) {
     try {
       const { medecin_id } = req.body;
-
-      if (!medecin_id || isNaN(Number(medecin_id))) {
-        return res.status(400).json({
-          success: false,
-          message: 'Le champ medecin_id est requis et doit être un nombre.',
-        });
-      }
-
-      const ticket = await ticketService.genererTicket(
-        req.utilisateur.user_id,
-        Number(medecin_id)
-      );
-
-      return res.status(201).json({
-        success: true,
-        message: 'Ticket généré avec succès.',
-        ticket,
-      });
-
-    } catch (err) {
-      if (err.statusCode) {
-        return res.status(err.statusCode).json({
-          success: false,
-          message: err.message,
-        });
-      }
-      console.error('[ticketController.genererTicket]', err);
-      return res.status(500).json({
-        success: false,
-        message: 'Erreur interne du serveur.',
-      });
-    }
+      if (!medecin_id || isNaN(Number(medecin_id)))
+        return res.status(400).json({ success: false, message: "Please select a valid doctor." });
+      const ticket = await ticketService.genererTicket(req.utilisateur.user_id, Number(medecin_id));
+      return res.status(201).json({ success: true, message: "Ticket generated successfully.", ticket });
+    } catch (err) { return sendError(res, err); }
   },
 
-  // GET /api/tickets/patient
   async consulterTickets(req, res) {
     try {
-      const tickets = await ticketService.consulterTickets(
-        req.utilisateur.patient_id
-      );
-
-      return res.status(200).json({
-        success: true,
-        count: tickets.length,
-        tickets,
-      });
-
-    } catch (err) {
-      console.error('[ticketController.consulterTickets]', err);
-      return res.status(500).json({
-        success: false,
-        message: 'Erreur interne du serveur.',
-      });
-    }
+      const tickets = await ticketService.consulterTickets(req.utilisateur.patient_id);
+      return res.status(200).json({ success: true, count: tickets.length, tickets });
+    } catch (err) { return sendError(res, err); }
   },
 
-  // GET /api/tickets/queue/:medecin_id (public)
   async getQueueStatus(req, res) {
     try {
       const { medecin_id } = req.params;
-
-      if (!medecin_id || isNaN(Number(medecin_id))) {
-        return res.status(400).json({
-          success: false,
-          message: 'medecin_id invalide.',
-        });
-      }
-
+      if (!medecin_id || isNaN(Number(medecin_id)))
+        return res.status(400).json({ success: false, message: "Invalid doctor ID." });
       const data = await ticketService.getQueueStatus(Number(medecin_id));
-
       return res.status(200).json({
         success: true,
         data: {
@@ -90,139 +37,116 @@ const ticketController = {
           next_position:    Number(data.next_position)    || 1,
         },
       });
-
-    } catch (err) {
-      console.error('[ticketController.getQueueStatus]', err);
-      return res.status(500).json({
-        success: false,
-        message: 'Erreur interne du serveur.',
-      });
-    }
+    } catch (err) { return sendError(res, err); }
   },
 
-  // PATCH /api/tickets/:id/serve
   async serveTicket(req, res) {
     try {
       const ticket_id  = Number(req.params.id);
       const medecin_id = req.utilisateur.medecin_id;
-
-      if (!medecin_id) {
-        return res.status(403).json({
-          success: false,
-          message: 'Accès réservé aux médecins.',
-        });
-      }
-
-      if (!ticket_id || isNaN(ticket_id)) {
-        return res.status(400).json({
-          success: false,
-          message: 'ticket_id invalide.',
-        });
-      }
-
+      if (!medecin_id)
+        return res.status(403).json({ success: false, message: "Access reserved for doctors." });
+      if (!ticket_id || isNaN(ticket_id))
+        return res.status(400).json({ success: false, message: "Invalid ticket ID." });
       const ticket = await ticketService.serveTicket(ticket_id, medecin_id);
-
-      return res.status(200).json({
-        success: true,
-        message: 'Ticket passé en cours ✅',
-        ticket,
-      });
-
-    } catch (err) {
-      if (err.statusCode) {
-        return res.status(err.statusCode).json({
-          success: false,
-          message: err.message,
-        });
-      }
-      console.error('[ticketController.serveTicket]', err);
-      return res.status(500).json({
-        success: false,
-        message: 'Erreur interne du serveur.',
-      });
-    }
+      return res.status(200).json({ success: true, message: "Patient is now in consultation.", ticket });
+    } catch (err) { return sendError(res, err); }
   },
 
-  // PATCH /api/tickets/:id/done
   async doneTicket(req, res) {
     try {
       const ticket_id  = Number(req.params.id);
       const medecin_id = req.utilisateur.medecin_id;
-
-      if (!medecin_id) {
-        return res.status(403).json({
-          success: false,
-          message: 'Accès réservé aux médecins.',
-        });
-      }
-
-      if (!ticket_id || isNaN(ticket_id)) {
-        return res.status(400).json({
-          success: false,
-          message: 'ticket_id invalide.',
-        });
-      }
-
+      if (!medecin_id)
+        return res.status(403).json({ success: false, message: "Access reserved for doctors." });
+      if (!ticket_id || isNaN(ticket_id))
+        return res.status(400).json({ success: false, message: "Invalid ticket ID." });
       const ticket = await ticketService.doneTicket(ticket_id, medecin_id);
-
-      return res.status(200).json({
-        success: true,
-        message: 'Consultation terminée.',
-        ticket,
-      });
-
-    } catch (err) {
-      if (err.statusCode) {
-        return res.status(err.statusCode).json({
-          success: false,
-          message: err.message,
-        });
-      }
-      console.error('[ticketController.doneTicket]', err);
-      return res.status(500).json({
-        success: false,
-        message: 'Erreur interne du serveur.',
-      });
-    }
+      return res.status(200).json({ success: true, message: "Consultation completed.", ticket });
+    } catch (err) { return sendError(res, err); }
   },
 
-  // GET /api/tickets/today
   async getTodayQueue(req, res) {
-    console.log("getTodayQueue → medecin_id:", req.utilisateur.medecin_id); // 👈
-    console.log("getTodayQueue → utilisateur:", req.utilisateur);   
     try {
       const medecin_id = req.utilisateur.medecin_id;
-
-      if (!medecin_id) {
-        return res.status(403).json({
-          success: false,
-          message: 'Accès réservé aux médecins.',
-        });
-      }
-
+      if (!medecin_id)
+        return res.status(403).json({ success: false, message: "Access reserved for doctors." });
       const queue = await ticketService.getTodayQueue(medecin_id);
-
-      return res.status(200).json({
-        success: true,
-        count: queue.length,
-        queue,
-      });
-
-    } catch (err) {
-      if (err.statusCode) {
-        return res.status(err.statusCode).json({
-          success: false,
-          message: err.message,
-        });
-      }
-      console.error('[ticketController.getTodayQueue]', err);
-      return res.status(500).json({
-        success: false,
-        message: 'Erreur interne du serveur.',
-      });
-    }
+      return res.status(200).json({ success: true, count: queue.length, queue });
+    } catch (err) { return sendError(res, err); }
   },
 
+  async getMyActiveStatus(req, res) {
+    try {
+      const patientId = req.utilisateur.patient_id;
+      if (!patientId)
+        return res.status(403).json({ success: false, message: "Access denied." });
+
+      const db = require('../config/db');
+
+      const [tickets] = await db.query(
+        `SELECT t.id, t.statut, t.numero, t.position, t.medecin_id,
+                CONCAT(u.prenom, ' ', u.nom) AS medecin_nom,
+                m.specialite
+         FROM TICKETS t
+         JOIN MEDECINS m ON m.id = t.medecin_id
+         JOIN USERS    u ON u.id = m.user_id
+         WHERE t.patient_id = ?
+           AND DATE(t.created_at) = CURDATE()
+         ORDER BY t.created_at DESC LIMIT 1`,
+        [patientId]
+      );
+
+      const [rdvs] = await db.query(
+        `SELECT r.id AS rdv_id, r.statut, r.medecin_id, r.evaluation_demandee,
+                CONCAT(u.prenom, ' ', u.nom) AS medecin_nom,
+                m.specialite
+         FROM RENDEZ_VOUS r
+         JOIN MEDECINS m ON m.id = r.medecin_id
+         JOIN USERS    u ON u.id = m.user_id
+         WHERE r.patient_id = ?
+           AND DATE(r.date_heure) = CURDATE()
+         ORDER BY r.date_heure DESC LIMIT 1`,
+        [patientId]
+      );
+
+      const ticket = tickets[0] || null;
+      const rdv    = rdvs[0]    || null;
+
+      let needsEvaluation = false;
+      let evaluationData  = null;
+
+      if (ticket?.statut === 'termine') {
+        const [existing] = await db.query(
+          `SELECT id FROM EVALUATIONS WHERE ticket_id = ? LIMIT 1`, [ticket.id]
+        );
+        if (!existing[0]) {
+          needsEvaluation = true;
+          evaluationData  = {
+            source: 'ticket', ticket_id: ticket.id,
+            medecin_id: ticket.medecin_id, medecin_nom: ticket.medecin_nom,
+            specialite: ticket.specialite, rdv_id: null,
+          };
+        }
+      }
+
+      if (!needsEvaluation && rdv?.evaluation_demandee && rdv?.statut === 'termine') {
+        const [existing] = await db.query(
+          `SELECT id FROM EVALUATIONS WHERE rendez_vous_id = ? LIMIT 1`, [rdv.rdv_id]
+        );
+        if (!existing[0]) {
+          needsEvaluation = true;
+          evaluationData  = {
+            source: 'rdv', medecin_id: rdv.medecin_id,
+            medecin_nom: rdv.medecin_nom, specialite: rdv.specialite,
+            rdv_id: rdv.rdv_id,
+          };
+        }
+      }
+
+      return res.json({ success: true, ticket, rdv, needsEvaluation, evaluationData });
+    } catch (err) { return sendError(res, err); }
+  },
 };
 
 module.exports = ticketController;

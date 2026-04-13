@@ -6,7 +6,7 @@
 }
 
 .hero {
-  min-height: 70vh;
+  min-height: 55vh;
   background: radial-gradient(ellipse at 30% 40%, #1e3a6e 0%, #0f1e45 40%, #090f2a 100%);
   display: flex;
   flex-direction: column;

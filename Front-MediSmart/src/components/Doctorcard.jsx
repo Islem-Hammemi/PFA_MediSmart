@@ -5,16 +5,15 @@ import BookingModal from "./BookingModal";
 import TicketModal from "./TicketModal";
 import "./cmp.css";
 
-// ── Status Badge — only Available or Absent ───────────────────
+// ── Status Badge ──────────────────────────────────────────────
 const StatusBadge = ({ statut }) => {
-  // disponible OR en_consultation → Available
   const isOnline = statut === "disponible" || statut === "en_consultation";
   return isOnline
     ? <span className="badge badge--available">Available</span>
     : <span className="badge badge--absent">Absent</span>;
 };
 
-// ── Star Rating ──────────────────────────────────────────────
+// ── Star Rating ───────────────────────────────────────────────
 const StarRating = ({ note }) => {
   const stars = [];
   const full  = Math.floor(note || 0);
@@ -32,7 +31,7 @@ const StarRating = ({ note }) => {
   );
 };
 
-// ── Doctor Card ──────────────────────────────────────────────
+// ── Doctor Card ───────────────────────────────────────────────
 const DoctorCard = ({ doctor, index = 0 }) => {
   const API_BASE = "http://localhost:5000";
   const navigate = useNavigate();
@@ -42,12 +41,15 @@ const DoctorCard = ({ doctor, index = 0 }) => {
   const [showBooking, setShowBooking] = useState(false);
   const [showTicket,  setShowTicket]  = useState(false);
 
+  const isAbsent = doctor.statut === "absent";
+
   const handleBook = () => {
     if (!isAuthenticated()) navigate("/login");
     else setShowBooking(true);
   };
 
   const handleTicket = () => {
+    if (isAbsent) return;
     if (!isAuthenticated()) navigate("/login");
     else setShowTicket(true);
   };
@@ -67,7 +69,14 @@ const DoctorCard = ({ doctor, index = 0 }) => {
             </svg>
             Book Appointment
           </button>
-          <button className="overlay-btn overlay-btn--ticket" onClick={handleTicket}>
+
+          <button
+            className="overlay-btn overlay-btn--ticket"
+            onClick={handleTicket}
+            disabled={isAbsent}
+            title={isAbsent ? "Doctor is absent today" : ""}
+            style={isAbsent ? { opacity: 0.4, cursor: "not-allowed" } : {}}
+          >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" strokeWidth="2">
               <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/>

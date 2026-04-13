@@ -31,6 +31,13 @@ const ticketService = {
       err.statusCode = 404;
       throw err;
     }
+    // ✅ ADD THIS — one ticket per day per patient
+const ticketDuJour = await ticketRepository.getActiveTicketToday(patient.id);
+if (ticketDuJour) {
+  const err = new Error('Vous avez déjà un ticket actif aujourd\'hui. Rendez-vous dans la file d\'attente.');
+  err.statusCode = 409;
+  throw err;
+}
 
     const [numero, position] = await Promise.all([
       ticketRepository.getNextNumero(medecin_id),

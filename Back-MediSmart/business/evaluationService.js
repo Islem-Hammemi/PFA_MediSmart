@@ -5,59 +5,71 @@
 // ============================================================
 
 const evaluationRepository = require('../repository/evaluationRepository');
-
 const evaluationService = {
+// business/evaluationService.js
+async evaluerMedecin({ patient_id, rendez_vous_id, medecin_id, ticket_id, note, commentaire }) {
+  //                                                              ↑ add this
 
-  async evaluerMedecin({ patient_id, rendez_vous_id, note, commentaire }) {
+  if (!patient_id) {
+    const err = new Error('patient_id requis.');
+    err.statusCode = 400;
+    throw err;
+  }
 
-    // 1. Vérifier que le RDV existe et appartient au patient
+  if (!Number.isInteger(note) || note < 1 || note > 5) {
+    const err = new Error('La note doit être un entier entre 1 et 5.');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  let resolvedMedecinId = medecin_id;
+
+  if (rendez_vous_id) {
     const rdv = await evaluationRepository.getRendezVousById(rendez_vous_id, patient_id);
     if (!rdv) {
-      const err = new Error("Rendez-vous introuvable ou vous n'êtes pas autorisé à évaluer ce rendez-vous.");
+      const err = new Error("Rendez-vous introuvable.");
       err.statusCode = 404;
       throw err;
     }
-
-    // 2. Vérifier que le RDV est terminé
     if (rdv.statut !== 'termine') {
-      const err = new Error(`Vous ne pouvez évaluer qu'un rendez-vous terminé. Statut actuel : "${rdv.statut}".`);
+      const err = new Error(`RDV pas encore terminé. Statut: "${rdv.statut}".`);
       err.statusCode = 403;
       throw err;
     }
-
-    // 3. Vérifier qu'il n'y a pas déjà une évaluation
     const dejaEvalue = await evaluationRepository.evaluationExistante(rendez_vous_id);
     if (dejaEvalue) {
-      const err = new Error('Ce rendez-vous a déjà été évalué. Une seule évaluation par rendez-vous est autorisée.');
+      const err = new Error('Ce rendez-vous a déjà été évalué.');
       err.statusCode = 409;
       throw err;
     }
+    resolvedMedecinId = rdv.medecin_id;
+  }
 
-    // 4. Valider la note
-    if (!Number.isInteger(note) || note < 1 || note > 5) {
-      const err = new Error('La note doit être un entier entre 1 et 5.');
-      err.statusCode = 400;
-      throw err;
-    }
+  if (!resolvedMedecinId) {
+    const err = new Error('medecin_id requis.');
+    err.statusCode = 400;
+    throw err;
+  }
 
-    // 5. Enregistrer l'évaluation
-    const evaluationId = await evaluationRepository.creerEvaluation({
-      patient_id,
-      medecin_id: rdv.medecin_id,
-      rendez_vous_id,
-      note,
-      commentaire,
-    });
+  const evaluationId = await evaluationRepository.creerEvaluation({
+    patient_id,
+    medecin_id:     resolvedMedecinId,
+    rendez_vous_id: rendez_vous_id || null,
+    ticket_id:      ticket_id      || null,  // ✅ add this
+    note,
+    commentaire,
+  });
 
-    // 6. Recalculer la note moyenne du médecin
-    await evaluationRepository.mettreAJourNoteMoyenne(rdv.medecin_id);
+  await evaluationRepository.mettreAJourNoteMoyenne(resolvedMedecinId);
 
-    // 7. FIX : désactiver le flag evaluation_demandee sur le RDV
+  if (rendez_vous_id) {
     await evaluationRepository.desactiverFlag(rendez_vous_id);
+  }
 
-    // 8. Retourner les détails complets
-    return await evaluationRepository.getEvaluationById(evaluationId);
-  },
+  return await evaluationRepository.getEvaluationById(evaluationId);
+},
+
+
 
   /**
    * Retourne les évaluations + stats d'un médecin.

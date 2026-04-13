@@ -1,81 +1,118 @@
 // ============================================================
-//  presentation/consultationController.js  — FIXED Sprint 3
-//
-//  Corrections :
-//   1. getTodayQueue : medecin_id récupéré via medecinRepository
-//      (req.utilisateur contient user_id, pas medecin_id directement
-//       dans certaines configurations middleware — on résout les deux cas)
-//   2. Codes HTTP uniformisés (403 vs 401 cohérents avec les routes)
+//  presentation/consultationController.js
 // ============================================================
 const consultationRepository = require('../repository/consultationRepository');
 const consultationService    = require('../business/consultationService');
 const medecinRepository      = require('../repository/medecinRepository');
+const db                     = require('../config/db');
+const { sendError }          = require('../middleware/errorHandler');
 
-// ─── GET /api/consultations/today-queue ──────────────────────
-const getTodayQueue = async (req, res) => {
-  try {
-    // FIX : le middleware peut exposer medecin_id directement (token enrichi)
-    // ou seulement user_id. On supporte les deux cas.
-    let medecin_id = req.utilisateur.medecin_id || null;
-
-    if (!medecin_id) {
-      // Fallback : résoudre depuis user_id
-      const medecin = await medecinRepository.trouverParId(req.utilisateur.user_id);
-      if (!medecin) {
-        return res.status(403).json({
-          success: false,
-          message: 'Accès réservé aux médecins.',
-        });
-      }
-      medecin_id = medecin.medecin_id;
-    }
-
-    const data = await consultationRepository.getTodayQueue(medecin_id);
-    return res.status(200).json({ success: true, count: data.length, data });
-
-  } catch (err) {
-    console.error('[consultationController.getTodayQueue]', err);
-    return res.status(500).json({ success: false, message: 'Erreur interne du serveur.' });
-  }
+const _getMedecinId = async (utilisateur) => {
+  if (utilisateur.medecin_id) return utilisateur.medecin_id;
+  const medecin = await medecinRepository.trouverParId(utilisateur.user_id);
+  return medecin?.medecin_id ?? null;
 };
 
-// ─── POST /api/consultations/notes ───────────────────────────
-// Body : { rdv_id, diagnostic?, traitement?, notes? }
+const getTodayQueue = async (req, res) => {
+  try {
+    const medecinId = await _getMedecinId(req.utilisateur);
+    if (!medecinId)
+      return res.status(403).json({ success: false, message: "Access reserved for doctors." });
+    const data = await consultationRepository.getTodayQueue(medecinId);
+    return res.status(200).json({ success: true, count: data.length, data });
+  } catch (err) { return sendError(res, err); }
+};
+
+const servePatient = async (req, res) => {
+  try {
+    const medecinId = await _getMedecinId(req.utilisateur);
+    if (!medecinId)
+      return res.status(403).json({ success: false, message: "Access reserved for doctors." });
+
+    const id = Number(req.params.id);
+    const { type } = req.body;
+
+    if (!type || !['ticket', 'rdv'].includes(type))
+      return res.status(400).json({ success: false, message: "Please specify whether this is a ticket or appointment." });
+
+    if (type === 'ticket') {
+      const [result] = await db.execute(
+        `UPDATE TICKETS SET statut = 'en_cours' WHERE id = ? AND medecin_id = ? AND statut = 'en_attente'`,
+        [id, medecinId]
+      );
+      if (!result.affectedRows)
+        return res.status(404).json({ success: false, message: "Ticket not found or already in progress." });
+    } else {
+      const [result] = await db.execute(
+        `UPDATE RENDEZ_VOUS SET statut = 'confirme' WHERE id = ? AND medecin_id = ? AND statut IN ('planifie', 'confirme')`,
+        [id, medecinId]
+      );
+      if (!result.affectedRows)
+        return res.status(404).json({ success: false, message: "Appointment not found." });
+    }
+
+    return res.json({ success: true, message: "Patient is now in consultation." });
+  } catch (err) { return sendError(res, err); }
+};
+
+const finishPatient = async (req, res) => {
+  try {
+    const medecinId = await _getMedecinId(req.utilisateur);
+    if (!medecinId)
+      return res.status(403).json({ success: false, message: "Access reserved for doctors." });
+
+    const id = Number(req.params.id);
+    const { type, notes, diagnostic, traitement, patientId } = req.body;
+
+    if (!type || !['ticket', 'rdv'].includes(type))
+      return res.status(400).json({ success: false, message: "Please specify whether this is a ticket or appointment." });
+
+    if (type === 'ticket') {
+      await db.execute(
+        `UPDATE TICKETS SET statut = 'termine' WHERE id = ? AND medecin_id = ?`,
+        [id, medecinId]
+      );
+    } else {
+      await db.execute(
+        `UPDATE RENDEZ_VOUS SET statut = 'termine', evaluation_demandee = TRUE WHERE id = ? AND medecin_id = ?`,
+        [id, medecinId]
+      );
+    }
+
+    // Save dossier if any field is filled
+    if (patientId && (notes?.trim() || diagnostic?.trim() || traitement?.trim())) {
+      await db.execute(
+        `INSERT INTO DOSSIERS_MEDICAUX
+          (patient_id, medecin_id, date_consultation, diagnostic, traitement, notes)
+         VALUES (?, ?, CURDATE(), ?, ?, ?)`,
+        [
+          Number(patientId),
+          medecinId,
+          diagnostic?.trim() || null,
+          traitement?.trim() || null,
+          notes?.trim()      || null,
+        ]
+      );
+    }
+
+    return res.json({ success: true, message: "Consultation completed." });
+  } catch (err) { return sendError(res, err); }
+};
+
 const sauvegarderNotes = async (req, res) => {
   try {
     const { rdv_id, diagnostic, traitement, notes } = req.body;
-
-    if (!rdv_id || isNaN(Number(rdv_id))) {
-      return res.status(400).json({
-        success: false,
-        message: 'Le champ rdv_id est requis et doit être un nombre.',
-      });
-    }
-
+    if (!rdv_id || isNaN(Number(rdv_id)))
+      return res.status(400).json({ success: false, message: "A valid appointment ID is required." });
     const dossier = await consultationService.sauvegarderNotes({
-      user_id   : req.utilisateur.user_id,
-      rdv_id    : Number(rdv_id),
+      user_id:    req.utilisateur.user_id,
+      rdv_id:     Number(rdv_id),
       diagnostic: diagnostic || null,
       traitement: traitement || null,
-      notes     : notes      || null,
+      notes:      notes      || null,
     });
-
-    return res.status(201).json({
-      success: true,
-      message: 'Notes de consultation sauvegardées.',
-      dossier,
-    });
-
-  } catch (err) {
-    if (err.statusCode) {
-      return res.status(err.statusCode).json({ success: false, message: err.message });
-    }
-    console.error('[consultationController.sauvegarderNotes]', err);
-    return res.status(500).json({ success: false, message: 'Erreur interne du serveur.' });
-  }
+    return res.status(201).json({ success: true, message: "Notes saved successfully.", dossier });
+  } catch (err) { return sendError(res, err); }
 };
 
-module.exports = {
-  getTodayQueue,
-  sauvegarderNotes,
-};
+module.exports = { getTodayQueue, servePatient, finishPatient, sauvegarderNotes };
