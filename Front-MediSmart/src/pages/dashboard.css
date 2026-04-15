@@ -54,7 +54,10 @@
 }
 
 
-
+.dashbackcolor{
+  background-color: #F1F4F9;
+  min-height: 100vh;
+}
 
 
 

@@ -1,7 +1,6 @@
 /*  styles for the StatusDropdown component */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
 
 
 
@@ -10,7 +9,7 @@
 .status-dropdown {
   position: relative;
   display: inline-block;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .status-trigger {
@@ -93,7 +92,7 @@
 
 .stats-wrapper {
   padding: 0 0 24px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .doc-stats-grid {
@@ -147,7 +146,7 @@
 
 .pr-wrapper {
   padding: 24px 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: 'Inter', sans-serif;
   margin-bottom: 30px;
 }
 
@@ -270,7 +269,7 @@
 /* ── TodaysAppointments ── */
 
 .ta-wrapper {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: 'Inter', sans-serif;
   flex: 2;
   min-width: 0;
 }
@@ -391,7 +390,7 @@
 /* ── RecentReviews ── */
 
 .rr-wrapper {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: 'Inter', sans-serif;
   background: #ffffff;
   border-radius: 16px;
   padding: 24px;
@@ -463,7 +462,7 @@
 /* TicketQueue.css */
 
 .tq-wrapper {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: 'Inter', sans-serif;
   padding: 0 0 24px 0;
   margin-top: 30px;
   
@@ -684,7 +683,7 @@
   font-size: 14.5px;
   color: #3a3f5c;
   width: 100%;
-  font-family: "Nunito", "Segoe UI", sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 500;
 }
 
@@ -748,7 +747,7 @@
 .add-patient-label {
   font-size: 11px;
   color: #6b7499;
-  font-family: "Nunito", "Segoe UI", sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 600;
   white-space: nowrap;
   letter-spacing: 0.01em;
@@ -864,14 +863,14 @@
   font-size: 15px;
   font-weight: 700;
   color: #2a2f4a;
-  font-family: "Nunito", "Segoe UI", sans-serif;
+  font-family: "Inter", sans-serif;
   line-height: 1.2;
 }
 
 .patient-age {
   font-size: 13px;
   color: #8a90aa;
-  font-family: "Nunito", "Segoe UI", sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 500;
 }
 
@@ -892,14 +891,14 @@
 .visit-label {
   font-size: 12.5px;
   color: #9ca3b8;
-  font-family: "Nunito", "Segoe UI", sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 500;
 }
 
 .visit-date {
   font-size: 12.5px;
-  color: #3a3f5c;
-  font-family: "Nunito", "Segoe UI", sans-serif;
+  color: #909194;
+  font-family: "Inter", sans-serif;
   font-weight: 600;
 }
 
@@ -924,7 +923,7 @@
   display: flex;
   gap: 1cm;
   justify-content: center;
-  font-family: "Nunito", "Segoe UI", sans-serif;
+  font-family: "Inter", sans-serif;
   margin: 0 auto 32px;
 }
 
@@ -1623,7 +1622,7 @@
   padding: 4px 7px;
   font-size: 11.5px;
   color: #ffffff;
-  font-family: "Nunito", sans-serif;
+  font-family: "Inter", sans-serif;
   outline: none;
   width: 100%;
 }
@@ -1644,7 +1643,7 @@
   color: #ffffff;
   font-size: 10.5px;
   font-weight: 700;
-  font-family: "Nunito", sans-serif;
+  font-family: "Inter", sans-serif;
   padding: 3px 8px;
   cursor: pointer;
   transition: background 0.15s ease;
@@ -1681,7 +1680,7 @@
   --sm-border:    #e2e7f0;
   --sm-surface:   #ffffff;
   --sm-bg:        #f4f7fb;
-  --sm-font:      'DM Sans', sans-serif;
+  --sm-font:      'Inter', sans-serif;
   --sm-radius:    14px;
   --sm-transition: 0.2s ease;
 }
@@ -1865,7 +1864,7 @@
   text-align: center;
   padding: 20px;
   color: #5a6a9a;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
 }
  
@@ -1882,7 +1881,7 @@
   gap: 6px;
   font-size: 12px;
   color: #5a6a9a;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   text-transform: capitalize;
 }
  
@@ -3269,4 +3268,1358 @@
   opacity: 0.5;
   cursor: not-allowed;
   transform: none !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============================================================
+   MediSmart – appointmentmodal.css
+   AppointmentDetailModal — vertical sidebar tabs
+   ============================================================ */
+
+
+:root {
+  --adm-primary:  #1e3a6e;
+  --adm-accent:   #3b7de9;
+  --adm-text:     #1a2236;
+  --adm-muted:    #6b7a99;
+  --adm-border:   #e2e7f0;
+  --adm-surface:  #ffffff;
+  --adm-bg:       #f4f7fb;
+  --adm-font:     'Inter', sans-serif;
+  --adm-radius:   16px;
+  --adm-sidebar-w: 170px;
+}
+
+/* ── Backdrop ────────────────────────────────────────────── */
+.adm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 50, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: admFade 0.18s ease forwards;
+}
+
+@keyframes admFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Modal ───────────────────────────────────────────────── */
+.adm-modal {
+  background: var(--adm-surface);
+  border-radius: var(--adm-radius);
+  width: 100%;
+  max-width: 620px;
+  max-height: 88vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 80px rgba(10, 20, 50, 0.25);
+  animation: admUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes admUp {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+.adm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  background: var(--adm-primary);
+  flex-shrink: 0;
+}
+
+.adm-header__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adm-header__title {
+  font-family: var(--adm-font);
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.adm-header__sub {
+  font-size: 11.5px;
+  color: rgba(255,255,255,.5);
+  margin: 2px 0 0;
+}
+
+.adm-header__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adm-statut-badge {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.adm-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: rgba(255,255,255,.12);
+  border: none;
+  color: rgba(255,255,255,.8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s;
+}
+
+.adm-close:hover { background: rgba(255,255,255,.22); }
+
+/* ── Doctor row ──────────────────────────────────────────── */
+.adm-doctor-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 22px;
+  background: var(--adm-bg);
+  border-bottom: 1px solid var(--adm-border);
+  flex-shrink: 0;
+}
+
+.adm-doctor-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dbe8ff, #c7d7f5);
+  color: var(--adm-primary);
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.adm-doctor-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--adm-text);
+  margin: 0 0 2px;
+}
+
+.adm-doctor-spec {
+  font-size: 12.5px;
+  color: var(--adm-accent);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ── Main: sidebar + content ─────────────────────────────── */
+.adm-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── Left sidebar ────────────────────────────────────────── */
+.adm-sidebar {
+  width: var(--adm-sidebar-w);
+  background: var(--adm-primary);   /* ← navy blue background */
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.adm-sidebar-tab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 18px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: var(--adm-font);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+  border-left: 3px solid transparent;
+  line-height: 1.3;
+}
+
+.adm-sidebar-tab svg { flex-shrink: 0; }
+
+.adm-sidebar-tab:hover {
+  background: rgba(255,255,255,.07);
+  color: rgba(255,255,255,.85);
+}
+
+.adm-sidebar-tab--active {
+  background: rgba(255,255,255,.12);
+  color: #ffffff;
+  font-weight: 600;
+  border-left-color: #60a5fa;
+}
+
+/* ── Right content area ──────────────────────────────────── */
+.adm-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 22px;
+  background: var(--adm-surface);
+  scrollbar-width: thin;
+  scrollbar-color: var(--adm-border) transparent;
+}
+
+/* ── Section ─────────────────────────────────────────────── */
+.adm-section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ── Field ───────────────────────────────────────────────── */
+.adm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.adm-field__label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--adm-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.adm-field__value {
+  font-size: 14px;
+  color: var(--adm-text);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.adm-field__badge {
+  display: inline-block;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 20px;
+  width: fit-content;
+}
+
+/* ── Empty note ──────────────────────────────────────────── */
+.adm-empty-note {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 14px 16px;
+  background: var(--adm-bg);
+  border-radius: 10px;
+  border: 1.5px dashed var(--adm-border);
+}
+
+.adm-empty-note svg { color: var(--adm-muted); opacity: 0.45; }
+
+.adm-empty-note p {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--adm-text);
+  margin: 0;
+}
+
+.adm-empty-note span {
+  font-size: 12px;
+  color: var(--adm-muted);
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.adm-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 22px 16px;
+  border-top: 1px solid var(--adm-border);
+  flex-shrink: 0;
+}
+
+.adm-btn {
+  padding: 9px 22px;
+  border-radius: 9px;
+  font-family: var(--adm-font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.18s ease;
+}
+
+.adm-btn--secondary {
+  background: var(--adm-bg);
+  color: var(--adm-text);
+  border: 1.5px solid var(--adm-border);
+}
+
+.adm-btn--secondary:hover {
+  border-color: var(--adm-accent);
+  color: var(--adm-accent);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 540px) {
+  .adm-backdrop { padding: 0; align-items: flex-end; }
+  .adm-modal    { border-radius: 20px 20px 0 0; max-height: 92vh; }
+  .adm-sidebar  { width: 130px; }
+  .adm-sidebar-tab span { font-size: 11.5px; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============================================================
+   ADD TO BOTTOM OF doctorspage.css
+   ============================================================ */
+
+/* ── Patient card – appointment section ── */
+.pl-rdv-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pl-rdv-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7a99;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pl-rdv-count {
+  background: #eff6ff;
+  color: #3b7de9;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.pl-rdv-empty {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0;
+  font-style: italic;
+}
+
+.pl-rdv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Appointment row ── */
+.pl-rdv-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8faff;
+  border: 1px solid #e8edf8;
+  border-radius: 8px;
+  padding: 8px 10px;
+  flex-wrap: wrap;
+}
+
+.pl-rdv-date {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #4a5568;
+  font-weight: 500;
+  flex: 1;
+  min-width: 120px;
+}
+
+.pl-rdv-statut {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.pl-rdv-motif {
+  font-size: 11.5px;
+  color: #6b7a99;
+  flex: 1;
+  min-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── File icon button ── */
+.pl-file-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #3b7de9;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.18s ease;
+}
+
+.pl-file-btn:hover {
+  background: #3b7de9;
+  color: #ffffff;
+  border-color: #3b7de9;
+}
+
+/* ── Avatar initials (patient cards) ── */
+.patient-avatar-initials {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+
+.patient-phone {
+  font-size: 12px;
+  color: #94a3b8;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============================================================
+   MediSmart – patientdossier.css
+   Styles for: PatientDossierPopup in Patientlist.jsx
+   ============================================================ */
+
+
+/* ── Backdrop ────────────────────────────────────────────── */
+.pd-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 50, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: pdFade 0.18s ease forwards;
+}
+
+@keyframes pdFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Modal ───────────────────────────────────────────────── */
+.pd-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 80px rgba(10, 20, 50, 0.22);
+  animation: pdUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  scrollbar-width: thin;
+  scrollbar-color: #e2e7f0 transparent;
+  font-family: 'Inter', sans-serif;
+}
+
+@keyframes pdUp {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+.pd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  background: #1e3a6e;
+  border-radius: 16px 16px 0 0;
+}
+
+.pd-header__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.pd-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.12);
+  border: none;
+  color: rgba(255,255,255,.8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s ease;
+}
+
+.pd-close:hover { background: rgba(255,255,255,.22); }
+
+/* ── Patient info block ──────────────────────────────────── */
+.pd-patient-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px 22px;
+  background: #f4f7fb;
+  border-bottom: 1px solid #e2e7f0;
+}
+
+.pd-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+
+.pd-patient-details { flex: 1; }
+
+.pd-patient-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a2236;
+  margin: 0 0 8px;
+}
+
+.pd-patient-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.pd-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #6b7a99;
+  font-weight: 400;
+}
+
+.pd-meta-item svg { flex-shrink: 0; opacity: 0.7; }
+
+/* ── Stats ───────────────────────────────────────────────── */
+.pd-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pd-stat {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 10px 16px;
+  text-align: center;
+  border: 1.5px solid #e2e7f0;
+  min-width: 72px;
+}
+
+.pd-stat__value {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  color: #3b7de9;
+  line-height: 1;
+}
+
+.pd-stat__label {
+  display: block;
+  font-size: 11px;
+  color: #6b7a99;
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+/* ── Section ─────────────────────────────────────────────── */
+.pd-section {
+  padding: 18px 22px 22px;
+}
+
+.pd-section__title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #6b7a99;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin: 0 0 14px;
+}
+
+.pd-section__title svg { opacity: 0.6; }
+
+.pd-empty {
+  font-size: 13.5px;
+  color: #94a3b8;
+  font-style: italic;
+  text-align: center;
+  padding: 16px 0;
+  margin: 0;
+}
+
+/* ── RDV list ────────────────────────────────────────────── */
+.pd-rdv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pd-rdv-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #f8faff;
+  border: 1px solid #e8edf8;
+  border-radius: 10px;
+  transition: background 0.15s ease;
+}
+
+.pd-rdv-row:hover { background: #eff6ff; }
+
+.pd-rdv-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pd-rdv-date {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1a2236;
+}
+
+.pd-rdv-motif {
+  font-size: 12px;
+  color: #6b7a99;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pd-rdv-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.pd-rdv-statut {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* ── File button ─────────────────────────────────────────── */
+.pd-file-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #CEDDF8;
+  border: 1.5px solid #bfdbfe;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.pd-file-btn:hover {
+  background: #3b7de9;
+  color: #ffffff;
+  border-color: #3b7de9;
+}
+
+/* ── Patient card phone ──────────────────────────────────── */
+.patient-phone {
+  font-size: 12px;
+  color: #94a3b8;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+}
+
+/* ── Patient avatar initials ─────────────────────────────── */
+.patient-avatar-initials {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Patient list empty ──────────────────────────────────── */
+.patient-list-empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 540px) {
+  .pd-backdrop { padding: 0; align-items: flex-end; }
+  .pd-modal    { border-radius: 20px 20px 0 0; max-height: 95vh; }
+  .pd-stats    { display: none; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============================================================
+   MediSmart – pastappointmentdetail.css
+   Styles for: PastAppointmentDetail component
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --pad-navy:    #1e3a6e;
+  --pad-accent:  #3b7de9;
+  --pad-text:    #1a2236;
+  --pad-muted:   #6b7a99;
+  --pad-border:  #e2e7f0;
+  --pad-surface: #ffffff;
+  --pad-bg:      #f4f7fb;
+  --pad-font:    'DM Sans', sans-serif;
+  --pad-radius:  16px;
+  --pad-sidebar: 170px;
+}
+
+/* ── Backdrop ────────────────────────────────────────────── */
+.pad-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 50, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: padFade 0.18s ease forwards;
+}
+
+@keyframes padFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Modal ───────────────────────────────────────────────── */
+.pad-modal {
+  background: var(--pad-surface);
+  border-radius: var(--pad-radius);
+  width: 100%;
+  max-width: 620px;
+  max-height: 88vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 80px rgba(10, 20, 50, 0.25);
+  animation: padUp 0.26s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes padUp {
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+.pad-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  background: var(--pad-navy);
+  flex-shrink: 0;
+}
+
+.pad-header__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255,255,255,.6);
+}
+
+.pad-header__title {
+  font-family: var(--pad-font);
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.pad-header__sub {
+  font-size: 11.5px;
+  color: rgba(255,255,255,.45);
+  margin: 2px 0 0;
+}
+
+.pad-header__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pad-statut {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.pad-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: rgba(255,255,255,.12);
+  border: none;
+  color: rgba(255,255,255,.8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s;
+}
+
+.pad-close:hover { background: rgba(255,255,255,.22); }
+
+/* ── Doctor row ──────────────────────────────────────────── */
+.pad-doctor {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 22px;
+  background: var(--pad-bg);
+  border-bottom: 1px solid var(--pad-border);
+  flex-shrink: 0;
+}
+
+.pad-doctor__avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dbe8ff, #c7d7f5);
+  color: var(--pad-navy);
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pad-doctor__name {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--pad-text);
+  margin: 0 0 3px;
+}
+
+.pad-doctor__spec {
+  font-size: 12.5px;
+  color: var(--pad-accent);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ── Body ────────────────────────────────────────────────── */
+.pad-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── Left sidebar (navy) ─────────────────────────────────── */
+.pad-sidebar {
+  width: var(--pad-sidebar);
+  background: var(--pad-navy);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pad-tab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 18px;
+  background: transparent;
+  border: none;
+  border-left: 3px solid transparent;
+  color: rgba(255,255,255,.5);
+  font-family: var(--pad-font);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  line-height: 1.3;
+  transition: all 0.18s ease;
+}
+
+.pad-tab svg { flex-shrink: 0; }
+
+.pad-tab:hover {
+  background: rgba(255,255,255,.07);
+  color: rgba(255,255,255,.85);
+}
+
+.pad-tab--active {
+  background: rgba(255,255,255,.12);
+  color: #ffffff;
+  font-weight: 600;
+  border-left-color: #60a5fa;
+}
+
+/* ── Right content (white) ───────────────────────────────── */
+.pad-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 22px 24px;
+  background: var(--pad-surface);
+  scrollbar-width: thin;
+  scrollbar-color: var(--pad-border) transparent;
+}
+
+/* ── Section ─────────────────────────────────────────────── */
+.pad-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Field ───────────────────────────────────────────────── */
+.pad-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.pad-field__label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pad-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.pad-field__value {
+  font-size: 14px;
+  color: var(--pad-text);
+  margin: 0;
+  line-height: 1.65;
+}
+
+/* ── Empty note ──────────────────────────────────────────── */
+.pad-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 14px 16px;
+  background: var(--pad-bg);
+  border-radius: 10px;
+  border: 1.5px dashed var(--pad-border);
+}
+
+.pad-empty svg { color: var(--pad-muted); opacity: 0.4; }
+
+.pad-empty p {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pad-text);
+  margin: 0;
+}
+
+.pad-empty span {
+  font-size: 12px;
+  color: var(--pad-muted);
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.pad-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 22px 16px;
+  border-top: 1px solid var(--pad-border);
+  flex-shrink: 0;
+}
+
+.pad-btn {
+  padding: 9px 24px;
+  border-radius: 9px;
+  background: var(--pad-bg);
+  color: var(--pad-text);
+  border: 1.5px solid var(--pad-border);
+  font-family: var(--pad-font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.pad-btn:hover {
+  border-color: var(--pad-accent);
+  color: var(--pad-accent);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 540px) {
+  .pad-backdrop { padding: 0; align-items: flex-end; }
+  .pad-modal    { border-radius: 20px 20px 0 0; max-height: 92vh; }
+  .pad-sidebar  { width: 130px; }
+  .pad-tab span { font-size: 11.5px; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*doctorprofile.css*/
+
+
+
+
+
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.dp-page {
+  min-height: 100vh;
+  background: #e8edf5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px 16px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ── Cards ── */
+.dp-card {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  max-width: 420px;
+}
+
+.dp-card--profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 24px 24px;
+  gap: 8px;
+}
+
+.dp-card--form {
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ── Avatar ── */
+.dp-avatar-wrapper {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-bottom: 6px;
+}
+
+.dp-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.25s ease, filter 0.25s ease;
+  border: 3px solid #f0f3f8;
+}
+
+.dp-avatar--dimmed {
+  opacity: 0.5;
+  filter: brightness(0);
+}
+
+.dp-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.dp-avatar-overlay--visible {
+  opacity: 1;
+}
+
+.dp-file-input {
+  display: none;
+}
+
+/* ── Profile text ── */
+.dp-name {
+  font-family: 'Inter', serif;
+  font-size: 1.25rem;
+  color: #1a1f2e;
+  letter-spacing: 0.01em;
+}
+
+.dp-specialty {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #4f93f5;
+  letter-spacing: 0.04em;
+}
+
+/* ── Form fields ── */
+.dp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dp-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #7a8399;
+  letter-spacing: 0.02em;
+}
+
+.dp-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.dp-input {
+  width: 100%;
+  padding: 10px 36px 10px 14px;
+  background: #f4f6fb;
+  border: 1.5px solid transparent;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  color: #1a1f2e;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dp-input:focus {
+  background: #ffffff;
+  border-color: #4f93f5;
+  box-shadow: 0 0 0 3px rgba(79, 147, 245, 0.12);
+}
+
+.dp-pencil {
+  position: absolute;
+  right: 12px;
+  color: #a0aec0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+.dp-input-wrapper:focus-within .dp-pencil {
+  color: #4f93f5;
+}
+
+/* ── Save button ── */
+.dp-save-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 32px;
+  background: #1a2744;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 14px rgba(26, 39, 68, 0.25);
+}
+
+.dp-save-btn:hover {
+  background: #243460;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(26, 39, 68, 0.32);
+}
+
+.dp-save-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(26, 39, 68, 0.2);
 }

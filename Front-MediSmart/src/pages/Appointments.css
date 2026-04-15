@@ -107,7 +107,6 @@
   color: #374151;
 }
 
-/* badge count inside tab */
 .appt-tab-badge {
   display: inline-flex;
   align-items: center;
@@ -224,6 +223,27 @@
 
 .appt-btn--cancel       { color: #D40F01; opacity: 0.7; }
 .appt-btn--cancel:hover { background: #fff1f1; opacity: 1; }
+
+/* ✅ NEW — file/details button on past appointments */
+.appt-btn--file {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: #eff6ff;
+  border: 1.5px solid #bfdbfe !important;
+  color: #3b6fe0;
+  font-weight: 600;
+  border-radius: 8px !important;
+  font-size: 12.5px;
+  transition: all 0.15s ease !important;
+}
+
+.appt-btn--file:hover {
+  background: #3b6fe0 !important;
+  color: #ffffff !important;
+  border-color: #3b6fe0 !important;
+}
 
 /* ══════════════════════════════════════════════
    EMPTY / LOADING / ERROR STATES
@@ -345,16 +365,10 @@
 
 .modal-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.modal-btn--back {
-  background: #f3f4f6;
-  color: #374151;
-}
+.modal-btn--back    { background: #f3f4f6; color: #374151; }
 .modal-btn--back:hover:not(:disabled) { background: #e5e7eb; }
 
-.modal-btn--confirm {
-  background: #dc2626;
-  color: #ffffff;
-}
+.modal-btn--confirm    { background: #dc2626; color: #ffffff; }
 .modal-btn--confirm:hover:not(:disabled) { background: #b91c1c; }
 
 /* ══════════════════════════════════════════════

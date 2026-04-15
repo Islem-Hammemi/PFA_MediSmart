@@ -1,166 +1,113 @@
-// ============================================================
-//  Patients.jsx  –  Page de gestion des patients (médecin)
-//  Sprint 3 – US14 + US15
-//  Responsable : Sarra Othmani
-// ============================================================
-
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getToken } from '../services/authService';
 import './patients.css';
+import Navbarmedecin from '../components/Navbarmedecin';
+import Searchbarrepatients from '../components/Searchbarrepatients';
+import PatientList from '../components/Patientlist';
+import Addpatientbutton from '../components/Addpatientbutton';
+import Footerr from '../components/Footerr';
 
-import Navbarmedecin        from '../components/Navbarmedecin';
-import Searchbarrepatients  from '../components/Searchbarrepatients';
-import PatientList          from '../components/Patientlist';
-import Addpatientbutton     from '../components/Addpatientbutton';
-import Footerr              from '../components/Footerr';
-import PatientFolderModal   from '../components/PatientFolderModal';
-import AddPatientModal      from '../components/AddPatientModal';
+const API_BASE = "http://localhost:5000/api";
 
-import { fetchMesPatients } from '../services/dossierAPI';
+function Patients() {
+  const [allPatients,  setAllPatients]  = useState([]);
+  const [filtered,     setFiltered]     = useState([]);
+  const [loading,      setLoading]      = useState(true);
+  const [search,       setSearch]       = useState("");
 
-export default function Patients() {
-  /* ── State ──────────────────────────────────────────── */
-  const [patients, setPatients]             = useState([]);
-  const [filtered, setFiltered]             = useState([]);
-  const [loading, setLoading]               = useState(true);
-  const [fetchError, setFetchError]         = useState(null);
+  // ── Fetch patient list + their rdv ───────────────────────
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        // 1. Get patient list
+        const res  = await fetch(`${API_BASE}/dossiers/mes-patients`, {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        });
+        const json = await res.json();
+        if (!json.success) return;
 
-  // Dossier ouvert
-  const [selectedPatient, setSelectedPatient] = useState(null); // { patient_id, nom_complet, … }
+        const patients = json.patients || [];
 
-  // Modale ajout patient
-  const [showAddModal, setShowAddModal]     = useState(false);
+        // 2. For each patient, fetch their rdv list
+        const enriched = await Promise.all(
+          patients.map(async (p) => {
+            try {
+              const dRes  = await fetch(`${API_BASE}/dossiers/patient/${p.patient_id}`, {
+                headers: { Authorization: `Bearer ${getToken()}` },
+              });
+              const dJson = await dRes.json();
+              if (dJson.success) {
+                return {
+                  ...p,
+                  rendez_vous:      dJson.rendez_vous      || [],
+                  dossiers_medicaux: dJson.dossiers_medicaux || [],
+                };
+              }
+            } catch { /* ignore individual errors */ }
+            return { ...p, rendez_vous: [], dossiers_medicaux: [] };
+          })
+        );
 
-  // Toast notification
-  const [toast, setToast]                   = useState(null); // { type: 'success'|'error', msg }
-
-  /* ── Chargement initial ─────────────────────────────── */
-  const loadPatients = useCallback(async () => {
-    setLoading(true);
-    setFetchError(null);
-    try {
-      const data = await fetchMesPatients();
-      setPatients(data.patients);
-      setFiltered(data.patients);
-    } catch (err) {
-      setFetchError(err.message);
-    } finally {
-      setLoading(false);
-    }
+        setAllPatients(enriched);
+        setFiltered(enriched);
+      } catch (err) {
+        console.error("Fetch patients error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPatients();
   }, []);
 
-  useEffect(() => { loadPatients(); }, [loadPatients]);
-
-  /* ── Recherche locale ───────────────────────────────── */
-  const handleSearch = (query) => {
-    const q = query.toLowerCase().trim();
-    if (!q) {
-      setFiltered(patients);
-    } else {
-      setFiltered(
-        patients.filter(
-          (p) =>
-            p.nom_complet?.toLowerCase().includes(q) ||
-            p.email?.toLowerCase().includes(q) ||
-            p.telephone?.includes(q)
-        )
-      );
+  // ── Search filter ─────────────────────────────────────────
+  const handleSearch = (value) => {
+    setSearch(value);
+    if (!value.trim()) {
+      setFiltered(allPatients);
+      return;
     }
+    const kw = value.toLowerCase();
+    setFiltered(
+      allPatients.filter(
+        (p) =>
+          p.nom_complet?.toLowerCase().includes(kw) ||
+          p.email?.toLowerCase().includes(kw)       ||
+          p.telephone?.includes(kw)
+      )
+    );
   };
 
-  /* ── Ouvrir dossier patient ─────────────────────────── */
-  const handleOpenFolder = (patient) => {
-    setSelectedPatient(patient);
-  };
-
-  /* ── Fermer dossier ─────────────────────────────────── */
-  const handleCloseFolder = () => {
-    setSelectedPatient(null);
-  };
-
-  /* ── Succès ajout patient ───────────────────────────── */
-  const handlePatientAdded = (result) => {
-    showToast('success', `Patient créé avec succès (ID : ${result.patient_id})`);
-    loadPatients(); // Recharger la liste
-  };
-
-  /* ── Toast ──────────────────────────────────────────── */
-  const showToast = (type, msg) => {
-    setToast({ type, msg });
-    setTimeout(() => setToast(null), 4000);
-  };
-
-  /* ── Render ─────────────────────────────────────────── */
   return (
-    <div className="patients-page">
+    <div className='patients-page'>
       <Navbarmedecin />
 
-      {/* Hero */}
       <section className="hero">
         <div className="hero-content">
-          <h1 className="hero-title">
-            Smart Patient <span className="hero-title-two">Management</span>
+          <h1 className='hero-title'>
+            Smart Patient <span className='hero-title-two'>Management</span>
           </h1>
-          <p className="hero-subtitle">
+          <p className='hero-subtitle'>
             Streamline patient information, track medical records, and deliver better care with ease.
           </p>
         </div>
       </section>
 
-      {/* Barre de recherche + bouton */}
-      <div className="patients-toolbar">
-        <Searchbarrepatients onSearch={handleSearch} />
-        <Addpatientbutton onClick={() => setShowAddModal(true)} />
-      </div>
+      <Searchbarrepatients onSearch={handleSearch} />
+      <Addpatientbutton />
 
-      {/* Compteur */}
-      {!loading && !fetchError && (
-        <p className="patients-count">
-          {filtered.length === patients.length
-            ? `${patients.length} patient${patients.length > 1 ? 's' : ''}`
-            : `${filtered.length} résultat${filtered.length > 1 ? 's' : ''} sur ${patients.length}`}
-        </p>
-      )}
-
-      {/* Erreur de chargement */}
-      {fetchError && (
-        <div className="patients-error">
-          <p>⚠ {fetchError}</p>
-          <button onClick={loadPatients}>Réessayer</button>
-        </div>
-      )}
-
-      {/* Liste patients */}
       <PatientList
         patients={filtered}
         loading={loading}
-        onOpenFolder={handleOpenFolder}
+        onOpenFolder={(patient) => {
+          // Optional: open a full-screen patient detail view
+          console.log("Open folder for:", patient);
+        }}
       />
 
       <br /><br /><br /><br />
       <Footerr />
-
-      {/* ── Modale dossier patient ─────────────────────── */}
-      {selectedPatient && (
-        <PatientFolderModal
-          patientId={selectedPatient.patient_id}
-          onClose={handleCloseFolder}
-        />
-      )}
-
-      {/* ── Modale ajout patient ───────────────────────── */}
-      {showAddModal && (
-        <AddPatientModal
-          onClose={() => setShowAddModal(false)}
-          onSuccess={handlePatientAdded}
-        />
-      )}
-
-      {/* ── Toast notification ─────────────────────────── */}
-      {toast && (
-        <div className={`patients-toast patients-toast-${toast.type}`}>
-          {toast.type === 'success' ? '✓' : '⚠'} {toast.msg}
-        </div>
-      )}
     </div>
   );
 }
+
+export default Patients;
