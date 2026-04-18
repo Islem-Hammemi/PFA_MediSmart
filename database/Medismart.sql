@@ -72,7 +72,7 @@ CREATE TABLE `dossiers_medicaux` (
   KEY `idx_dossiers_date` (`date_consultation`),
   CONSTRAINT `fk_dossiers_medecin` FOREIGN KEY (`medecin_id`) REFERENCES `medecins` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_dossiers_patient` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -81,7 +81,6 @@ CREATE TABLE `dossiers_medicaux` (
 
 LOCK TABLES `dossiers_medicaux` WRITE;
 /*!40000 ALTER TABLE `dossiers_medicaux` DISABLE KEYS */;
-INSERT INTO `dossiers_medicaux` VALUES (1,3,1,'2026-04-11',NULL,NULL,'broken heart','2026-04-11 22:11:33','2026-04-11 22:11:33',0),(2,3,1,'2026-04-11',NULL,NULL,'hello word','2026-04-11 22:52:08','2026-04-11 22:52:08',0),(3,4,1,'2026-04-11',NULL,NULL,'bowwwww','2026-04-11 22:52:49','2026-04-11 22:52:49',0),(4,2,1,'2026-04-13',NULL,NULL,'iouythg','2026-04-13 20:00:27','2026-04-13 20:00:27',0),(5,2,1,'2026-04-13',NULL,NULL,'oujyhtgfds','2026-04-13 20:00:40','2026-04-13 20:00:40',0),(6,2,1,'2026-04-13',NULL,NULL,'Hello','2026-04-13 20:14:47','2026-04-13 20:14:47',0),(7,5,1,'2026-04-13',NULL,NULL,'rassha youja3','2026-04-13 20:40:53','2026-04-13 20:40:53',0),(8,3,1,'2026-04-13',NULL,NULL,'helloo','2026-04-13 20:52:23','2026-04-13 20:52:23',0),(9,5,1,'2026-04-13',NULL,NULL,'ha tofla le fhimitt chbeha','2026-04-13 20:52:49','2026-04-13 20:52:49',0),(10,5,1,'2026-04-13',NULL,NULL,'hablitniiii','2026-04-13 21:42:13','2026-04-13 21:42:13',0),(11,5,1,'2026-04-13',NULL,NULL,'whaaaaat','2026-04-13 21:44:35','2026-04-13 21:44:35',0),(12,5,1,'2026-04-13','hello','ya benti maEch tjii','ochrib maa','2026-04-13 23:58:34','2026-04-13 23:58:34',0),(13,3,1,'2026-04-16','hala wallah','or9id bilgdaaa','nchallah lebes','2026-04-16 17:13:12','2026-04-16 17:13:12',0),(14,1,1,'2026-04-18','hellooo',NULL,NULL,'2026-04-18 14:49:34','2026-04-18 14:49:34',7),(15,2,12,'2026-04-18','ahla bik','bara 3adi','le le ma3ach ysa3id','2026-04-18 15:00:08','2026-04-18 15:00:08',17),(16,2,12,'2026-04-18','helooo','jklmjkhfzejkfz','jnkfjkerjhkerjkg  fjklerjkfrejkfrjke','2026-04-18 15:17:17','2026-04-18 15:17:17',31),(17,1,10,'2026-04-18','hjfezferz','jbkjdsdbfz,jsdgfz','jhsdbz','2026-04-18 15:26:28','2026-04-18 15:26:28',6),(18,8,10,'2026-04-18','hhh','hhh','hhh','2026-04-18 15:30:16','2026-04-18 15:30:16',99),(19,9,10,'2026-04-18','bara rawa777','lklshjaziudezh','jdsjdfbzef','2026-04-18 15:34:40','2026-04-18 15:34:40',26),(20,2,10,'2026-04-18','vsdjfvbdsfkjger',',ncbsdjbfvre','s,jdjbfjqdferf','2026-04-18 15:34:55','2026-04-18 15:34:55',9),(21,10,10,'2026-04-18','hhh','hhhh','hhh','2026-04-18 15:35:35','2026-04-18 15:35:35',31),(22,10,10,'2026-04-18','qjkgfez',',nfnbds','jkhfkdsf','2026-04-18 15:38:21','2026-04-18 15:38:21',47),(23,11,10,'2026-04-18','ggg','gggg','ggg','2026-04-18 16:42:22','2026-04-18 16:42:22',23),(24,12,10,'2026-04-18','jjj','jjj','jj','2026-04-18 16:42:55','2026-04-18 16:42:55',15),(25,13,10,'2026-04-18','hhhhh','hhh','hhh','2026-04-18 16:44:11','2026-04-18 16:44:11',63);
 /*!40000 ALTER TABLE `dossiers_medicaux` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -111,7 +110,7 @@ CREATE TABLE `evaluations` (
   CONSTRAINT `fk_evaluations_rdv` FOREIGN KEY (`rendez_vous_id`) REFERENCES `rendez_vous` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_evaluations_ticket` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`) ON DELETE SET NULL,
   CONSTRAINT `chk_evaluations_note` CHECK ((`note` between 1 and 5))
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -120,7 +119,6 @@ CREATE TABLE `evaluations` (
 
 LOCK TABLES `evaluations` WRITE;
 /*!40000 ALTER TABLE `evaluations` DISABLE KEYS */;
-INSERT INTO `evaluations` VALUES (1,2,1,NULL,5,'soo professional','2026-04-13 20:15:23',NULL),(2,2,1,NULL,5,'soo professional','2026-04-13 20:15:25',NULL),(3,2,1,NULL,5,'soo professional','2026-04-13 20:15:32',NULL),(5,5,1,NULL,4,'wooow','2026-04-13 21:38:00',11),(6,5,1,21,2,'iwww','2026-04-13 21:38:07',NULL),(7,5,1,NULL,2,'ahhh not bad','2026-04-13 21:42:45',12),(8,5,1,NULL,1,'naaaah','2026-04-13 21:44:53',13),(9,3,1,19,5,'woow','2026-04-13 22:16:32',NULL),(10,5,1,NULL,1,'chbih ha rajilll','2026-04-13 23:59:00',14),(11,3,1,NULL,3,'pas mal','2026-04-16 17:13:42',18),(12,2,12,NULL,2,NULL,'2026-04-18 15:02:08',24),(13,8,12,NULL,3,'a','2026-04-18 15:17:50',25),(14,9,12,NULL,4,NULL,'2026-04-18 15:22:08',26),(15,2,12,NULL,4,NULL,'2026-04-18 15:22:54',27),(16,8,10,NULL,3,'naambouzink mabanek','2026-04-18 15:30:41',28),(17,10,10,NULL,5,'merci beaucoup','2026-04-18 15:36:04',31),(18,10,10,NULL,3,'mmmm','2026-04-18 15:38:32',32),(19,13,10,NULL,1,'je t\'aime pas','2026-04-18 16:44:32',35);
 /*!40000 ALTER TABLE `evaluations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -200,7 +198,7 @@ CREATE TABLE `patients` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_patients_user` (`user_id`),
   CONSTRAINT `fk_patients_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -209,7 +207,6 @@ CREATE TABLE `patients` (
 
 LOCK TABLES `patients` WRITE;
 /*!40000 ALTER TABLE `patients` DISABLE KEYS */;
-INSERT INTO `patients` VALUES (1,21,'2000-02-28','254781389'),(2,22,'2010-02-06','23448239'),(3,23,'2026-04-11','28885279'),(4,24,'2026-04-15','856326565'),(5,25,'2000-02-25','25874139'),(6,26,'1222-02-25','285479'),(7,27,'2200-02-25','852147'),(8,28,'3333-12-20','214587'),(9,29,'2000-12-25','2154698'),(10,30,'5525-02-25','123547'),(11,31,'2005-09-10','20785813'),(12,32,'9874-11-20','20154789'),(13,34,'5222-02-10','20123466');
 /*!40000 ALTER TABLE `patients` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -238,7 +235,7 @@ CREATE TABLE `rendez_vous` (
   KEY `idx_rdv_statut` (`statut`),
   CONSTRAINT `fk_rdv_medecin` FOREIGN KEY (`medecin_id`) REFERENCES `medecins` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_rdv_patient` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -247,7 +244,6 @@ CREATE TABLE `rendez_vous` (
 
 LOCK TABLES `rendez_vous` WRITE;
 /*!40000 ALTER TABLE `rendez_vous` DISABLE KEYS */;
-INSERT INTO `rendez_vous` VALUES (1,2,16,'2026-04-28 11:30:00','annule',NULL,'2026-03-31 22:26:06','2026-03-31 22:26:41',0),(2,2,1,'2026-04-05 10:00:00','planifie',NULL,'2026-04-04 23:18:05','2026-04-04 23:18:05',0),(3,2,1,'2026-04-17 10:00:00','annule',NULL,'2026-04-05 14:36:28','2026-04-06 21:41:37',0),(4,2,20,'2026-04-15 11:30:00','annule',NULL,'2026-04-05 16:41:32','2026-04-06 21:41:35',0),(5,2,6,'2026-04-17 11:30:00','annule',NULL,'2026-04-06 21:40:12','2026-04-06 21:40:33',0),(6,2,20,'2026-04-17 10:00:00','annule',NULL,'2026-04-06 21:40:50','2026-04-06 21:41:39',0),(7,1,10,'2026-04-16 16:30:00','annule',NULL,'2026-04-06 22:01:31','2026-04-09 22:03:25',0),(8,1,1,'2026-04-16 11:30:00','annule',NULL,'2026-04-07 21:37:51','2026-04-11 21:33:09',0),(9,1,10,'2026-04-16 09:30:00','annule',NULL,'2026-04-07 22:00:45','2026-04-11 21:33:11',0),(10,1,18,'2026-04-09 13:00:00','planifie',NULL,'2026-04-09 23:10:53','2026-04-09 23:10:53',0),(11,1,1,'2026-04-18 10:00:00','annule',NULL,'2026-04-11 21:24:37','2026-04-11 21:33:13',0),(12,1,1,'2026-04-24 09:00:00','annule',NULL,'2026-04-11 21:32:53','2026-04-11 21:33:14',0),(13,1,10,'2026-04-18 15:00:00','termine',NULL,'2026-04-11 21:33:38','2026-04-18 15:26:28',1),(14,1,1,'2026-04-21 11:30:00','annule',NULL,'2026-04-11 21:37:31','2026-04-11 22:12:10',0),(15,3,1,'2026-04-11 09:30:00','termine',NULL,'2026-04-11 22:50:29','2026-04-11 22:52:08',1),(16,3,1,'2026-04-12 09:30:00','planifie',NULL,'2026-04-11 22:55:17','2026-04-11 22:55:17',0),(17,2,1,'2026-04-15 10:00:00','confirme',NULL,'2026-04-13 20:07:49','2026-04-13 20:20:21',0),(18,2,1,'2026-04-14 09:30:00','confirme',NULL,'2026-04-13 20:20:06','2026-04-13 20:20:20',0),(19,3,1,'2026-04-13 09:00:00','termine',NULL,'2026-04-13 20:37:52','2026-04-13 22:16:32',0),(20,5,1,'2026-04-14 10:00:00','annule',NULL,'2026-04-13 20:38:46','2026-04-13 23:39:08',0),(21,5,1,'2026-04-13 09:30:00','termine',NULL,'2026-04-13 20:40:03','2026-04-13 20:40:53',1),(23,5,1,'2026-04-14 11:30:00','annule',NULL,'2026-04-13 22:30:28','2026-04-13 22:30:35',0),(26,5,1,'2026-04-14 13:00:00','annule',NULL,'2026-04-13 22:58:14','2026-04-13 22:59:19',0),(30,5,3,'2026-04-14 09:30:00','annule',NULL,'2026-04-13 23:10:22','2026-04-13 23:31:57',0),(31,5,1,'2026-04-15 09:30:00','annule',NULL,'2026-04-13 23:30:23','2026-04-13 23:31:35',0),(32,5,1,'2026-04-18 16:30:00','annule',NULL,'2026-04-13 23:31:08','2026-04-13 23:31:36',0),(34,5,1,'2026-04-14 09:00:00','annule',NULL,'2026-04-13 23:39:17','2026-04-13 23:45:32',0),(35,5,10,'2026-04-15 09:30:00','annule',NULL,'2026-04-13 23:40:09','2026-04-13 23:45:34',0),(36,13,10,'2026-04-19 09:00:00','confirme',NULL,'2026-04-18 16:39:47','2026-04-18 16:40:14',0),(37,1,10,'2026-04-20 10:00:00','planifie','pain of knees','2026-04-18 16:41:28','2026-04-18 16:41:28',0);
 /*!40000 ALTER TABLE `rendez_vous` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -268,7 +264,7 @@ CREATE TABLE `sessions` (
   UNIQUE KEY `uk_sessions_token` (`token`),
   KEY `fk_sessions_user` (`user_id`),
   CONSTRAINT `fk_sessions_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=136 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -277,7 +273,6 @@ CREATE TABLE `sessions` (
 
 LOCK TABLES `sessions` WRITE;
 /*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
-INSERT INTO `sessions` VALUES (129,30,'cff076cabe7a15d7c49feddd3e38feea546af8b1efd08866258a05421d99c8dd','2026-04-25 15:33:28','2026-04-18 15:33:27'),(131,10,'2b72db7f4bda46f5c2c51b0f7cdd506614986eb8f51d307271cdfcb03bc1127c','2026-04-25 16:26:55','2026-04-18 16:26:54'),(135,34,'b7e38da683aa53cba67bf356acf25392747b961b1d4a0d94bc2b07271398bbf9','2026-04-25 16:39:23','2026-04-18 16:39:23');
 /*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -303,7 +298,7 @@ CREATE TABLE `tickets` (
   KEY `idx_tickets_statut` (`statut`),
   CONSTRAINT `fk_tickets_medecin` FOREIGN KEY (`medecin_id`) REFERENCES `medecins` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_tickets_patient` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -312,7 +307,6 @@ CREATE TABLE `tickets` (
 
 LOCK TABLES `tickets` WRITE;
 /*!40000 ALTER TABLE `tickets` DISABLE KEYS */;
-INSERT INTO `tickets` VALUES (1,1,1,1,1,'en_attente','2026-03-30 16:10:43','2026-03-30 16:10:43'),(2,2,2,1,1,'en_attente','2026-03-31 22:24:57','2026-03-31 22:24:57'),(3,1,1,1,1,'en_attente','2026-04-09 23:11:48','2026-04-09 23:11:48'),(4,3,1,1,1,'termine','2026-04-11 22:10:48','2026-04-11 22:11:33'),(5,4,1,1,1,'termine','2026-04-11 22:51:21','2026-04-11 22:52:49'),(6,2,1,1,1,'termine','2026-04-13 19:59:14','2026-04-13 20:00:43'),(7,2,1,2,2,'termine','2026-04-13 19:59:25','2026-04-13 20:00:27'),(8,2,1,3,3,'termine','2026-04-13 19:59:52','2026-04-13 20:00:40'),(9,2,10,1,1,'en_attente','2026-04-13 19:59:57','2026-04-13 19:59:57'),(10,2,1,1,1,'termine','2026-04-13 20:04:43','2026-04-13 20:14:47'),(11,5,1,1,1,'termine','2026-04-13 20:51:47','2026-04-13 20:52:48'),(12,5,1,1,1,'termine','2026-04-13 21:41:38','2026-04-13 21:42:13'),(13,5,1,1,1,'termine','2026-04-13 21:44:06','2026-04-13 21:44:35'),(14,5,1,1,1,'termine','2026-04-13 23:57:56','2026-04-13 23:58:34'),(15,4,1,1,1,'en_attente','2026-04-14 00:15:31','2026-04-14 00:15:31'),(16,3,1,2,2,'en_attente','2026-04-14 00:15:44','2026-04-14 00:15:44'),(17,6,1,3,3,'en_attente','2026-04-14 00:16:42','2026-04-14 00:16:42'),(18,3,1,1,1,'termine','2026-04-16 17:12:19','2026-04-16 17:13:12'),(19,6,1,1,1,'termine','2026-04-18 00:32:25','2026-04-18 01:00:52'),(20,1,1,2,2,'termine','2026-04-18 00:33:23','2026-04-18 14:49:34'),(21,3,1,3,3,'en_cours','2026-04-18 00:33:59','2026-04-18 14:26:16'),(22,5,1,4,4,'en_cours','2026-04-18 14:24:53','2026-04-18 14:26:38'),(23,7,1,5,5,'en_attente','2026-04-18 14:48:48','2026-04-18 14:48:48'),(24,2,12,1,1,'termine','2026-04-18 14:55:58','2026-04-18 15:00:08'),(25,8,12,2,1,'termine','2026-04-18 14:56:44','2026-04-18 15:04:40'),(26,9,12,3,1,'termine','2026-04-18 14:58:07','2026-04-18 15:14:09'),(27,2,12,4,1,'termine','2026-04-18 15:02:23','2026-04-18 15:17:17'),(28,8,10,1,1,'termine','2026-04-18 15:21:22','2026-04-18 15:30:16'),(29,9,10,2,1,'termine','2026-04-18 15:22:11','2026-04-18 15:34:40'),(30,2,10,3,1,'termine','2026-04-18 15:22:59','2026-04-18 15:34:55'),(31,10,10,4,1,'termine','2026-04-18 15:33:35','2026-04-18 15:35:35'),(32,10,10,1,1,'termine','2026-04-18 15:37:11','2026-04-18 15:38:21'),(33,11,10,1,1,'termine','2026-04-18 16:35:48','2026-04-18 16:42:22'),(34,12,10,2,1,'termine','2026-04-18 16:38:24','2026-04-18 16:42:55'),(35,13,10,3,1,'termine','2026-04-18 16:39:57','2026-04-18 16:44:11');
 /*!40000 ALTER TABLE `tickets` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -475,4 +469,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-18 17:13:24
+-- Dump completed on 2026-04-18 18:13:28
