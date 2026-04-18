@@ -80,7 +80,7 @@ function PatientDossierPopup({ patient, onClose }) {
 
           {/* Header */}
           <div className="pd-header">
-            <h3 className="pd-header__title">Dossier Patient</h3>
+            <h3 className="pd-header__title">Patient File</h3>
             <button className="pd-close" onClick={onClose}>
               X
             </button>
@@ -125,7 +125,7 @@ style={{ backgroundColor: getAvatarColor(), color: '#365081' }}            >
                       <line x1="3"  y1="10" x2="21" y2="10"/>
                     </svg>
                     {formatDate(patient.date_naissance)}
-                    {age !== null && ` · ${age} ans`}
+                    {age !== null && ` · ${age} years old`}
                   </span>
                 )}
               </div>
@@ -135,7 +135,7 @@ style={{ backgroundColor: getAvatarColor(), color: '#365081' }}            >
             <div className="pd-stats">
               <div className="pd-stat">
                 <span className="pd-stat__value">{patient.nb_rdv ?? rdvList.length}</span>
-                <span className="pd-stat__label">Rendez-vous</span>
+                <span className="pd-stat__label">Appointments</span>
               </div>
             </div>
           </div>
@@ -179,7 +179,7 @@ style={{ backgroundColor: getAvatarColor(), color: '#365081' }}            >
                           title="View details"
                           onClick={() => setSelectedRdv(rdv)}
                         >
-                          <FileIcon />
+                          View
                         </button>
                       </div>
                     </div>
@@ -225,7 +225,7 @@ style={{ backgroundColor: getAvatarColor(), color: '#365081' }}        >
         </div>
         <div className="patient-details">
           <span className="patient-name">{patient.nom_complet}</span>
-          {age !== null && <span className="patient-age">{age} ans</span>}
+          {age !== null && <span className="patient-age">{age} years old</span>}
           {patient.telephone && (
             <span className="patient-phone">{patient.telephone}</span>
           )}

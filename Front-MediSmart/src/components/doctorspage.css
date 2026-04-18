@@ -775,6 +775,7 @@
   gap: 16px;
   width: 100%;
   padding: 4px 24px;
+  margin-top: 2cm;
 }
 
 @media (max-width: 1100px) {
@@ -4431,63 +4432,54 @@
 
 
 
-/*doctorprofile.css*/
+/* ============================================================
+   MediSmart – doctorprofile.css
+   ============================================================ */
 
-
-
-
-
-
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
 
 .dp-page {
-  min-height: 100vh;
-  background: #e8edf5;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 16px;
-  padding: 40px 16px;
-  font-family: 'Inter', sans-serif;
+  padding: 24px 16px 32px;
+  font-family: 'DM Sans', sans-serif;
+  min-width: 260px;
 }
 
-/* ── Cards ── */
+/* ── Card ────────────────────────────────────────────────── */
 .dp-card {
   background: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(30,58,110,.08);
   width: 100%;
-  max-width: 420px;
 }
 
 .dp-card--profile {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 32px 24px 24px;
+  padding: 28px 20px 20px;
   gap: 8px;
 }
 
 .dp-card--form {
-  padding: 24px 28px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
 }
 
-/* ── Avatar ── */
+/* ── Avatar ──────────────────────────────────────────────── */
 .dp-avatar-wrapper {
   position: relative;
   width: 90px;
   height: 90px;
   border-radius: 50%;
   cursor: pointer;
-  margin-bottom: 6px;
+  flex-shrink: 0;
+  margin-bottom: 4px;
 }
 
 .dp-avatar {
@@ -4495,15 +4487,22 @@
   height: 90px;
   border-radius: 50%;
   object-fit: cover;
+  border: 3px solid #e2e7f0;
+  transition: opacity 0.2s ease;
   display: block;
-  transition: opacity 0.25s ease, filter 0.25s ease;
-  border: 3px solid #f0f3f8;
 }
 
-.dp-avatar--dimmed {
-  opacity: 0.5;
-  filter: brightness(0);
+.dp-avatar--initials {
+  background: linear-gradient(135deg, #1e3a6e, #3b7de9);
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.dp-avatar--dimmed { opacity: 0.45; }
 
 .dp-avatar-overlay {
   position: absolute;
@@ -4514,44 +4513,37 @@
   justify-content: center;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.2s ease;
 }
 
-.dp-avatar-overlay--visible {
-  opacity: 1;
-}
+.dp-avatar-overlay--visible { opacity: 1; }
 
-.dp-file-input {
-  display: none;
-}
+.dp-file-input { display: none; }
 
-/* ── Profile text ── */
+/* ── Name & specialty ────────────────────────────────────── */
 .dp-name {
-  font-family: 'Inter', serif;
-  font-size: 1.25rem;
-  color: #1a1f2e;
-  letter-spacing: 0.01em;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a2236;
+  margin: 0;
+  text-align: center;
 }
 
 .dp-specialty {
-  font-size: 0.8rem;
+  font-size: 13px;
+  color: #3b7de9;
   font-weight: 500;
-  color: #4f93f5;
-  letter-spacing: 0.04em;
 }
 
-/* ── Form fields ── */
-.dp-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+/* ── Form fields ─────────────────────────────────────────── */
+.dp-field { display: flex; flex-direction: column; gap: 5px; }
 
 .dp-label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #7a8399;
-  letter-spacing: 0.02em;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #6b7a99;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .dp-input-wrapper {
@@ -4562,64 +4554,76 @@
 
 .dp-input {
   width: 100%;
-  padding: 10px 36px 10px 14px;
-  background: #f4f6fb;
-  border: 1.5px solid transparent;
-  border-radius: 10px;
-  font-size: 0.88rem;
-  color: #1a1f2e;
-  font-family: 'Inter', sans-serif;
+  padding: 9px 36px 9px 12px;
+  border: 1.5px solid #e2e7f0;
+  border-radius: 9px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  color: #1a2236;
+  background: #f4f7fb;
   outline: none;
-  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+  transition: border-color 0.18s, background 0.18s;
 }
 
 .dp-input:focus {
+  border-color: #3b7de9;
   background: #ffffff;
-  border-color: #4f93f5;
-  box-shadow: 0 0 0 3px rgba(79, 147, 245, 0.12);
+  box-shadow: 0 0 0 3px rgba(59,125,233,.1);
 }
 
 .dp-pencil {
   position: absolute;
-  right: 12px;
-  color: #a0aec0;
+  right: 10px;
+  color: #94a3b8;
   display: flex;
-  align-items: center;
-  justify-content: center;
   pointer-events: none;
-  transition: color 0.2s ease;
 }
 
-.dp-input-wrapper:focus-within .dp-pencil {
-  color: #4f93f5;
+/* ── Feedback ────────────────────────────────────────────── */
+.dp-feedback {
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 8px;
+  width: 100%;
+  text-align: center;
+  box-sizing: border-box;
 }
 
-/* ── Save button ── */
+.dp-feedback--success { background: #d1fae5; color: #065f46; }
+.dp-feedback--error   { background: #fee2e2; color: #991b1b; }
+
+/* ── Save button ─────────────────────────────────────────── */
 .dp-save-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 13px 32px;
-  background: #1a2744;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  background: #1e3a6e;
   color: #ffffff;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
   font-weight: 600;
   border: none;
-  border-radius: 14px;
   cursor: pointer;
-  letter-spacing: 0.02em;
-  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 14px rgba(26, 39, 68, 0.25);
+  transition: background 0.18s, opacity 0.18s;
 }
 
-.dp-save-btn:hover {
-  background: #243460;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(26, 39, 68, 0.32);
-}
+.dp-save-btn:hover:not(:disabled) { background: #2a4f94; }
+.dp-save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-.dp-save-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(26, 39, 68, 0.2);
+
+
+
+
+
+
+.pd-file-btn{
+  color: #414141;
+  font-size: 10px;
 }

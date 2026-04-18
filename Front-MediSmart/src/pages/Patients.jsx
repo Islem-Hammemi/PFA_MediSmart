@@ -4,7 +4,6 @@ import './patients.css';
 import Navbarmedecin from '../components/Navbarmedecin';
 import Searchbarrepatients from '../components/Searchbarrepatients';
 import PatientList from '../components/Patientlist';
-import Addpatientbutton from '../components/Addpatientbutton';
 import Footerr from '../components/Footerr';
 
 const API_BASE = "http://localhost:5000/api";
@@ -93,7 +92,6 @@ function Patients() {
       </section>
 
       <Searchbarrepatients onSearch={handleSearch} />
-      <Addpatientbutton />
 
       <PatientList
         patients={filtered}

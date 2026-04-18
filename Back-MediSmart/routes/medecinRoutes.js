@@ -2,13 +2,12 @@ const express = require("express");
 const router  = express.Router();
 const multer  = require("multer");
 const path    = require("path");
+const { proteger, autoriserRole } = require("../middleware/authMiddleware");
 
-// ── Config Multer ─────────────────────────────────────────
+// ── Multer — saves to uploads/medecins/ ───────────────────────
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/medecins/");
-  },
-  filename: (req, file, cb) => {
+  destination: (req, file, cb) => cb(null, "uploads/medecins/"),
+  filename:    (req, file, cb) => {
     const ext = path.extname(file.originalname);
     cb(null, `medecin_${Date.now()}${ext}`);
   },
@@ -21,26 +20,31 @@ const upload = multer({
     const allowed = ["image/jpeg", "image/png", "image/webp"];
     allowed.includes(file.mimetype)
       ? cb(null, true)
-      : cb(new Error("Format invalide. Utilisez JPG, PNG ou WEBP."));
+      : cb(new Error("Format invalide. JPG, PNG ou WEBP seulement."));
   },
 });
 
-// ── Import controller ─────────────────────────────────────
-const {
-  getMedecins,
-  getMedecinsPresents,
-  checkIn,
-  checkOut,
-  getMedecinSemaine, 
-  uploadPhoto,       
-} = require("../presentation/medecinController");
+const medecinAuth = [proteger, autoriserRole("medecin")];
 
+const ctrl = require("../presentation/medecinController");
 
-router.get("/",          getMedecins);
-router.get("/presents",  getMedecinsPresents);
-router.post("/checkin",  checkIn);
-router.post("/checkout", checkOut);
-router.get("/semaine",  getMedecinSemaine);
-router.post("/photo",   upload.single("photo"), uploadPhoto);
+// ── Public ────────────────────────────────────────────────────
+router.get("/",         ctrl.getMedecins);
+router.get("/presents", ctrl.getMedecinsPresents);
+router.get("/semaine",  ctrl.getMedecinSemaine);
+router.get("/stats",    ctrl.getStats);
+
+// ── Legacy (userId in body — kept for backward compat) ────────
+router.post("/checkin",  ctrl.checkIn);
+router.post("/checkout", ctrl.checkOut);
+
+// ── Photo upload (optional token — works both ways) ───────────
+router.post("/photo", upload.single("photo"), ctrl.uploadPhoto);
+
+// ── Authenticated medecin ─────────────────────────────────────
+router.get("/mon-statut",    medecinAuth, ctrl.getMonStatut);
+router.post("/checkin-auth", medecinAuth, ctrl.checkin);
+router.post("/checkout-auth",medecinAuth, ctrl.checkout);
+router.put("/profile",       medecinAuth, ctrl.updateProfile);
 
 module.exports = router;
