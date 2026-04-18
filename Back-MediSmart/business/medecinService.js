@@ -31,9 +31,6 @@ const getMedecinsPresents = async () => {
   return await attachQueueInfo(doctors);
 };
 
-
-const getMedecinsPresents = async () => await medecinRepository.findPresents();
-
 const checkInMedecin = async (userId) => {
   if (!userId) throw new Error("userId requis");
   return await medecinRepository.checkIn(userId);
