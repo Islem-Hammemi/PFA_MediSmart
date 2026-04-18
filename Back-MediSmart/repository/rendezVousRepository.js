@@ -242,7 +242,7 @@ const getPendingByMedecin = async (medecinId) => {
   return rows;
 };
 
-// ✅ YOUR KEY FUNCTION
+//  YOUR KEY FUNCTION
 const changerStatutRdv = async (rdvId, medecinId, nouveauStatut, statutsAutorises) => {
   const placeholders = statutsAutorises.map(() => "?").join(",");
   const [result] = await pool.execute(

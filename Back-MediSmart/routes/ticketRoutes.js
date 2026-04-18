@@ -14,7 +14,7 @@ router.post('/', patientAuth, ticketController.genererTicket);
 // US9 : Consulter ses tickets (patient)
 router.get('/patient', patientAuth, ticketController.consulterTickets);
 
-// ✅ MUST be here — before /:id routes
+//  MUST be here — before /:id routes
 router.get('/my-active-status', protegerTicketRDV, ticketController.getMyActiveStatus);
 
 // File d'attente du jour (médecin)

@@ -84,7 +84,7 @@ const reserver = async (userId, { medecinId, dateHeure, motif }) => {
 
   const patientId = await _getPatientId(userId);
 
-  // ✅ important (Sarra)
+  //  important 
   const conflitPatient = await rendezVousRepository.verifierConflitPatient(patientId, dateHeure);
   if (conflitPatient)
     throw new Error("Vous avez déjà un RDV à cette date.");
@@ -173,7 +173,7 @@ const getPendingMedecin = async (medecinId) => {
   return rows.map(_formaterRdvMedecin);
 };
 
-// ✅ YOUR FEATURE (better than separate ones)
+//  YOUR FEATURE (better than separate ones)
 const changerStatut = async (rdvId, medecinId, nouveauStatut, statutsAutorisés) => {
   const affected = await rendezVousRepository.changerStatutRdv(
     rdvId, medecinId, nouveauStatut, statutsAutorisés
@@ -182,7 +182,7 @@ const changerStatut = async (rdvId, medecinId, nouveauStatut, statutsAutorisés)
   return { message: `Statut mis à jour : ${nouveauStatut}` };
 };
 
-// ✅ YOUR FEATURE
+//  YOUR FEATURE
 const reserverParMedecin = async ({ medecinId, patientId, dateHeure, motif }) => {
   const [result] = await pool.execute(
     `INSERT INTO RENDEZ_VOUS (patient_id, medecin_id, date_heure, motif)

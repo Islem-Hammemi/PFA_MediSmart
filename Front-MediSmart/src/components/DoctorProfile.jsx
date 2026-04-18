@@ -59,7 +59,7 @@ export default function DoctorProfile({ onPhotoUpdated }) {
     });
   }, []);
 
-  // ✅ Compute current photo URL — from preview blob or stored path
+  //  Compute current photo URL — from preview blob or stored path
   const photoSrc = previewUrl
     ? previewUrl
     : user?.photo
@@ -92,11 +92,11 @@ export default function DoctorProfile({ onPhotoUpdated }) {
       const json = await res.json();
 
       if (json.success) {
-        // ✅ Save real path to localStorage so it persists
+        //  Save real path to localStorage so it persists
         const stored = JSON.parse(localStorage.getItem("user") || "{}");
         localStorage.setItem("user", JSON.stringify({ ...stored, photo: json.photo }));
 
-        // ✅ Tell Navbarmedecin to update its avatar
+        //  Tell Navbarmedecin to update its avatar
         if (onPhotoUpdated) onPhotoUpdated(json.photoUrl);
       }
     } catch (err) {
@@ -151,7 +151,7 @@ export default function DoctorProfile({ onPhotoUpdated }) {
           onMouseLeave={() => setIsHoveringPic(false)}
           onClick={handlePicClick}
         >
-          {/* ✅ Show photo if available, otherwise initials */}
+          {/*  Show photo if available, otherwise initials */}
           {photoSrc ? (
             <img
               src={photoSrc}
@@ -175,7 +175,7 @@ export default function DoctorProfile({ onPhotoUpdated }) {
           />
         </div>
 
-        {/* ✅ Name + specialty */}
+        {/*  Name + specialty */}
         <h2 className="dp-name">Dr. {fields.prenom} {fields.nom}</h2>
         <span className="dp-specialty">{specialty}</span>
       </div>
@@ -185,7 +185,7 @@ export default function DoctorProfile({ onPhotoUpdated }) {
         {[
           { label: "First Name",    field: "prenom",    type: "text"  },
           { label: "Last Name",     field: "nom",       type: "text"  },
-          { label: "Phone Number",  field: "telephone", type: "tel"   }, // ✅ BACK
+          { label: "Phone Number",  field: "telephone", type: "tel"   }, //  BACK
           { label: "Email Address", field: "email",     type: "email" },
         ].map(({ label, field, type }) => (
           <div className="dp-field" key={field}>

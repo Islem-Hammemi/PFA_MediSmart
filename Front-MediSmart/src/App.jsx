@@ -14,16 +14,16 @@ import Patients from "./pages/Patients";
 import Schedule from "./pages/schedule";
 import Tickets from "./pages/Tickets";
 import Reviews from "./pages/Reviews";
-import { useEvaluationPoller } from "./hooks/useEvaluationPoller";  // ✅ NEW
-import RatingModal from "./components/RatingModal";                  // ✅ NEW
+import { useEvaluationPoller } from "./hooks/useEvaluationPoller";  
+import RatingModal from "./components/RatingModal";                  
 
 function App() {
-  // ✅ Global evaluation poller — works for BOTH ticket and RDV patients
+  //  Global evaluation poller — works for BOTH ticket and RDV patients
   const { showRating, evaluationData, handleSubmit } = useEvaluationPoller();
 
   return (
     <>
-      {/* ✅ Global rating modal — appears on ANY page when consultation ends */}
+      {/*  Global rating modal — appears on ANY page when consultation ends */}
       {showRating && evaluationData && (
         <RatingModal
           medecinNom={evaluationData.medecin_nom}

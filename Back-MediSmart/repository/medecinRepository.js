@@ -86,7 +86,7 @@ const checkOut = async (userId) => {
   return rows[0];
 };
 
-// ✅ FIX — photo stored as /uploads/medecins/... served from /uploads/medecins/
+// FIX — photo stored as /uploads/medecins/... served from /uploads/medecins/
 const updatePhoto = async (userId, photoPath) => {
   await pool.query(
     "UPDATE MEDECINS SET photo = ? WHERE user_id = ?",
@@ -146,7 +146,7 @@ const trouverParEmail = async (email) => {
   return rows[0] || null;
 };
 
-// ✅ FIX — includes specialite, statut, photo so DoctorProfile + Statusdropdown work
+//  FIX — includes specialite, statut, photo so DoctorProfile + Statusdropdown work
 const trouverParId = async (id) => {
   const [rows] = await pool.execute(
     `SELECT u.id AS user_id, u.email, u.nom, u.prenom, u.role,
@@ -160,7 +160,7 @@ const trouverParId = async (id) => {
   return rows[0] || null;
 };
 
-// ✅ NEW — get statut by medecin_id (for Statusdropdown)
+//  NEW — get statut by medecin_id (for Statusdropdown)
 const getStatutById = async (medecinId) => {
   const [rows] = await pool.query(
     `SELECT statut FROM MEDECINS WHERE id = ? LIMIT 1`,
@@ -169,7 +169,7 @@ const getStatutById = async (medecinId) => {
   return rows[0] || null;
 };
 
-// ✅ NEW — update statut by medecin_id
+//  NEW — update statut by medecin_id
 const updateStatut = async (medecinId, statut) => {
   await pool.query(
     `UPDATE MEDECINS SET statut = ? WHERE id = ?`,
@@ -177,7 +177,7 @@ const updateStatut = async (medecinId, statut) => {
   );
 };
 
-// ✅ NEW — update USERS table (prenom, nom, email) + telephone on MEDECINS if column exists
+//  NEW — update USERS table (prenom, nom, email) + telephone on MEDECINS if column exists
 const updateUserProfile = async (user_id, { prenom, nom, email, telephone }) => {
   await pool.query(
     `UPDATE USERS SET prenom = ?, nom = ?, email = ? WHERE id = ?`,
@@ -196,7 +196,7 @@ const updateUserProfile = async (user_id, { prenom, nom, email, telephone }) => 
   }
 };
 
-// ✅ NEW — dashboard stats
+//  NEW — dashboard stats
 const getStats = async () => {
   const [rows] = await pool.query(
     `SELECT

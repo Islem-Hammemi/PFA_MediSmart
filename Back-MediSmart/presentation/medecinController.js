@@ -49,14 +49,14 @@ const getMedecinSemaine = async (req, res) => {
   }
 };
 
-// ✅ FIX — reads userId from token OR body (backward compat)
+//  FIX — reads userId from token OR body (backward compat)
 const uploadPhoto = async (req, res) => {
   try {
     if (!req.file)
       return res.status(400).json({ success: false, message: "Aucun fichier envoyé." });
 
     const userId   = req.utilisateur?.user_id || req.body.userId;
-    // ✅ Path must match static serve: app.use("/uploads", express.static("uploads"))
+    //  Path must match static serve: app.use("/uploads", express.static("uploads"))
     // So store as /uploads/medecins/filename (relative to uploads root)
     const photoPath = `/uploads/medecins/${req.file.filename}`;
     const medecin  = await medecinService.updatePhoto(userId, photoPath);
@@ -73,7 +73,7 @@ const uploadPhoto = async (req, res) => {
   }
 };
 
-// ✅ GET /api/medecins/mon-statut
+//  GET /api/medecins/mon-statut
 const getMonStatut = async (req, res) => {
   try {
     const medecinId = req.utilisateur.medecin_id;
@@ -86,7 +86,7 @@ const getMonStatut = async (req, res) => {
   }
 };
 
-// ✅ POST /api/medecins/checkin-auth (by medecin_id from token)
+//  POST /api/medecins/checkin-auth (by medecin_id from token)
 const checkin = async (req, res) => {
   try {
     const medecinId = req.utilisateur.medecin_id;
@@ -101,7 +101,7 @@ const checkin = async (req, res) => {
   }
 };
 
-// ✅ POST /api/medecins/checkout-auth (by medecin_id from token)
+//  POST /api/medecins/checkout-auth (by medecin_id from token)
 const checkout = async (req, res) => {
   try {
     const medecinId = req.utilisateur.medecin_id;
@@ -114,7 +114,7 @@ const checkout = async (req, res) => {
   }
 };
 
-// ✅ PUT /api/medecins/profile
+// PUT /api/medecins/profile
 const updateProfile = async (req, res) => {
   try {
     const userId = req.utilisateur.user_id;
@@ -130,7 +130,7 @@ const updateProfile = async (req, res) => {
   }
 };
 
-// ✅ GET /api/medecins/stats
+//  GET /api/medecins/stats
 const getStats = async (req, res) => {
   try {
     const data = await medecinService.getStats();

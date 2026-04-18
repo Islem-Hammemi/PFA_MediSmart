@@ -153,7 +153,7 @@ const creerPatient = async ({ prenom, nom, email, date_naissance, telephone }) =
   } finally {
     conn.release();
   }
-}; // ✅ THIS WAS MISSING
+}; //  THIS WAS MISSING
 
 // ───────────────────────────────────────────────
 // NOW THIS IS OUTSIDE (correct place)

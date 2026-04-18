@@ -94,12 +94,12 @@ export default function TicketQueuemed() {
         <div className="tq-header">
           <div className="tq-header-left">
             <h2 className="tq-title">Today's Ticket Queue</h2>
-            {/* ✅ Dynamic patient count badge */}
+            {/*  Dynamic patient count badge */}
             <span className="tq-badge">
               {loading ? "..." : `${tickets.length} Patient${tickets.length !== 1 ? "s" : ""}`}
             </span>
           </div>
-          {/* ✅ Navigate to Tickets page */}
+          {/*  Navigate to Tickets page */}
           <button className="tq-manage" onClick={() => navigate("/tickets")}>
             Manage <ArrowIcon />
           </button>

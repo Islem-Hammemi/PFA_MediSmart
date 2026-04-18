@@ -52,7 +52,7 @@ export default function PastAppointmentDetail({ appointment, onClose }) {
     if (e.target === e.currentTarget) onClose();
   };
 
-  // ✅ Portal renders directly into document.body — never affected by any parent blur/filter
+  //  Portal renders directly into document.body — never affected by any parent blur/filter
   return createPortal(
     <div className="pad-backdrop" onClick={handleBackdrop}>
       <div className="pad-modal">
@@ -149,6 +149,6 @@ export default function PastAppointmentDetail({ appointment, onClose }) {
 
       </div>
     </div>,
-    document.body   // ✅ always above everything, never blurred
+    document.body   //  always above everything, never blurred
   );
 }

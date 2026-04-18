@@ -72,7 +72,7 @@ CREATE TABLE `dossiers_medicaux` (
   KEY `idx_dossiers_date` (`date_consultation`),
   CONSTRAINT `fk_dossiers_medecin` FOREIGN KEY (`medecin_id`) REFERENCES `medecins` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_dossiers_patient` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -81,6 +81,7 @@ CREATE TABLE `dossiers_medicaux` (
 
 LOCK TABLES `dossiers_medicaux` WRITE;
 /*!40000 ALTER TABLE `dossiers_medicaux` DISABLE KEYS */;
+INSERT INTO `dossiers_medicaux` VALUES (1,1,10,'2026-04-18','hello','ochrib barcha ma','3ando l ka7a','2026-04-18 23:16:56','2026-04-18 23:16:56',43);
 /*!40000 ALTER TABLE `dossiers_medicaux` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -110,7 +111,7 @@ CREATE TABLE `evaluations` (
   CONSTRAINT `fk_evaluations_rdv` FOREIGN KEY (`rendez_vous_id`) REFERENCES `rendez_vous` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_evaluations_ticket` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`) ON DELETE SET NULL,
   CONSTRAINT `chk_evaluations_note` CHECK ((`note` between 1 and 5))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -119,6 +120,7 @@ CREATE TABLE `evaluations` (
 
 LOCK TABLES `evaluations` WRITE;
 /*!40000 ALTER TABLE `evaluations` DISABLE KEYS */;
+INSERT INTO `evaluations` VALUES (1,1,10,NULL,4,NULL,'2026-04-18 23:17:06',1);
 /*!40000 ALTER TABLE `evaluations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -179,7 +181,7 @@ CREATE TABLE `medecins` (
 
 LOCK TABLES `medecins` WRITE;
 /*!40000 ALTER TABLE `medecins` DISABLE KEYS */;
-INSERT INTO `medecins` VALUES (1,1,'Dermatologie','ORD-2024-001','disponible',NULL,3.30,10),(2,2,'Gynécologie','ORD-2024-002','disponible',NULL,0.00,0),(3,3,'Cardiologie','ORD-2024-003','absent',NULL,0.00,0),(4,4,'Neurologie','ORD-2024-004','absent',NULL,0.00,0),(5,5,'Cardiologie','ORD-2024-005','disponible',NULL,0.00,0),(6,6,'Cardiologie','ORD-2024-006','disponible',NULL,0.00,0),(7,7,'Pédiatrie','ORD-2024-007','disponible',NULL,0.00,0),(8,8,'Orthopédie','ORD-2024-008','absent',NULL,0.00,0),(9,9,'Cardiologie','ORD-2024-009','en_consultation',NULL,0.00,0),(10,10,'Ophtalmologie','ORD-2024-010','disponible',NULL,3.00,4),(11,11,'Psychiatrie','ORD-2024-011','disponible',NULL,0.00,0),(12,12,'Endocrinologie','ORD-2024-012','en_consultation',NULL,3.25,4),(13,13,'Rhumatologie','ORD-2024-013','disponible',NULL,0.00,0),(14,14,'Gastro-enterologie','ORD-2024-014','absent',NULL,0.00,0),(15,15,'Urologie','ORD-2024-015','disponible',NULL,0.00,0),(16,16,'Pneumologie','ORD-2024-016','disponible',NULL,0.00,0),(17,17,'ORL','ORD-2024-017','en_consultation',NULL,0.00,0),(18,18,'Radiologie','ORD-2024-018','disponible',NULL,0.00,0),(19,19,'Anesthesiologie','ORD-2024-019','absent',NULL,0.00,0),(20,20,'Medecine generale','ORD-2024-020','disponible',NULL,0.00,0);
+INSERT INTO `medecins` VALUES (1,1,'Dermatologie','ORD-2024-001','disponible',NULL,3.30,10),(2,2,'Gynécologie','ORD-2024-002','disponible',NULL,0.00,0),(3,3,'Cardiologie','ORD-2024-003','absent',NULL,0.00,0),(4,4,'Neurologie','ORD-2024-004','absent',NULL,0.00,0),(5,5,'Cardiologie','ORD-2024-005','disponible',NULL,0.00,0),(6,6,'Cardiologie','ORD-2024-006','disponible',NULL,0.00,0),(7,7,'Pédiatrie','ORD-2024-007','disponible',NULL,0.00,0),(8,8,'Orthopédie','ORD-2024-008','absent',NULL,0.00,0),(9,9,'Cardiologie','ORD-2024-009','en_consultation',NULL,0.00,0),(10,10,'Ophtalmologie','ORD-2024-010','disponible',NULL,4.00,1),(11,11,'Psychiatrie','ORD-2024-011','disponible',NULL,0.00,0),(12,12,'Endocrinologie','ORD-2024-012','en_consultation',NULL,3.25,4),(13,13,'Rhumatologie','ORD-2024-013','disponible',NULL,0.00,0),(14,14,'Gastro-enterologie','ORD-2024-014','absent',NULL,0.00,0),(15,15,'Urologie','ORD-2024-015','disponible',NULL,0.00,0),(16,16,'Pneumologie','ORD-2024-016','disponible',NULL,0.00,0),(17,17,'ORL','ORD-2024-017','en_consultation',NULL,0.00,0),(18,18,'Radiologie','ORD-2024-018','disponible',NULL,0.00,0),(19,19,'Anesthesiologie','ORD-2024-019','absent',NULL,0.00,0),(20,20,'Medecine generale','ORD-2024-020','disponible',NULL,0.00,0);
 /*!40000 ALTER TABLE `medecins` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -198,7 +200,7 @@ CREATE TABLE `patients` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_patients_user` (`user_id`),
   CONSTRAINT `fk_patients_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -207,6 +209,7 @@ CREATE TABLE `patients` (
 
 LOCK TABLES `patients` WRITE;
 /*!40000 ALTER TABLE `patients` DISABLE KEYS */;
+INSERT INTO `patients` VALUES (1,41,'2000-12-22','28885279');
 /*!40000 ALTER TABLE `patients` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -235,7 +238,7 @@ CREATE TABLE `rendez_vous` (
   KEY `idx_rdv_statut` (`statut`),
   CONSTRAINT `fk_rdv_medecin` FOREIGN KEY (`medecin_id`) REFERENCES `medecins` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_rdv_patient` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -244,6 +247,7 @@ CREATE TABLE `rendez_vous` (
 
 LOCK TABLES `rendez_vous` WRITE;
 /*!40000 ALTER TABLE `rendez_vous` DISABLE KEYS */;
+INSERT INTO `rendez_vous` VALUES (1,1,10,'2026-04-19 09:00:00','confirme',NULL,'2026-04-18 23:14:06','2026-04-18 23:15:24',0);
 /*!40000 ALTER TABLE `rendez_vous` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -264,7 +268,7 @@ CREATE TABLE `sessions` (
   UNIQUE KEY `uk_sessions_token` (`token`),
   KEY `fk_sessions_user` (`user_id`),
   CONSTRAINT `fk_sessions_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -273,6 +277,7 @@ CREATE TABLE `sessions` (
 
 LOCK TABLES `sessions` WRITE;
 /*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
+INSERT INTO `sessions` VALUES (2,41,'e30437eb27ee760c0cab71b178971b61269c44eda01962b7fedcd7b59fb2c2e9','2026-04-25 23:13:38','2026-04-18 23:13:37'),(3,10,'2dcf7dc07c3c9482432df9029b4cd200c701f4ca1d0a385bf4e32847b19c3c4a','2026-04-25 23:15:19','2026-04-18 23:15:18');
 /*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -298,7 +303,7 @@ CREATE TABLE `tickets` (
   KEY `idx_tickets_statut` (`statut`),
   CONSTRAINT `fk_tickets_medecin` FOREIGN KEY (`medecin_id`) REFERENCES `medecins` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_tickets_patient` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -307,6 +312,7 @@ CREATE TABLE `tickets` (
 
 LOCK TABLES `tickets` WRITE;
 /*!40000 ALTER TABLE `tickets` DISABLE KEYS */;
+INSERT INTO `tickets` VALUES (1,1,10,1,1,'termine','2026-04-18 23:14:16','2026-04-18 23:16:56');
 /*!40000 ALTER TABLE `tickets` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -328,7 +334,7 @@ CREATE TABLE `users` (
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_users_email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -337,7 +343,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'ahmed.belhaj@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Belhaj','Ahmed','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(2,'nour.gharbi@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Gharbi','Nour','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(3,'islem.hammami@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Hammami','Islem','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(4,'syrine.lassoued@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Lassoued','Syrine','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(5,'rania.mrad@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Mrad','Rania','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(6,'sarra.othmani@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Othmani','Sarra','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(7,'shaima.quarteni@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Quarteni','Shaima','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(8,'karim.zouari@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Zouari','Karim','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(9,'oussema.ayedi@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Ayedi','Oussema','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(10,'leila.benali@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Ben Ali','Leila','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(11,'mehdi.trabelsi@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Trabelsi','Mehdi','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(12,'amira.chaari@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Chaari','Amira','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(13,'youssef.sellami@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Sellami','Youssef','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(14,'ines.jebali@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Jebali','Ines','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(15,'bilel.mahjoub@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Mahjoub','Bilel','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(16,'rim.boughanmi@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Boughanmi','Rim','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(17,'tarek.ferchichi@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Ferchichi','Tarek','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(18,'salma.najar@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Najar','Salma','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(19,'omar.riahi@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Riahi','Omar','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(20,'fatma.bouaziz@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Bouaziz','Fatma','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(21,'farhatkhalifa@gmail.com','$2b$10$ICCNQ6MvojAEn6l8UX.z3.ND6CvtKZOySgOdjTFzOOvkV9Z3I40Ou','khalifa','Farhat','patient','2026-03-30 16:10:12','2026-03-30 16:10:12'),(22,'mohamedamin@gmail.com','$2b$10$GUS7728Pi7AfpuC0dIvnIu.aOC0xyfd.FeoBd4drc78b5LS2yPl2G','hammami','mhamed amin','patient','2026-03-31 22:22:25','2026-03-31 22:22:25'),(23,'test@gmail.com','$2b$10$gX2ou/dpIs5j5BicuRUmBuFaH9y64auKpGKal0T89tS12u0vRMu6u','tasti','test','patient','2026-04-11 22:10:38','2026-04-11 22:10:38'),(24,'hihi@gmail.com','$2b$10$lIztpmS/Rr.XhpQMx3pM3uBvIJYnphErIYPbXolIOzQGcZQZU0r3.','Hammami','islem','patient','2026-04-11 22:51:13','2026-04-11 22:51:13'),(25,'hammami@gmail.com','$2b$10$fbV5ceVZgQAoP7dIbP.kyutThIgD1PxVemYD1BM4bUiLOZJOfhx0O','Hammami','İslem','patient','2026-04-13 20:39:50','2026-04-13 20:39:50'),(26,'hello@gmail.com','$2b$10$JgFdQXOVb7cDKI8JsCiAqeMAKqEIPpWRFFqQg9.8ntm2YzVk36zB.','tasta','test22','patient','2026-04-14 00:16:34','2026-04-14 00:16:34'),(27,'toto@gmail.com','$2b$10$Dojd649BnyGh9LhQFeuUNuOzJNu8LW6EJ0iFyF2P3G49pPXwQsZWm','takouta','ticket','patient','2026-04-18 14:48:40','2026-04-18 14:48:40'),(28,'sisi@gmail.com','$2b$10$hA6D/Kt8FtZSeGR8EHXMyO0XRsWjdtzAOetloBbJdQ.LoaxTvrfza','so','sousou','patient','2026-04-18 14:56:36','2026-04-18 14:56:36'),(29,'mimi@gmail.com','$2b$10$2/94dsAbKguYDZ5EQEF70u6GyPMATdItbvWrBvtAtYJpVtyaYg43m','mi','louma','patient','2026-04-18 14:57:55','2026-04-18 14:57:55'),(30,'op@gmail.com','$2b$10$gtvfNwK.RhNWtFHaMhzRA.6mYqvwLg1Dw8K5YlwYn7z4F5lBKJXI6','halahopa','opa','patient','2026-04-18 15:33:27','2026-04-18 15:33:27'),(31,'islem@gmail.com','$2b$10$nFvo1qHhb.wcEb8B/PDBZuAWn5elru/G.VnP0qIT1KDjEGHEb278S','ouerteni','islzm','patient','2026-04-18 16:35:05','2026-04-18 16:35:05'),(32,'sarra@gmail.com','$2b$10$IPtgNMDteK9huiPa0u1Fx.8EGJ/QVffUf6ccSa/aITrqbeobGnLXa','othmeni','sarra','patient','2026-04-18 16:38:13','2026-04-18 16:38:13'),(34,'syrine@gail.com','$2b$10$jydReX1.wDQzoTfbPjn/SuD/3CzHnOVIRbuOwj86ukrgeqvD26nwq','lassoued','syrine','patient','2026-04-18 16:39:23','2026-04-18 16:39:23');
+INSERT INTO `users` VALUES (1,'ahmed.belhaj@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Belhaj','Ahmed','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(2,'nour.gharbi@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Gharbi','Nour','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(3,'islem.hammami@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Hammami','Islem','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(4,'syrine.lassoued@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Lassoued','Syrine','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(5,'rania.mrad@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Mrad','Rania','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(6,'sarra.othmani@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Othmani','Sarra','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(7,'shaima.quarteni@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Quarteni','Shaima','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(8,'karim.zouari@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Zouari','Karim','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(9,'oussema.ayedi@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Ayedi','Oussema','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(10,'leila.benali@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Ben Ali','Leila','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(11,'mehdi.trabelsi@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Trabelsi','Mehdi','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(12,'amira.chaari@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Chaari','Amira','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(13,'youssef.sellami@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Sellami','Youssef','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(14,'ines.jebali@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Jebali','Ines','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(15,'bilel.mahjoub@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Mahjoub','Bilel','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(16,'rim.boughanmi@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Boughanmi','Rim','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(17,'tarek.ferchichi@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Ferchichi','Tarek','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(18,'salma.najar@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Najar','Salma','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(19,'omar.riahi@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Riahi','Omar','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(20,'fatma.bouaziz@medismart.tn','$2b$10$j6Jv5gZrVSlNLDbGaKAeteQmww7UqhlNbJTDB7D3RjQZc0ZuthMv6','Bouaziz','Fatma','medecin','2026-03-30 16:06:07','2026-03-30 16:06:07'),(41,'nini@gmail.com','$2b$10$7WuEE.37eX4yPuBZXWYI9.JYNatbpqF33EXJjMhBrp6J6mdn3Q85G','chabchouba','islem','patient','2026-04-18 23:13:37','2026-04-18 23:13:37');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -469,4 +475,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-18 18:13:28
+-- Dump completed on 2026-04-18 23:26:32

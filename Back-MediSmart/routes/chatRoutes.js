@@ -6,7 +6,7 @@
 const express = require('express');
 const router  = express.Router();
 
-// ✅ Free models that are currently available on OpenRouter
+//  Free models that are currently available on OpenRouter
 const MODEL = 'openai/gpt-oss-120b:free';
 
 // POST /api/chat

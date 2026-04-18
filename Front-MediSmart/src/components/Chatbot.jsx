@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./chatbot.css";
 
-// ✅ API key is now server-side only — not exposed in frontend
+//  API key is now server-side only — not exposed in frontend
 const API_URL = import.meta.env.VITE_API_URL; // http://localhost:5000/api
 
 const SYSTEM_PROMPT = `You are MediSmart AI, a friendly and professional medical assistant for the MediSmart hospital platform in Tunisia.
@@ -46,7 +46,7 @@ const Chatbot = () => {
     if (open) bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, open, typing]);
 
-  // ✅ Calls our own backend — key never exposed to browser
+  //  Calls our own backend — key never exposed to browser
   const callLLM = async (history) => {
     const res = await fetch(`${API_URL}/chat`, {
       method: "POST",

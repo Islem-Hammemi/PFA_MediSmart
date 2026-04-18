@@ -49,25 +49,25 @@ const updatePhoto = async (userId, photoPath) => {
   return await medecinRepository.updatePhoto(userId, photoPath);
 };
 
-// ✅ get statut by medecin_id
+//  get statut by medecin_id
 const getStatut = async (medecinId) => {
   const row = await medecinRepository.getStatutById(medecinId);
   return row?.statut ?? "absent";
 };
 
-// ✅ set statut by medecin_id
+//  set statut by medecin_id
 const setStatut = async (medecinId, statut) => {
   const allowed = ["disponible", "en_consultation", "absent"];
   if (!allowed.includes(statut)) throw new Error(`Statut invalide: ${statut}`);
   await medecinRepository.updateStatut(medecinId, statut);
 };
 
-// ✅ update profile fields (prenom, nom, email, telephone)
+//  update profile fields (prenom, nom, email, telephone)
 const updateProfile = async (user_id, { prenom, nom, email, telephone }) => {
   await medecinRepository.updateUserProfile(user_id, { prenom, nom, email, telephone });
 };
 
-// ✅ dashboard stats
+//  dashboard stats
 const getStats = async () => await medecinRepository.getStats();
 
 module.exports = {

@@ -39,13 +39,13 @@ const creer = async ({ nom, prenom, email, passwordHash, telephone, dateNaissanc
       [email, passwordHash, nom, prenom]
     );
     const userId = userResult.insertId;
-    console.log("✅ USER created with id:", userId);
+    
     await conn.execute(
       `INSERT INTO PATIENTS (user_id, date_naissance, telephone)
        VALUES (?, ?, ?)`,
       [userId, dateNaissance || null, telephone || null]
     );
-    console.log("✅ PATIENT created");
+    
 
     await conn.commit();
     return trouverParId(userId);

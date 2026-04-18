@@ -55,7 +55,7 @@ async evaluerMedecin({ patient_id, rendez_vous_id, medecin_id, ticket_id, note, 
     patient_id,
     medecin_id:     resolvedMedecinId,
     rendez_vous_id: rendez_vous_id || null,
-    ticket_id:      ticket_id      || null,  // ✅ add this
+    ticket_id:      ticket_id      || null,  //  add this
     note,
     commentaire,
   });

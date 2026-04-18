@@ -49,7 +49,7 @@ export default function Statusdropdown() {
     setLoading(true);
     setOpen(false);
     try {
-      // ✅ Use auth endpoints that read medecin_id from token
+      //  Use auth endpoints that read medecin_id from token
       const endpoint = status.id === "absent"
         ? `${API_BASE}/medecins/checkout-auth`
         : `${API_BASE}/medecins/checkin-auth`;

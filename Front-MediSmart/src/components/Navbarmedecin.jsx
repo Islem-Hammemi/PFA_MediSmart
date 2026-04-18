@@ -11,12 +11,12 @@ const IMG_BASE = "http://localhost:5000";
 function Navbarmedecin() {
   const navigate = useNavigate();
 
-  // ✅ Read fresh from localStorage every render so photo updates instantly
+  //  Read fresh from localStorage every render so photo updates instantly
   const getUser  = () => getCurrentUser();
   const user     = getUser();
   const initials = `${user?.prenom?.[0] ?? ""}${user?.nom?.[0] ?? ""}`.toUpperCase();
 
-  // ✅ photo state — initialized from stored user.photo
+  //  photo state — initialized from stored user.photo
   const [photo,        setPhoto]        = useState(
     user?.photo ? `${IMG_BASE}${user.photo}` : null
   );
@@ -46,7 +46,7 @@ function Navbarmedecin() {
     navigate("/");
   };
 
-  // ✅ Called by DoctorProfile after successful upload
+  //  Called by DoctorProfile after successful upload
   const handlePhotoUpdated = (photoUrl) => {
     setPhoto(photoUrl); // photoUrl = full URL e.g. http://localhost:5000/uploads/medecins/xxx.jpg
   };
@@ -80,7 +80,7 @@ function Navbarmedecin() {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 style={{ cursor: "pointer" }}
               >
-                {/* ✅ Show photo if available, else initials */}
+                {/*  Show photo if available, else initials */}
                 {photo ? (
                   <img
                     src={photo}
@@ -100,7 +100,7 @@ function Navbarmedecin() {
                   </div>
                   <hr className="pdp-dropdown__divider" />
 
-                  {/* ✅ My Profile — ABOVE Log out */}
+                  {/*  My Profile — ABOVE Log out */}
                   <button
                     className="pdp-dropdown__profile"
                     onClick={() => { setDropdownOpen(false); setProfileOpen(true); }}

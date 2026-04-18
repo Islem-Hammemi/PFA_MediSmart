@@ -66,7 +66,7 @@ function AddRdvModal({ selectedSlot, patients, onClose, onSaved }) {
     setSubmitting(true);
     setError("");
     try {
-      // ✅ Use doctor-side booking endpoint
+      //  Use doctor-side booking endpoint
       const res  = await fetch(`${API_BASE}/rendez-vous/medecin/reserver`, {
         method: "POST",
         headers: {
