@@ -11,7 +11,7 @@ function Queue() {
  
 
   return (
-    <div>
+    <div className='dashbackcolor'>
         <NavBarpatient/>
 
         <section className="hero">

@@ -14,7 +14,7 @@
   --bm-surface:    #ffffff;
   --bm-bg:         #f0f4fa;
   --bm-gold:       #f59e0b;
-  --bm-font:       'DM Sans', sans-serif;
+  --bm-font:       'Inter', sans-serif;
   --bm-radius:     14px;
   --bm-t:          0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }

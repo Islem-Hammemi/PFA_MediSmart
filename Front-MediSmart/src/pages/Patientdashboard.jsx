@@ -14,7 +14,7 @@ import Footerr from '../components/Footerr';
 function Patientdashboard() {
   const user = getCurrentUser();
     return (
-        <div>
+        <div className='dashbackcolor'>
       <NavBarpatient />
       <section className="hero">
         <div className="hero-content">

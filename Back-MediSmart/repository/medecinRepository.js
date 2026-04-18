@@ -1,6 +1,6 @@
 const pool = require("../config/db");
 
-
+// ── Public queries ────────────────────────────────────────────
 
 const findAll = async () => {
   const [rows] = await pool.query(`
@@ -31,10 +31,7 @@ const findBySearch = async (keyword) => {
       note_moyenne AS evaluation,
       nb_evaluations
     FROM VW_NOTE_MEDECIN
-    WHERE
-      nom        LIKE ? OR
-      prenom     LIKE ? OR
-      specialite LIKE ?
+    WHERE nom LIKE ? OR prenom LIKE ? OR specialite LIKE ?
     ORDER BY nom ASC`,
     [keyword, keyword, keyword]
   );
@@ -44,20 +41,22 @@ const findBySearch = async (keyword) => {
 const findPresents = async () => {
   const [rows] = await pool.query(`
     SELECT
-      v.medecin_id   AS id,
-      v.nom,
-      v.prenom,
-      v.specialite,
-      v.photo,
-      v.note_moyenne AS evaluation,
-      v.nb_evaluations,
-      v.statut
-    FROM VW_NOTE_MEDECIN v
-    WHERE v.statut IN ('disponible', 'en_consultation')
-    ORDER BY v.nom ASC
+      medecin_id   AS id,
+      nom,
+      prenom,
+      specialite,
+      photo,
+      statut,
+      note_moyenne AS evaluation,
+      nb_evaluations
+    FROM VW_NOTE_MEDECIN
+    WHERE statut IN ('disponible', 'en_consultation')
+    ORDER BY nom ASC
   `);
   return rows;
 };
+
+// ── Checkin / Checkout (legacy — by userId in body) ───────────
 
 const checkIn = async (userId) => {
   await pool.query(
@@ -66,8 +65,7 @@ const checkIn = async (userId) => {
   );
   const [rows] = await pool.query(
     `SELECT m.id, m.statut, m.photo, u.nom, u.prenom
-     FROM MEDECINS m
-     JOIN USERS u ON u.id = m.user_id
+     FROM MEDECINS m JOIN USERS u ON u.id = m.user_id
      WHERE m.user_id = ?`,
     [userId]
   );
@@ -81,30 +79,27 @@ const checkOut = async (userId) => {
   );
   const [rows] = await pool.query(
     `SELECT m.id, m.statut, m.photo, u.nom, u.prenom
-     FROM MEDECINS m
-     JOIN USERS u ON u.id = m.user_id
+     FROM MEDECINS m JOIN USERS u ON u.id = m.user_id
      WHERE m.user_id = ?`,
     [userId]
   );
   return rows[0];
 };
 
+// ✅ FIX — photo stored as /uploads/medecins/... served from /uploads/medecins/
 const updatePhoto = async (userId, photoPath) => {
   await pool.query(
     "UPDATE MEDECINS SET photo = ? WHERE user_id = ?",
     [photoPath, userId]
   );
   const [rows] = await pool.query(
-    `SELECT m.*, u.nom, u.prenom
-     FROM MEDECINS m
-     JOIN USERS u ON u.id = m.user_id
+    `SELECT m.id, m.photo, m.statut, m.specialite, u.nom, u.prenom
+     FROM MEDECINS m JOIN USERS u ON u.id = m.user_id
      WHERE m.user_id = ?`,
     [userId]
   );
   return rows[0];
 };
-
-
 
 const getMedecinSemaine = async () => {
   const [rows] = await pool.query(
@@ -122,7 +117,6 @@ const getMedecinSemaine = async () => {
   );
   const doc = rows[0];
   if (!doc) return null;
-
   const [comments] = await pool.query(
     `SELECT commentaire FROM EVALUATIONS
      WHERE medecin_id = ? AND commentaire IS NOT NULL AND commentaire != ''
@@ -139,12 +133,10 @@ const getMedecinSemaine = async () => {
 // Toutes les requêtes SQL liées au médecin
 // =============================================
 
-
-// ── Trouver un médecin par email ─────────────────────────────────────────────
 const trouverParEmail = async (email) => {
   const [rows] = await pool.execute(
-     `SELECT u.id AS user_id, u.email, u.password_hash, u.nom, u.prenom, u.role,
-            m.id AS medecin_id, m.specialite, m.numero_ordre
+    `SELECT u.id AS user_id, u.email, u.password_hash, u.nom, u.prenom, u.role,
+            m.id AS medecin_id, m.specialite, m.numero_ordre, m.statut, m.photo
      FROM USERS u
      JOIN MEDECINS m ON m.user_id = u.id
      WHERE u.email = ? AND u.role = 'medecin'
@@ -154,13 +146,11 @@ const trouverParEmail = async (email) => {
   return rows[0] || null;
 };
 
-// ── Trouver un médecin par ID ────────────────────────────────────────────────
+// ✅ FIX — includes specialite, statut, photo so DoctorProfile + Statusdropdown work
 const trouverParId = async (id) => {
   const [rows] = await pool.execute(
-    // FIX: u.role ajouté – était manquant, causait req.utilisateur.role = undefined
-    // ce qui faisait échouer autoriserRole("medecin") avec un 403 systématique
     `SELECT u.id AS user_id, u.email, u.nom, u.prenom, u.role,
-            m.id AS medecin_id, m.specialite, m.numero_ordre
+            m.id AS medecin_id, m.specialite, m.numero_ordre, m.statut, m.photo
      FROM USERS u
      JOIN MEDECINS m ON m.user_id = u.id
      WHERE u.id = ? AND u.role = 'medecin'
@@ -170,6 +160,54 @@ const trouverParId = async (id) => {
   return rows[0] || null;
 };
 
+// ✅ NEW — get statut by medecin_id (for Statusdropdown)
+const getStatutById = async (medecinId) => {
+  const [rows] = await pool.query(
+    `SELECT statut FROM MEDECINS WHERE id = ? LIMIT 1`,
+    [medecinId]
+  );
+  return rows[0] || null;
+};
+
+// ✅ NEW — update statut by medecin_id
+const updateStatut = async (medecinId, statut) => {
+  await pool.query(
+    `UPDATE MEDECINS SET statut = ? WHERE id = ?`,
+    [statut, medecinId]
+  );
+};
+
+// ✅ NEW — update USERS table (prenom, nom, email) + telephone on MEDECINS if column exists
+const updateUserProfile = async (user_id, { prenom, nom, email, telephone }) => {
+  await pool.query(
+    `UPDATE USERS SET prenom = ?, nom = ?, email = ? WHERE id = ?`,
+    [prenom, nom, email, user_id]
+  );
+  // Store telephone in MEDECINS if you have that column; otherwise skip
+  if (telephone !== undefined) {
+    try {
+      await pool.query(
+        `UPDATE MEDECINS SET telephone = ? WHERE user_id = ?`,
+        [telephone, user_id]
+      );
+    } catch (e) {
+      // Column may not exist yet — silently ignore
+    }
+  }
+};
+
+// ✅ NEW — dashboard stats
+const getStats = async () => {
+  const [rows] = await pool.query(
+    `SELECT
+       (SELECT COUNT(*) FROM MEDECINS WHERE statut IN ('disponible','en_consultation')) AS doctorsAvailable,
+       (SELECT COUNT(*) FROM TICKETS WHERE DATE(created_at) = CURDATE())               AS patientsServedToday,
+       (SELECT ROUND(AVG(TIMESTAMPDIFF(MINUTE, created_at, updated_at)), 0)
+        FROM TICKETS WHERE statut = 'termine')                                          AS avgWaitTime`
+  );
+  return rows[0];
+};
+
 module.exports = {
   findAll,
   findBySearch,
@@ -177,7 +215,11 @@ module.exports = {
   checkIn,
   checkOut,
   updatePhoto,
-  getMedecinSemaine, 
+  getMedecinSemaine,
   trouverParEmail,
   trouverParId,
+  getStatutById,
+  updateStatut,
+  updateUserProfile,
+  getStats,
 };
