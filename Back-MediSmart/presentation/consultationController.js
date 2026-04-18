@@ -19,7 +19,8 @@ const getTodayQueue = async (req, res) => {
     if (!medecinId)
       return res.status(403).json({ success: false, message: "Access reserved for doctors." });
     const data = await consultationRepository.getTodayQueue(medecinId);
-    return res.status(200).json({ success: true, count: data.length, data });
+    const avgTime = await consultationRepository.getAverageConsultationTime(medecinId);
+    return res.status(200).json({ success: true, count: data.length, data, avgConsultationTime: avgTime });
   } catch (err) { return sendError(res, err); }
 };
 
@@ -36,12 +37,27 @@ const servePatient = async (req, res) => {
       return res.status(400).json({ success: false, message: "Please specify whether this is a ticket or appointment." });
 
     if (type === 'ticket') {
+      // Get position
+      const [ticketRows] = await db.execute(
+        `SELECT position FROM TICKETS WHERE id = ? AND medecin_id = ?`,
+        [id, medecinId]
+      );
+      if (!ticketRows[0])
+        return res.status(404).json({ success: false, message: "Ticket not found." });
+      const servedPosition = ticketRows[0].position;
+
       const [result] = await db.execute(
         `UPDATE TICKETS SET statut = 'en_cours' WHERE id = ? AND medecin_id = ? AND statut = 'en_attente'`,
         [id, medecinId]
       );
       if (!result.affectedRows)
         return res.status(404).json({ success: false, message: "Ticket not found or already in progress." });
+
+      // Decrease positions
+      await db.execute(
+        `UPDATE TICKETS SET position = position - 1 WHERE medecin_id = ? AND statut = 'en_attente' AND position > ?`,
+        [medecinId, servedPosition]
+      );
     } else {
       const [result] = await db.execute(
         `UPDATE RENDEZ_VOUS SET statut = 'confirme' WHERE id = ? AND medecin_id = ? AND statut IN ('planifie', 'confirme')`,
@@ -62,7 +78,7 @@ const finishPatient = async (req, res) => {
       return res.status(403).json({ success: false, message: "Access reserved for doctors." });
 
     const id = Number(req.params.id);
-    const { type, notes, diagnostic, traitement, patientId } = req.body;
+    const { type, notes, diagnostic, traitement, patientId, duration } = req.body;
 
     if (!type || !['ticket', 'rdv'].includes(type))
       return res.status(400).json({ success: false, message: "Please specify whether this is a ticket or appointment." });
@@ -83,14 +99,15 @@ const finishPatient = async (req, res) => {
     if (patientId && (notes?.trim() || diagnostic?.trim() || traitement?.trim())) {
       await db.execute(
         `INSERT INTO DOSSIERS_MEDICAUX
-          (patient_id, medecin_id, date_consultation, diagnostic, traitement, notes)
-         VALUES (?, ?, CURDATE(), ?, ?, ?)`,
+          (patient_id, medecin_id, date_consultation, diagnostic, traitement, notes, duration)
+         VALUES (?, ?, CURDATE(), ?, ?, ?, ?)`,
         [
           Number(patientId),
           medecinId,
           diagnostic?.trim() || null,
           traitement?.trim() || null,
           notes?.trim()      || null,
+          duration || 0,
         ]
       );
     }

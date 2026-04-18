@@ -4,13 +4,14 @@ import "./queuetracker.css";
 
 const API_BASE     = "http://localhost:5000/api";
 const POLL_MS      = 8000;
-const MINS_PER_POS = 4;
+const DEFAULT_MINS = 4;
 
 function QueueTracker() {
   const [ticket,      setTicket]      = useState(null);
   const [queue,       setQueue]       = useState(null);
   const [loading,     setLoading]     = useState(true);
   const [consultDone, setConsultDone] = useState(false); // only for stepper visual
+  const [avgTime,     setAvgTime]     = useState(DEFAULT_MINS);
   const intervalRef = useRef(null);
 
   const authHeader = { Authorization: `Bearer ${getToken()}` };
@@ -30,7 +31,10 @@ function QueueTracker() {
       if (medecinId) {
         const qRes  = await fetch(`${API_BASE}/tickets/queue/${medecinId}`);
         const qJson = await qRes.json();
-        if (qJson.success) setQueue(qJson.data);
+        if (qJson.success) {
+          setQueue(qJson.data);
+          setAvgTime(qJson.data.avgConsultationTime || DEFAULT_MINS);
+        }
       }
 
       // Just advance the stepper — modal is shown globally by App.jsx
@@ -58,7 +62,7 @@ function QueueTracker() {
   const servingPos    = queue?.serving_position ?? 1;
   const peopleAhead   = Math.max(0, position - servingPos - 1);
   const estimatedWait = position > servingPos
-    ? (position - servingPos) * MINS_PER_POS
+    ? (position - servingPos) * avgTime
     : 0;
   const progressPct   = totalQueue > 0
     ? Math.min(100, Math.round((servingPos / totalQueue) * 100))

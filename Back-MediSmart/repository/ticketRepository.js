@@ -117,10 +117,24 @@ const ticketRepository = {
          AND DATE(created_at) = CURDATE()`,
       [medecin_id]
     );
-    return rows[0];
+
+    // Get average consultation time
+    const consultationRepository = require('./consultationRepository');
+    const avgTime = await consultationRepository.getAverageConsultationTime(medecin_id);
+
+    return { ...rows[0], avgConsultationTime: avgTime };
   },
 
   async serveTicket(ticket_id, medecin_id) {
+    // Get the position of the ticket being served
+    const [ticketRows] = await db.query(
+      `SELECT position FROM TICKETS WHERE id = ? AND medecin_id = ?`,
+      [ticket_id, medecin_id]
+    );
+    if (!ticketRows[0]) return null;
+    const servedPosition = ticketRows[0].position;
+
+    // Update the ticket to en_cours
     const [result] = await db.query(
       `UPDATE TICKETS
        SET statut = 'en_cours'
@@ -128,6 +142,15 @@ const ticketRepository = {
       [ticket_id, medecin_id]
     );
     if (!result.affectedRows) return null;
+
+    // Decrease positions of tickets after this one
+    await db.query(
+      `UPDATE TICKETS
+       SET position = position - 1
+       WHERE medecin_id = ? AND statut = 'en_attente' AND position > ?`,
+      [medecin_id, servedPosition]
+    );
+
     return await this.getTicketById(ticket_id);
   },
 

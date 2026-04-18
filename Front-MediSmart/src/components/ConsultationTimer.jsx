@@ -54,15 +54,55 @@ export default function ConsultationTimer({ currentPatient = null, onFinish }) {
   const [saved,      setSaved]      = useState(false);
   const intervalRef = useRef(null);
 
+  const draftKey = currentPatient
+    ? `consultationDraft:${currentPatient.source_type}:${currentPatient.source_id}`
+    : null;
+
+  const loadDraft = () => {
+    if (!draftKey) return { diagnostic: "", traitement: "", notes: "" };
+    try {
+      const saved = localStorage.getItem(draftKey);
+      if (!saved) return { diagnostic: "", traitement: "", notes: "" };
+      return JSON.parse(saved);
+    } catch (err) {
+      console.warn("Failed to load consultation draft", err);
+      return { diagnostic: "", traitement: "", notes: "" };
+    }
+  };
+
+  const saveDraft = (values) => {
+    if (!draftKey) return;
+    try {
+      localStorage.setItem(draftKey, JSON.stringify(values));
+    } catch (err) {
+      console.warn("Failed to save consultation draft", err);
+    }
+  };
+
+  const clearDraft = () => {
+    if (!draftKey) return;
+    localStorage.removeItem(draftKey);
+  };
+
   useEffect(() => {
-    setSeconds(0);
-    setDiagnostic("");
-    setTraitement("");
-    setNotes("");
+    const computeSeconds = () => {
+      if (!currentPatient) return 0;
+      const start = currentPatient.started_at
+        ? Number(currentPatient.started_at) * 1000
+        : null;
+      if (!start || Number.isNaN(start)) return 0;
+      return Math.max(0, Math.floor((Date.now() - start) / 1000));
+    };
+
+    const draft = loadDraft();
+    setSeconds(computeSeconds());
+    setDiagnostic(draft.diagnostic || "");
+    setTraitement(draft.traitement || "");
+    setNotes(draft.notes || "");
     setSaved(false);
     if (currentPatient) setRunning(true);
     else setRunning(false);
-  }, [currentPatient?.source_id, currentPatient?.source_type]);
+  }, [currentPatient?.source_id, currentPatient?.source_type, currentPatient?.started_at]);
 
   useEffect(() => {
     if (running) {
@@ -81,7 +121,8 @@ export default function ConsultationTimer({ currentPatient = null, onFinish }) {
     if (!currentPatient || saving) return;
     setSaving(true);
     try {
-      await onFinish(currentPatient, { notes, diagnostic, traitement });
+      await onFinish(currentPatient, { notes, diagnostic, traitement, duration: seconds });
+      clearDraft();
       setRunning(false);
       setSaved(true);
       setDiagnostic("");
@@ -136,7 +177,11 @@ export default function ConsultationTimer({ currentPatient = null, onFinish }) {
           className="notes-textarea"
           placeholder={isActive ? "Enter diagnosis..." : "Select a patient first..."}
           value={diagnostic}
-          onChange={e => setDiagnostic(e.target.value)}
+          onChange={e => {
+            const value = e.target.value;
+            setDiagnostic(value);
+            saveDraft({ diagnostic: value, traitement, notes });
+          }}
           disabled={!isActive}
           rows={2}
           style={{ marginBottom: "14px" }}
@@ -151,7 +196,11 @@ export default function ConsultationTimer({ currentPatient = null, onFinish }) {
           className="notes-textarea"
           placeholder={isActive ? "Enter treatment plan..." : "Select a patient first..."}
           value={traitement}
-          onChange={e => setTraitement(e.target.value)}
+          onChange={e => {
+            const value = e.target.value;
+            setTraitement(value);
+            saveDraft({ diagnostic, traitement: value, notes });
+          }}
           disabled={!isActive}
           rows={2}
           style={{ marginBottom: "14px" }}
@@ -166,7 +215,11 @@ export default function ConsultationTimer({ currentPatient = null, onFinish }) {
           className="notes-textarea"
           placeholder={isActive ? "Type clinical notes, prescriptions, and observations here..." : "Select a patient to start writing notes..."}
           value={notes}
-          onChange={e => setNotes(e.target.value)}
+          onChange={e => {
+            const value = e.target.value;
+            setNotes(value);
+            saveDraft({ diagnostic, traitement, notes: value });
+          }}
           disabled={!isActive}
           rows={3}
         />

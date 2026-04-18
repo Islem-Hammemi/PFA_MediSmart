@@ -106,7 +106,9 @@ const DoctorCard = ({ doctor, index, onBook, onTicket }) => {
               <circle cx="12" cy="12" r="10"/>
               <polyline points="12 6 12 12 16 14"/>
             </svg>
-            ~15 min
+            {doctor.avgWaitTime != null && doctor.avgWaitTime >= 0
+              ? (doctor.avgWaitTime === 0 ? "Now" : `~${doctor.avgWaitTime} min`)
+              : "~15 min"}
           </span>
         </div>
       </div>

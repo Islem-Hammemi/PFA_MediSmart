@@ -1,17 +1,34 @@
 const medecinRepository = require("../repository/medecinRepository");
+const ticketRepository  = require("../repository/ticketRepository");
 
-
+const attachQueueInfo = async (doctors) => {
+  return await Promise.all(doctors.map(async (doctor) => {
+    const queueData = await ticketRepository.getQueueStatus(doctor.id);
+    const totalQueue = Number(queueData?.total_queue) || 0;
+    const avgTime     = Number(queueData?.avgConsultationTime) || 4;
+    return {
+      ...doctor,
+      queueCount: totalQueue,
+      avgConsultationTime: avgTime,
+      avgWaitTime: Math.max(0, totalQueue) * avgTime,
+    };
+  }));
+};
 
 const getMedecins = async (search) => {
+  let doctors;
   if (!search || search.trim() === "") {
-    return await medecinRepository.findAll();
+    doctors = await medecinRepository.findAll();
+  } else {
+    const keyword = `%${search.trim()}%`;
+    doctors = await medecinRepository.findBySearch(keyword);
   }
-  const keyword = `%${search.trim()}%`;
-  return await medecinRepository.findBySearch(keyword);
+  return await attachQueueInfo(doctors);
 };
 
 const getMedecinsPresents = async () => {
-  return await medecinRepository.findPresents();
+  const doctors = await medecinRepository.findPresents();
+  return await attachQueueInfo(doctors);
 };
 
 const checkInMedecin = async (userId) => {

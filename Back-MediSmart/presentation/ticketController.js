@@ -35,6 +35,7 @@ const ticketController = {
           total_queue:      Number(data.total_queue)      || 0,
           serving_position: Number(data.serving_position) || 1,
           next_position:    Number(data.next_position)    || 1,
+          avgConsultationTime: Number(data.avgConsultationTime) || 4,
         },
       });
     } catch (err) { return sendError(res, err); }

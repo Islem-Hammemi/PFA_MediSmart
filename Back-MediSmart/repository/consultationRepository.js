@@ -60,7 +60,8 @@ const getTodayQueue = async (medecin_id) => {
        u.email,
        t.numero                                          AS ticket_numero,
        t.position                                        AS ticket_position,
-       t.statut                                          AS ticket_statut
+       t.statut                                          AS ticket_statut,
+       CASE WHEN t.statut = 'en_cours' THEN UNIX_TIMESTAMP(t.updated_at) END AS started_at
      FROM TICKETS t
      JOIN PATIENTS pa ON pa.id = t.patient_id
      JOIN USERS    u  ON u.id  = pa.user_id
@@ -179,6 +180,7 @@ const getDossierById = async (dossier_id) => {
        d.diagnostic,
        d.traitement,
        d.notes,
+       d.duration,
        d.created_at,
        CONCAT(um.prenom, ' ', um.nom) AS medecin_nom,
        CONCAT(up.prenom, ' ', up.nom) AS patient_nom
@@ -194,9 +196,31 @@ const getDossierById = async (dossier_id) => {
   return rows[0] || null;
 };
 
+// ─── Obtenir la durée moyenne de consultation pour un médecin ──
+/**
+ * Calcule la durée moyenne des consultations récentes pour un médecin.
+ * Utilise les 10 dernières consultations avec durée > 0.
+ *
+ * @param {number} medecin_id
+ * @returns {number} durée moyenne en minutes (défaut 4 si pas de données)
+ */
+const getAverageConsultationTime = async (medecin_id) => {
+  const [rows] = await db.query(
+    `SELECT AVG(duration) AS avg_duration
+     FROM DOSSIERS_MEDICAUX
+     WHERE medecin_id = ? AND duration > 0
+     ORDER BY created_at DESC
+     LIMIT 10`,
+    [medecin_id]
+  );
+  const avgSeconds = rows[0]?.avg_duration || 0;
+  return avgSeconds > 0 ? Math.ceil(avgSeconds / 60) : 4; // minutes, default 4
+};
+
 module.exports = {
   getTodayQueue,
   getRdvMedecin,   // ← NOUVEAU
   creerDossier,    // ← NOUVEAU
   getDossierById,  // ← NOUVEAU
+  getAverageConsultationTime, // ← NOUVEAU
 };

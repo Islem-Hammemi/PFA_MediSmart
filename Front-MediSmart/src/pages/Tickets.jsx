@@ -73,7 +73,10 @@ function Tickets() {
       const json = await res.json();
       if (!json.success) throw new Error(json.message);
 
-      setCurrentPatient(patient);
+      setCurrentPatient({
+        ...patient,
+        started_at: Math.floor(Date.now() / 1000),
+      });
       setQueue(q => q.filter(p => !(p.source_id === patient.source_id && p.source_type === patient.source_type)));
       setStats(s => ({ ...s, waiting: Math.max(0, s.waiting - 1) }));
 
@@ -82,7 +85,7 @@ function Tickets() {
     }
   };
 
-  const handleFinish = async (patient, { notes, diagnostic, traitement }) => {
+  const handleFinish = async (patient, { notes, diagnostic, traitement, duration }) => {
     try {
       const res  = await fetch(`${API_BASE}/api/consultations/finish/${patient.source_id}`, {
         method:  'PATCH',
@@ -96,6 +99,7 @@ function Tickets() {
           diagnostic,
           traitement,
           patientId:  patient.patient_id,
+          duration,
         }),
       });
       const json = await res.json();
