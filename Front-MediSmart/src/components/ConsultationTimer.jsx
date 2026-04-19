@@ -50,6 +50,7 @@ export default function ConsultationTimer({ currentPatient = null, onFinish }) {
   const [diagnostic, setDiagnostic] = useState("");
   const [traitement, setTraitement] = useState("");
   const [notes,      setNotes]      = useState("");
+  const [activeTab,  setActiveTab]  = useState("diagnostic");
   const [saving,     setSaving]     = useState(false);
   const [saved,      setSaved]      = useState(false);
   const intervalRef = useRef(null);
@@ -99,6 +100,7 @@ export default function ConsultationTimer({ currentPatient = null, onFinish }) {
     setDiagnostic(draft.diagnostic || "");
     setTraitement(draft.traitement || "");
     setNotes(draft.notes || "");
+    setActiveTab("diagnostic");
     setSaved(false);
     if (currentPatient) setRunning(true);
     else setRunning(false);
@@ -141,8 +143,6 @@ export default function ConsultationTimer({ currentPatient = null, onFinish }) {
 
   return (
     <div className={`consultation-wrapper ${isActive ? "consultation-wrapper--active" : ""}`}>
-
-      {/* Header */}
       <div className="consultation-header">
         <div className="consultation-patient">
           <div className="patient-icon-circle">
@@ -150,7 +150,9 @@ export default function ConsultationTimer({ currentPatient = null, onFinish }) {
           </div>
           <div>
             <span className="consultation-patient-name">{patientName}</span>
-            
+            <span className="patient-status">
+              {isActive ? "Active consultation" : "No patient selected"}
+            </span>
           </div>
         </div>
         <div className="consultation-timer-display">
@@ -162,84 +164,100 @@ export default function ConsultationTimer({ currentPatient = null, onFinish }) {
         </div>
       </div>
 
-      {/* Notes fields */}
-      <div className="consultation-notes-section">
+      <div className="consultation-grid">
+        <aside className="consultation-sidebar">
+          <div className="consultation-sidebar-info">
+            <span className="sidebar-title">Consultation</span>
+            <p className="sidebar-subtitle">Review and record the patient session.</p>
+          </div>
+          <div className="sidebar-items">
+            <button
+              type="button"
+              className={`sidebar-item ${activeTab === "diagnostic" ? "active" : ""}`}
+              onClick={() => setActiveTab("diagnostic")}
+            >
+              <span>Diagnostic</span>
+            </button>
+            <button
+              type="button"
+              className={`sidebar-item ${activeTab === "traitement" ? "active" : ""}`}
+              onClick={() => setActiveTab("traitement")}
+            >
+              <span>Traitement</span>
+            </button>
+            <button
+              type="button"
+              className={`sidebar-item ${activeTab === "notes" ? "active" : ""}`}
+              onClick={() => setActiveTab("notes")}
+            >
+              <span>Consultation Notes</span>
+            </button>
+          </div>
+          <div className="sidebar-action">
+            {isActive ? (
+              <button
+                className={`start-consultation-btn finish-btn ${saving ? "running" : ""}`}
+                onClick={handleFinish}
+                disabled={saving}
+              >
+                {saving ? "Saving…" : <><CheckIcon /> End consultation</>}
+              </button>
+            ) : (
+              <button className="start-consultation-btn" disabled>
+                <PlayIcon /> Start Consultation
+              </button>
+            )}
+            {saved && (
+              <p className="save-confirmation">Consultation saved successfully.</p>
+            )}
+          </div>
+        </aside>
 
-        {/* Diagnostic */}
-        <div className="notes-label-row" style={{ marginBottom: "6px" }}>
-          <NoteIcon />
-          <span className="notes-label">Diagnostic</span>
-        </div>
-        <textarea
-          className="notes-textarea"
-          placeholder={isActive ? "Enter diagnosis..." : "Select a patient first..."}
-          value={diagnostic}
-          onChange={e => {
-            const value = e.target.value;
-            setDiagnostic(value);
-            saveDraft({ diagnostic: value, traitement, notes });
-          }}
-          disabled={!isActive}
-          rows={2}
-          style={{ marginBottom: "14px" }}
-        />
-
-        {/* Traitement */}
-        <div className="notes-label-row" style={{ marginBottom: "6px" }}>
-          <NoteIcon />
-          <span className="notes-label">Traitement</span>
-        </div>
-        <textarea
-          className="notes-textarea"
-          placeholder={isActive ? "Enter treatment plan..." : "Select a patient first..."}
-          value={traitement}
-          onChange={e => {
-            const value = e.target.value;
-            setTraitement(value);
-            saveDraft({ diagnostic, traitement: value, notes });
-          }}
-          disabled={!isActive}
-          rows={2}
-          style={{ marginBottom: "14px" }}
-        />
-
-        {/* Notes */}
-        <div className="notes-label-row" style={{ marginBottom: "6px" }}>
-          <NoteIcon />
-          <span className="notes-label">Consultation Notes</span>
-        </div>
-        <textarea
-          className="notes-textarea"
-          placeholder={isActive ? "Type clinical notes, prescriptions, and observations here..." : "Select a patient to start writing notes..."}
-          value={notes}
-          onChange={e => {
-            const value = e.target.value;
-            setNotes(value);
-            saveDraft({ diagnostic, traitement, notes: value });
-          }}
-          disabled={!isActive}
-          rows={3}
-        />
-      </div>
-
-      {/* Action button */}
-      <div className="consultation-footer">
-        {isActive ? (
-          <button
-            className={`start-consultation-btn finish-btn ${saving ? "running" : ""}`}
-            onClick={handleFinish}
-            disabled={saving}
-          >
-            {saving ? <>Saving…</> : <><CheckIcon /> End &amp; Save Consultation</>}
-          </button>
-        ) : (
-          <button className="start-consultation-btn" disabled>
-            <PlayIcon /> Start Consultation
-          </button>
-        )}
-        {saved && (
-          <p className="save-confirmation">Consultation saved successfully.</p>
-        )}
+        <section className="consultation-main">
+          <div className="consultation-main-panel">
+            <div className="notes-header-row">
+              <div>
+                <span className="notes-heading">
+                  {activeTab === "diagnostic" && "Diagnostic"}
+                  {activeTab === "traitement" && "Traitement"}
+                  {activeTab === "notes" && "Consultation Notes"}
+                </span>
+                <p className="notes-subtext">
+                  {activeTab === "diagnostic" && "Describe the clinical diagnosis."}
+                  {activeTab === "traitement" && "Write the prescribed treatment plan."}
+                  {activeTab === "notes" && "Add observations and clinical notes."}
+                </p>
+              </div>
+            </div>
+            <textarea
+              className="notes-textarea notes-textarea--large"
+              placeholder={isActive
+                ? activeTab === "diagnostic"
+                  ? "Enter diagnosis..."
+                  : activeTab === "traitement"
+                    ? "Enter treatment plan..."
+                    : "Type clinical notes, prescriptions, and observations here..."
+                : "Select a patient to start writing notes..."
+              }
+              value={activeTab === "diagnostic" ? diagnostic : activeTab === "traitement" ? traitement : notes}
+              onChange={e => {
+                const value = e.target.value;
+                if (activeTab === "diagnostic") {
+                  setDiagnostic(value);
+                  saveDraft({ diagnostic: value, traitement, notes });
+                } else if (activeTab === "traitement") {
+                  setTraitement(value);
+                  saveDraft({ diagnostic, traitement: value, notes });
+                } else {
+                  setNotes(value);
+                  saveDraft({ diagnostic, traitement, notes: value });
+                }
+              }}
+              disabled={!isActive}
+              rows={12}
+            />
+          </div>
+        </section>
       </div>
     </div>
   );

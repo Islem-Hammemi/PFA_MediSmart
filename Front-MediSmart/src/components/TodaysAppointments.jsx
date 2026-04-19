@@ -102,7 +102,7 @@ export default function TodaysAppointments({ refreshKey }) {
                 </span>
               )}
 
-              <button className="ta-details-btn">Details</button>
+             
             </div>
           ))}
 
