@@ -196,7 +196,7 @@ export default function PatientFolderModal({ patientId, onClose }) {
                     <p className="pfm-empty">Aucun dossier médical enregistré.</p>
                   ) : (
                     data.dossiers_medicaux.map((d) => (
-                      <div className="pfm-card" key={d.id}>
+                      <div className="pfm-card" key={`dossier-${d.id}`}>
                         <div className="pfm-card-top">
                           <span className="pfm-card-date">
                             <IconCalendar /> {d.date_consultation}

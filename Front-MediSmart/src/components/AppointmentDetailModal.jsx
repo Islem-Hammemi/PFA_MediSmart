@@ -29,12 +29,7 @@ export default function AppointmentDetailModal({ appointment, onClose }) {
 
   const specialty = appointment?.medecin?.specialite ?? appointment?.specialite ?? "—";
 
-  const dateStr = appointment?.date_heure
-    ? new Date(appointment.date_heure).toLocaleDateString("en-GB", {
-        day: "numeric", month: "long", year: "numeric",
-        hour: "2-digit", minute: "2-digit",
-      })
-    : appointment?.date_heure_formatee ?? "—";
+  const dateStr = appointment?.date_heure || appointment?.date_heure_formatee || "—";
 
   const motif = appointment?.motif ?? "No reason specified.";
   const noteText = appointment?.notes || null;
@@ -116,10 +111,6 @@ export default function AppointmentDetailModal({ appointment, onClose }) {
                     style={{ color: statut.color, background: statut.bg }}>
                     {statut.label}
                   </span>
-                </div>
-                <div className="adm-field">
-                  <span className="adm-field__label">Date & Time</span>
-                  <p className="adm-field__value">{dateStr}</p>
                 </div>
                 {appointment?.patient && (
                   <>

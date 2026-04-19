@@ -99,18 +99,52 @@ const getRDVPatient = async (medecin_id, patient_id) => {
   const [rows] = await db.query(
     `SELECT
        r.id,
+       'rdv' AS source_type,
        r.statut,
        r.motif,
-       DATE_FORMAT(r.date_heure, '%d/%m/%Y à %H:%i') AS date_heure
+       DATE_FORMAT(r.date_heure, '%d/%m/%Y à %H:%i') AS date_heure,
+       d.diagnostic,
+       d.traitement,
+       d.notes
      FROM RENDEZ_VOUS r
+     LEFT JOIN (
+       SELECT d2.id, d2.medecin_id, d2.patient_id, d2.date_consultation,
+              d2.diagnostic, d2.traitement, d2.notes
+       FROM DOSSIERS_MEDICAUX d2
+       INNER JOIN (
+         SELECT medecin_id, patient_id, date_consultation, MAX(id) AS last_id
+         FROM DOSSIERS_MEDICAUX
+         GROUP BY medecin_id, patient_id, date_consultation
+       ) AS latest ON latest.last_id = d2.id
+     ) AS d
+       ON d.patient_id = r.patient_id
+      AND d.medecin_id = r.medecin_id
+      AND d.date_consultation = DATE(r.date_heure)
      WHERE r.medecin_id = ? AND r.patient_id = ?
      UNION ALL
      SELECT
        t.id,
+       'ticket' AS source_type,
        t.statut,
        'Ticket consultation' AS motif,
-       DATE_FORMAT(t.created_at, '%d/%m/%Y à %H:%i') AS date_heure
+       DATE_FORMAT(t.created_at, '%d/%m/%Y à %H:%i') AS date_heure,
+       d.diagnostic,
+       d.traitement,
+       d.notes
      FROM TICKETS t
+     LEFT JOIN (
+       SELECT d2.id, d2.medecin_id, d2.patient_id, d2.date_consultation,
+              d2.diagnostic, d2.traitement, d2.notes
+       FROM DOSSIERS_MEDICAUX d2
+       INNER JOIN (
+         SELECT medecin_id, patient_id, date_consultation, MAX(id) AS last_id
+         FROM DOSSIERS_MEDICAUX
+         GROUP BY medecin_id, patient_id, date_consultation
+       ) AS latest ON latest.last_id = d2.id
+     ) AS d
+       ON d.patient_id = t.patient_id
+      AND d.medecin_id = t.medecin_id
+      AND d.date_consultation = DATE(t.created_at)
      WHERE t.medecin_id = ? AND t.patient_id = ? AND t.statut = 'termine'
      ORDER BY date_heure DESC`,
     [medecin_id, patient_id, medecin_id, patient_id]

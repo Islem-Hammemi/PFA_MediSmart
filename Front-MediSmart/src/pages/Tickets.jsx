@@ -35,10 +35,18 @@ function Tickets() {
         p => p.ticket_statut !== 'en_cours' && p.rdv_statut !== 'en_cours'
       );
 
-      setQueue(waiting);
-      setCurrentPatient(serving);
+      // If no serving patient from backend, keep current one if exists
+      const activePatient = serving || currentPatient;
+      const filteredWaiting = activePatient
+        ? waiting.filter(
+            p => !(p.source_type === activePatient.source_type && p.source_id === activePatient.source_id)
+          )
+        : waiting;
+
+      setQueue(filteredWaiting);
+      setCurrentPatient(activePatient);
       setLastFetched(Date.now());
-      setStats(prev => ({ ...prev, waiting: waiting.length }));
+      setStats(prev => ({ ...prev, waiting: filteredWaiting.length }));
 
     } catch (err) {
       setError(err.message);

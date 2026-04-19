@@ -28,6 +28,7 @@ const getTodayQueue = async (medecin_id) => {
        r.motif,
        r.date_heure                                      AS heure_prevue,
        TIME_FORMAT(r.date_heure, '%H:%i')               AS heure_affichee,
+       CASE WHEN r.statut = 'en_cours' THEN UNIX_TIMESTAMP(r.updated_at) END AS started_at,
        pa.id                                             AS patient_id,
        CONCAT(u.prenom, ' ', u.nom)                      AS patient_nom,
        pa.telephone,
@@ -39,7 +40,7 @@ const getTodayQueue = async (medecin_id) => {
      JOIN USERS    u  ON u.id  = pa.user_id
      WHERE r.medecin_id = ?
        AND DATE(r.date_heure) = CURDATE()
-       AND r.statut IN ('planifie', 'confirme')
+       AND r.statut IN ('planifie', 'confirme', 'en_cours')
      ORDER BY r.date_heure ASC`,
     [medecin_id]
   );
