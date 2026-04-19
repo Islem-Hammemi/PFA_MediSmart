@@ -242,6 +242,9 @@ function Appointments() {
                           Dr. {item.medecin.prenom} {item.medecin.nom}
                         </span>
                         <span className="appt-specialty">{item.medecin.specialite}</span>
+                        {isPast && item.source_type === 'ticket' && (
+                          <span className="appt-motif">Ticket consultation</span>
+                        )}
                         {!isPast && item.motif && (
                           <span className="appt-motif">{item.motif}</span>
                         )}

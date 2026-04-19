@@ -143,8 +143,18 @@ function BookingModal({ doctor, onClose }) {
   const [loading,      setLoading]      = useState(false);
   const [error,        setError]        = useState(null);
   const [bookedTimes,  setBookedTimes]  = useState([]);
+  const [patientBookedTimes, setPatientBookedTimes] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
-  const [hasRdvOnDate, setHasRdvOnDate] = useState(false);
+
+  const formatRdvTime = (dateTime) => {
+    const d = new Date(dateTime);
+    let h = d.getHours();
+    const m = String(d.getMinutes()).padStart(2, "0");
+    const period = h >= 12 ? "PM" : "AM";
+    if (h > 12) h -= 12;
+    if (h === 0) h = 12;
+    return `${String(h).padStart(2, "0")}:${m} ${period}`;
+  };
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") onClose(); };
@@ -157,7 +167,7 @@ function BookingModal({ doctor, onClose }) {
     return () => { document.body.style.overflow = ""; };
   }, []);
 
-  // Fetch booked slots for selected date
+  // Fetch booked slots for selected date and patient appointment times on that date
   useEffect(() => {
     if (!selectedDate || !doctor?.id) return;
     const fetchBookedSlots = async () => {
@@ -165,11 +175,29 @@ function BookingModal({ doctor, onClose }) {
       try {
         const pad = (n) => String(n).padStart(2, "0");
         const dateStr = `${selectedDate.year}-${pad(selectedDate.month + 1)}-${pad(selectedDate.day)}`;
-        const res  = await fetch(`${API_BASE}/api/rendez-vous/disponibilite/${doctor.id}/${dateStr}`);
-        const json = await res.json();
-        if (json.success) setBookedTimes(json.booked || []);
+        const [slotsRes, patientRes] = await Promise.all([
+          fetch(`${API_BASE}/api/rendez-vous/disponibilite/${doctor.id}/${dateStr}`),
+          fetch(`${API_BASE}/api/rendez-vous/upcoming`, {
+            headers: { Authorization: `Bearer ${getToken()}` },
+          }),
+        ]);
+
+        const slotsJson = await slotsRes.json();
+        if (slotsJson.success) setBookedTimes(slotsJson.booked || []);
+        else setBookedTimes([]);
+
+        const patientJson = await patientRes.json();
+        if (patientJson.success) {
+          const patientTimes = (patientJson.data || [])
+            .filter((rdv) => rdv.date_heure?.startsWith(dateStr))
+            .map((rdv) => formatRdvTime(rdv.date_heure));
+          setPatientBookedTimes(patientTimes);
+        } else {
+          setPatientBookedTimes([]);
+        }
       } catch {
         setBookedTimes([]);
+        setPatientBookedTimes([]);
       } finally {
         setLoadingSlots(false);
       }
@@ -177,33 +205,11 @@ function BookingModal({ doctor, onClose }) {
     fetchBookedSlots();
   }, [selectedDate, doctor?.id]);
 
-  // Check if patient already has an RDV on selected date
-  useEffect(() => {
-    if (!selectedDate) { setHasRdvOnDate(false); return; }
-    const checkMyRdv = async () => {
-      try {
-        const res  = await fetch(`${API_BASE}/api/rendez-vous/upcoming`, {
-          headers: { Authorization: `Bearer ${getToken()}` },
-        });
-        const json = await res.json();
-        if (!json.success) return;
-        const pad = (n) => String(n).padStart(2, "0");
-        const dateStr = `${selectedDate.year}-${pad(selectedDate.month + 1)}-${pad(selectedDate.day)}`;
-        const already = (json.data || []).some(rdv =>
-          rdv.date_heure?.startsWith(dateStr)
-        );
-        setHasRdvOnDate(already);
-      } catch {
-        setHasRdvOnDate(false);
-      }
-    };
-    checkMyRdv();
-  }, [selectedDate]);
-
   const handleDateSelect = (date) => {
     setSelectedDate(date);
+    setSelectedTime(null);
     setBookedTimes([]);
-    setHasRdvOnDate(false);
+    setPatientBookedTimes([]);
     setError(null);
     if (selectedTime && isSlotPast(date, selectedTime)) setSelectedTime(null);
   };
@@ -212,7 +218,7 @@ function BookingModal({ doctor, onClose }) {
   const initials = `${doctor.prenom?.[0] ?? ""}${doctor.nom?.[0] ?? ""}`.toUpperCase();
 
   const doctorAbsentToday = doctor.statut === "absent" && selectedDate && isToday(selectedDate);
-  const canSubmit = selectedDate && selectedTime && !loading && !doctorAbsentToday && !hasRdvOnDate;
+  const canSubmit = selectedDate && selectedTime && !loading && !doctorAbsentToday;
 
   const formatDate = () => {
     if (!selectedDate) return "Not selected";
@@ -262,7 +268,7 @@ function BookingModal({ doctor, onClose }) {
 
       const json = await res.json();
 
-      if (!json.success) {
+        if (!json.success) {
         setError(toFriendlyError(json.message));
         if (/taken|booked|unavailable|already/i.test(json.message || "")) {
           setSelectedTime(null);
@@ -281,9 +287,12 @@ function BookingModal({ doctor, onClose }) {
   };
 
   const renderSlot = (t) => {
-    const past     = isSlotPast(selectedDate, t);
-    const booked   = !past && bookedTimes.includes(t);
-    const disabled = past || booked || loadingSlots || hasRdvOnDate;
+    const past = isSlotPast(selectedDate, t);
+    const doctorBooked = !past && bookedTimes.includes(t);
+    const patientBooked = !past && patientBookedTimes.includes(t);
+    const disabled = past || doctorBooked || patientBooked || loadingSlots;
+
+    const busy = doctorBooked || patientBooked;
 
     return (
       <button
@@ -291,17 +300,17 @@ function BookingModal({ doctor, onClose }) {
         className={`bm-slot ${selectedTime === t ? "bm-slot--active" : ""}`}
         onClick={() => !disabled && setSelectedTime(t)}
         disabled={disabled}
-        title={past ? "Time already passed" : booked ? "Already booked" : ""}
+        title={past ? "Time already passed" : busy ? "Already booked" : ""}
         style={disabled ? {
           opacity: 0.4,
           cursor: "not-allowed",
           textDecoration: "line-through",
-          background: booked ? "#fee2e2" : undefined,
-          color:      booked ? "#ef4444" : undefined,
+          background: busy ? "#fee2e2" : undefined,
+          color:      busy ? "#ef4444" : undefined,
         } : {}}
       >
         {t}
-        {booked && (
+        {busy && (
           <span style={{ fontSize: "9px", display: "block", color: "#ef4444", fontWeight: 600 }}>
             Taken
           </span>
@@ -377,17 +386,7 @@ function BookingModal({ doctor, onClose }) {
                   </div>
                 )}
 
-                {hasRdvOnDate && (
-                  <div style={{
-                    background: "#fef2f2", border: "1px solid #fecaca",
-                    borderRadius: "8px", padding: "10px 14px",
-                    color: "#dc2626", fontSize: "0.85rem", marginTop: "10px",
-                  }}>
-                    You already have an appointment on this date. Please choose another day.
-                  </div>
-                )}
-
-                {selectedDate && !doctorAbsentToday && !hasRdvOnDate && (
+                            {selectedDate && !doctorAbsentToday && (
                   <div className="bm-slots">
                     {loadingSlots && (
                       <p style={{ fontSize: "12px", color: "#94a3b8", margin: "8px 0" }}>
@@ -467,8 +466,6 @@ function BookingModal({ doctor, onClose }) {
                   <p className="bm-summary__hint">
                     {doctorAbsentToday
                       ? "Doctor is absent today — pick another date"
-                      : hasRdvOnDate
-                      ? "You already have an appointment this day"
                       : "Please select a date and time to continue"}
                   </p>
                 )}

@@ -39,7 +39,12 @@ export default function PastAppointmentDetail({ appointment, onClose }) {
   const initials = getInitials(medecin.prenom, medecin.nom);
   const specialty = medecin.specialite ?? "—";
   const dateStr   = formatDateTime(appointment?.date_heure);
-  const motif     = appointment?.motif || "No reason specified.";
+  const isTicket  = appointment?.source_type === 'ticket';
+  const motif     = isTicket
+    ? 'Ticket consultation'
+    : appointment?.motif || 'No reason specified.';
+  const caseDescription = appointment?.notes || appointment?.diagnostic || null;
+  const treatmentText   = appointment?.traitement || null;
 
   // Close on Escape
   useEffect(() => {
@@ -114,11 +119,16 @@ export default function PastAppointmentDetail({ appointment, onClose }) {
                 </div>
                 <div className="pad-field">
                   <span className="pad-field__label">Patient Case Description</span>
-                  <div className="pad-empty">
-                    
-                    <p>No case description recorded.</p>
-                    <span>The doctor will complete this during or after the consultation.</span>
-                  </div>
+                  {caseDescription ? (
+                    <p className="pad-field__value pad-field__value--notes">
+                      {caseDescription}
+                    </p>
+                  ) : (
+                    <div className="pad-empty">
+                      <p>No case description recorded.</p>
+                      <span>The doctor will complete this during or after the consultation.</span>
+                    </div>
+                  )}
                 </div>
                 
               </div>
@@ -128,13 +138,15 @@ export default function PastAppointmentDetail({ appointment, onClose }) {
               <div className="pad-section">
                 <div className="pad-field">
                   <span className="pad-field__label">Prescribed Medicines</span>
-                  <div className="pad-empty">
-                    
-                    <p>No medicines prescribed yet.</p>
-                    <span>Prescriptions written by the doctor will appear here.</span>
-                  </div>
+                  {treatmentText ? (
+                    <p className="pad-field__value">{treatmentText}</p>
+                  ) : (
+                    <div className="pad-empty">
+                      <p>No medicines prescribed yet.</p>
+                      <span>Prescriptions written by the doctor will appear here.</span>
+                    </div>
+                  )}
                 </div>
-               
                 
               </div>
             )}

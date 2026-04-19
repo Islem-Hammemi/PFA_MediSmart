@@ -159,8 +159,9 @@ style={{ backgroundColor: getAvatarColor(), color: '#365081' }}            >
               <div className="pd-rdv-list">
                 {rdvList.map((rdv, i) => {
                   const st = STATUT_STYLE[rdv.statut] || STATUT_STYLE.planifie;
+                  const itemKey = rdv.source_type ? `${rdv.source_type}-${rdv.id}` : rdv.id ?? i;
                   return (
-                    <div className="pd-rdv-row" key={rdv.id ?? i}>
+                    <div className="pd-rdv-row" key={itemKey}>
                       <div className="pd-rdv-left">
                         <span className="pd-rdv-date">{rdv.date_heure}</span>
                         {rdv.motif && (

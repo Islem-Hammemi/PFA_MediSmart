@@ -60,7 +60,7 @@ const servePatient = async (req, res) => {
       );
     } else {
       const [result] = await db.execute(
-        `UPDATE RENDEZ_VOUS SET statut = 'confirme' WHERE id = ? AND medecin_id = ? AND statut IN ('planifie', 'confirme')`,
+        `UPDATE RENDEZ_VOUS SET statut = 'en_cours' WHERE id = ? AND medecin_id = ? AND statut IN ('planifie', 'confirme')`,
         [id, medecinId]
       );
       if (!result.affectedRows)
