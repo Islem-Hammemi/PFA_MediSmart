@@ -140,6 +140,19 @@ const getStats = async (req, res) => {
   }
 };
 
+//  GET /api/medecins/dashboard-stats
+const getDoctorDashboardStats = async (req, res) => {
+  try {
+    const medecinId = req.utilisateur.medecin_id;
+    if (!medecinId)
+      return res.status(403).json({ success: false, message: "Accès réservé aux médecins." });
+    const data = await medecinService.getDoctorDashboardStats(medecinId);
+    return res.json({ success: true, data });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 module.exports = {
   getMedecins,
   getMedecinsPresents,
@@ -152,4 +165,5 @@ module.exports = {
   checkout,
   updateProfile,
   getStats,
+  getDoctorDashboardStats,
 };

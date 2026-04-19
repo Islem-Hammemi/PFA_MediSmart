@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+import { getDoctorDashboardStats } from '../services/medecinAPI';
 import "./doctorspage.css";
 
 const CalendarIcon = () => (
@@ -29,14 +31,34 @@ const TicketIcon = () => (
   </svg>
 );
 
-const stats = [
-  { icon: <CalendarIcon />, label: "Today's Appointments", value: "4" },
-  { icon: <ActivityIcon />, label: "Pending Requests", value: "2" },
-  { icon: <ClockIcon />, label: "Avg. consult Time", value: "18m" },
-  { icon: <TicketIcon />, label: "In Queue", value: "3" },
-];
-
 export default function Docstats() {
+  const [stats, setStats] = useState([
+    { icon: <CalendarIcon />, label: "Today's Appointments", value: "0", loading: true },
+    { icon: <ActivityIcon />, label: "Pending Requests", value: "0", loading: true },
+    { icon: <ClockIcon />, label: "Avg. Wait Time", value: "0m", loading: true },
+    { icon: <TicketIcon />, label: "In Queue", value: "0", loading: true },
+  ]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await getDoctorDashboardStats();
+        setStats([
+          { icon: <CalendarIcon />, label: "Today's Appointments", value: data.todayConfirmedAppointments?.toString() || "0", loading: false },
+          { icon: <ActivityIcon />, label: "Pending Requests", value: data.pendingRequests?.toString() || "0", loading: false },
+          { icon: <ClockIcon />, label: "Avg. Wait Time", value: `${data.avgWaitTime || 0}m`, loading: false },
+          { icon: <TicketIcon />, label: "In Queue", value: data.patientsInQueue?.toString() || "0", loading: false },
+        ]);
+      } catch (error) {
+        console.error('Error fetching doctor stats:', error);
+        // Keep default values on error
+        setStats(prevStats => prevStats.map(stat => ({ ...stat, loading: false })));
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   return (
     <div className="stats-wrapper">
       <div className="doc-stats-grid">
@@ -44,7 +66,7 @@ export default function Docstats() {
           <div className="stat-card-doc" key={i}>
             <div className="stat-icon">{stat.icon}</div>
             <p className="stat-label-doc">{stat.label}</p>
-            <p className="stat-value">{stat.value}</p>
+            <p className="stat-value">{stat.loading ? "..." : stat.value}</p>
           </div>
         ))}
       </div>
