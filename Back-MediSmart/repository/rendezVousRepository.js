@@ -25,17 +25,42 @@ const getUpcomingByPatient = async (patientId) => {
 
 const getPastByPatient = async (patientId) => {
   const [rows] = await pool.execute(
-    `SELECT r.id AS rdv_id, r.date_heure, r.statut, r.motif,
-            m.id AS medecin_id, u.nom AS medecin_nom, u.prenom AS medecin_prenom,
-            m.specialite, m.photo,
-            (SELECT COUNT(*) FROM EVALUATIONS e WHERE e.rendez_vous_id = r.id) AS has_evaluation
-     FROM RENDEZ_VOUS r
-     JOIN MEDECINS m ON m.id = r.medecin_id
-     JOIN USERS u ON u.id = m.user_id
-     WHERE r.patient_id = ?
-       AND (r.statut IN ('termine','annule') OR r.date_heure < NOW())
-     ORDER BY r.date_heure DESC`,
-    [patientId]
+    `SELECT * FROM (
+       SELECT r.id AS rdv_id, r.date_heure, r.statut, r.motif,
+              m.id AS medecin_id, u.nom AS medecin_nom, u.prenom AS medecin_prenom,
+              m.specialite, m.photo,
+              (SELECT COUNT(*) FROM EVALUATIONS e WHERE e.rendez_vous_id = r.id) AS has_evaluation,
+              d.diagnostic, d.traitement, d.notes,
+              'rdv' AS source_type
+        FROM RENDEZ_VOUS r
+        JOIN MEDECINS m ON m.id = r.medecin_id
+        JOIN USERS u ON u.id = m.user_id
+        LEFT JOIN DOSSIERS_MEDICAUX d
+          ON d.patient_id = r.patient_id
+         AND d.medecin_id = r.medecin_id
+         AND d.date_consultation = DATE(r.date_heure)
+        WHERE r.patient_id = ?
+          AND (r.statut IN ('termine','annule') OR r.date_heure < NOW())
+      UNION ALL
+       SELECT t.id AS rdv_id, t.created_at AS date_heure, t.statut,
+              'Ticket consultation' AS motif,
+              m.id AS medecin_id, u.nom AS medecin_nom, u.prenom AS medecin_prenom,
+              m.specialite, m.photo,
+              0 AS has_evaluation,
+              d.diagnostic, d.traitement, d.notes,
+              'ticket' AS source_type
+        FROM TICKETS t
+        JOIN MEDECINS m ON m.id = t.medecin_id
+        JOIN USERS u ON u.id = m.user_id
+        LEFT JOIN DOSSIERS_MEDICAUX d
+          ON d.patient_id = t.patient_id
+         AND d.medecin_id = t.medecin_id
+         AND d.date_consultation = DATE(t.created_at)
+        WHERE t.patient_id = ?
+          AND t.statut = 'termine'
+      ) AS combined
+      ORDER BY combined.date_heure DESC`,
+    [patientId, patientId]
   );
   return rows;
 };

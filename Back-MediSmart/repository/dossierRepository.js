@@ -16,9 +16,16 @@ const bcrypt = require('bcrypt');
 const verifierRelation = async (medecin_id, patient_id) => {
   const [rows] = await db.query(
     `SELECT COUNT(*) AS nb
-     FROM RENDEZ_VOUS
-     WHERE medecin_id = ? AND patient_id = ?`,
-    [medecin_id, patient_id]
+     FROM (
+       SELECT patient_id
+       FROM RENDEZ_VOUS
+       WHERE medecin_id = ? AND patient_id = ?
+       UNION
+       SELECT patient_id
+       FROM TICKETS
+       WHERE medecin_id = ? AND patient_id = ? AND statut = 'termine'
+     ) AS rel`,
+    [medecin_id, patient_id, medecin_id, patient_id]
   );
   return rows[0].nb > 0;
 };
@@ -26,22 +33,29 @@ const verifierRelation = async (medecin_id, patient_id) => {
 // ── MODIFIÉ : ajout age + date_naissance formatée ─────────────
 const getMesPatientsListe = async (medecin_id) => {
   const [rows] = await db.query(
-    `SELECT DISTINCT
+    `SELECT
        pa.id                                          AS patient_id,
        CONCAT(u.prenom, ' ', u.nom)                   AS nom_complet,
        u.email,
        pa.telephone,
        DATE_FORMAT(pa.date_naissance, '%d/%m/%Y')     AS date_naissance,
        TIMESTAMPDIFF(YEAR, pa.date_naissance, NOW())  AS age,
-       COUNT(r.id)                                    AS nb_rdv,
-       MAX(DATE_FORMAT(r.date_heure, '%d/%m/%Y à %H:%i')) AS dernier_rdv
-     FROM RENDEZ_VOUS r
-     JOIN PATIENTS pa ON pa.id = r.patient_id
-     JOIN USERS    u  ON u.id  = pa.user_id
-     WHERE r.medecin_id = ?
+       COUNT(*)                                       AS nb_rdv,
+       DATE_FORMAT(MAX(v.date_heure), '%d/%m/%Y à %H:%i') AS dernier_rdv
+     FROM PATIENTS pa
+     JOIN USERS u ON u.id = pa.user_id
+     JOIN (
+       SELECT patient_id, date_heure
+       FROM RENDEZ_VOUS
+       WHERE medecin_id = ?
+       UNION ALL
+       SELECT patient_id, created_at AS date_heure
+       FROM TICKETS
+       WHERE medecin_id = ? AND statut = 'termine'
+     ) AS v ON v.patient_id = pa.id
      GROUP BY pa.id, u.prenom, u.nom, u.email, pa.telephone, pa.date_naissance
-     ORDER BY dernier_rdv DESC`,
-    [medecin_id]
+     ORDER BY MAX(v.date_heure) DESC`,
+    [medecin_id, medecin_id]
   );
   return rows;
 };
@@ -90,8 +104,16 @@ const getRDVPatient = async (medecin_id, patient_id) => {
        DATE_FORMAT(r.date_heure, '%d/%m/%Y à %H:%i') AS date_heure
      FROM RENDEZ_VOUS r
      WHERE r.medecin_id = ? AND r.patient_id = ?
-     ORDER BY r.date_heure DESC`,
-    [medecin_id, patient_id]
+     UNION ALL
+     SELECT
+       t.id,
+       t.statut,
+       'Ticket consultation' AS motif,
+       DATE_FORMAT(t.created_at, '%d/%m/%Y à %H:%i') AS date_heure
+     FROM TICKETS t
+     WHERE t.medecin_id = ? AND t.patient_id = ? AND t.statut = 'termine'
+     ORDER BY date_heure DESC`,
+    [medecin_id, patient_id, medecin_id, patient_id]
   );
   return rows;
 };

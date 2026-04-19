@@ -24,6 +24,10 @@ const _formaterRdvPatient = (row, avecEvaluation = false) => {
     date_heure: row.date_heure,
     statut    : row.statut,
     motif     : row.motif,
+    source_type: row.source_type || 'rdv',
+    diagnostic: row.diagnostic || null,
+    traitement: row.traitement || null,
+    notes     : row.notes || null,
     medecin: {
       id        : row.medecin_id,
       nom       : row.medecin_nom,

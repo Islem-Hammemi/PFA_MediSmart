@@ -137,13 +137,19 @@ const getDashboardStats = async (patientId) => {
   );
 
   // Past visits — same logic as getPastByPatient in rendezVousRepository:
-  // any RDV that is terminated/cancelled OR whose date has already passed
+  // includes completed ticket consultations as well.
   const [[{ pastVisits }]] = await pool.execute(
     `SELECT COUNT(*) AS pastVisits
-     FROM RENDEZ_VOUS
-     WHERE patient_id = ?
-       AND (statut IN ('termine', 'annule') OR date_heure < NOW())`,
-    [patientId]
+     FROM (
+       SELECT id FROM RENDEZ_VOUS
+       WHERE patient_id = ?
+         AND (statut IN ('termine', 'annule') OR date_heure < NOW())
+       UNION ALL
+       SELECT id FROM TICKETS
+       WHERE patient_id = ?
+         AND statut = 'termine'
+     ) AS history`,
+    [patientId, patientId]
   );
 
   return {

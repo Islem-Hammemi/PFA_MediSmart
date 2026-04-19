@@ -11,13 +11,13 @@ const STATUT_CONFIG = {
 
 
 const TABS = [
-  { id: "status",     label: "Patient Status",   },
-  { id: "diagnostic", label: "Diagnostic",        },
-  { id: "treatment",  label: "Medicines & Cure",   },
+  { id: "summary",    label: "Summary"        },
+  { id: "diagnostic", label: "Diagnostic"     },
+  { id: "treatment",  label: "Treatment"      },
 ];
 
 export default function AppointmentDetailModal({ appointment, onClose }) {
-  const [activeTab, setActiveTab] = useState("status");
+  const [activeTab, setActiveTab] = useState("summary");
 
   const statut = STATUT_CONFIG[appointment?.statut] || STATUT_CONFIG.planifie;
 
@@ -37,6 +37,9 @@ export default function AppointmentDetailModal({ appointment, onClose }) {
     : appointment?.date_heure_formatee ?? "—";
 
   const motif = appointment?.motif ?? "No reason specified.";
+  const noteText = appointment?.notes || null;
+  const diagnosticText = appointment?.diagnostic || null;
+  const treatmentText = appointment?.traitement || null;
 
   // Backdrop + Escape
   useEffect(() => {
@@ -101,7 +104,7 @@ export default function AppointmentDetailModal({ appointment, onClose }) {
           {/* Right content area */}
           <div className="adm-content">
 
-            {activeTab === "status" && (
+            {activeTab === "summary" && (
               <div className="adm-section">
                 <div className="adm-field">
                   <span className="adm-field__label">Reason for Visit</span>
@@ -134,35 +137,39 @@ export default function AppointmentDetailModal({ appointment, onClose }) {
                     )}
                   </>
                 )}
+                
               </div>
             )}
 
             {activeTab === "diagnostic" && (
               <div className="adm-section">
-                
                 <div className="adm-field">
-                  <span className="adm-field__label">Diagnostic Notes</span>
-                  <div className="adm-empty-note">
-                    
-                    <p>No diagnostic recorded yet.</p>
-                    <span>The doctor will fill this after the consultation.</span>
-                  </div>
+                  <span className="adm-field__label">Diagnostic</span>
+                  {diagnosticText ? (
+                    <p className="adm-field__value">{diagnosticText}</p>
+                  ) : (
+                    <div className="adm-empty-note">
+                      <p>No diagnostic recorded yet.</p>
+                      <span>The doctor will fill this after the consultation.</span>
+                    </div>
+                  )}
                 </div>
-                
               </div>
             )}
 
             {activeTab === "treatment" && (
               <div className="adm-section">
                 <div className="adm-field">
-                  <span className="adm-field__label">Prescribed Medicines</span>
-                  <div className="adm-empty-note">
-                    
-                    <p>No prescriptions recorded yet.</p>
-                    <span>Prescriptions will appear here after the consultation.</span>
-                  </div>
+                  <span className="adm-field__label">Treatment</span>
+                  {treatmentText ? (
+                    <p className="adm-field__value">{treatmentText}</p>
+                  ) : (
+                    <div className="adm-empty-note">
+                      <p>No treatment recorded yet.</p>
+                      <span>The doctor will add treatment details after the consultation.</span>
+                    </div>
+                  )}
                 </div>
-                
               </div>
             )}
 
