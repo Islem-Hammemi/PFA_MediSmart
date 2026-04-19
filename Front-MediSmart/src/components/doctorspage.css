@@ -460,24 +460,19 @@
 
 
 /* TicketQueue.css */
-
 .tq-wrapper {
   font-family: 'Inter', sans-serif;
   padding: 0 0 24px 0;
   margin-top: 30px;
-  
 }
-
 .tq-card {
   background: #ffffff;
-  
   border-radius: 20px;
   padding: 28px 28px 24px;
   width: 100%;
   box-sizing: border-box;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.05);
 }
-
 /* header */
 .tq-header {
   display: flex;
@@ -485,20 +480,17 @@
   justify-content: space-between;
   margin-bottom: 28px;
 }
-
 .tq-header-left {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-
 .tq-title {
   font-size: 18px;
   font-weight: 700;
   color: #1a202c;
   margin: 0;
 }
-
 .tq-badge {
   background: #eef2ff;
   color: #4a5568;
@@ -507,7 +499,6 @@
   padding: 4px 12px;
   border-radius: 20px;
 }
-
 .tq-manage {
   display: flex;
   align-items: center;
@@ -521,14 +512,21 @@
   padding: 0;
   transition: opacity 0.15s;
 }
-
 .tq-manage:hover { opacity: 0.75; }
+
+/* shared grid — header and rows must be identical */
+.tq-table-header,
+.tq-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 120px 130px 100px;
+  align-items: center;
+  padding: 0 20px;
+}
 
 /* column labels */
 .tq-table-header {
-  display: grid;
-  grid-template-columns: 100px 1fr 160px 120px;
-  padding: 0 16px 10px;
+  padding-top: 0;
+  padding-bottom: 10px;
   font-size: 13px;
   color: #94a3b8;
   font-weight: 500;
@@ -538,38 +536,31 @@
 .tq-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
-
 .tq-empty {
   text-align: center;
   color: #94a3b8;
   font-size: 14px;
   padding: 20px 0;
 }
-
 .tq-row {
-  display: grid;
-  grid-template-columns: 100px 1fr 160px 120px;
-  align-items: center;
   background: #f7f9fc;
   border-radius: 14px;
-  padding: 14px 16px;
+  padding-top: 14px;
+  padding-bottom: 14px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
-
 .tq-ticket-id {
   font-size: 15px;
   font-weight: 700;
   color: #1a202c;
 }
-
 .tq-patient {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-
 .tq-avatar {
   width: 40px;
   height: 40px;
@@ -578,26 +569,22 @@
   flex-shrink: 0;
   background: #dde3ee;
 }
-
 .tq-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-
 .tq-avatar-placeholder {
   display: block;
   width: 100%;
   height: 100%;
   background: linear-gradient(135deg, #c8d0e0, #9aa5bc);
 }
-
 .tq-name {
   font-size: 15px;
   font-weight: 600;
   color: #1a202c;
 }
-
 .tq-time {
   font-size: 14px;
   color: #4a5568;
@@ -618,19 +605,16 @@
   color: #4A90D9;
   cursor: pointer;
   transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
-  justify-self: start;
+  white-space: nowrap;
 }
-
 .tq-serve-btn:hover {
   background: #2563EB;
   color: #ffffff;
   border-color: #2563EB;
 }
-
 .tq-serve-btn:active {
   transform: scale(0.97);
 }
-
 
 
 

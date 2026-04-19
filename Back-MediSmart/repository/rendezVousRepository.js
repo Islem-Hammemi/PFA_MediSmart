@@ -56,7 +56,7 @@ const verifierConflitPatient = async (patientId, dateHeure) => {
   const [rows] = await pool.execute(
     `SELECT id FROM RENDEZ_VOUS
      WHERE patient_id = ?
-       AND DATE(date_heure) = DATE(?)
+       AND date_heure = ?
        AND statut NOT IN ('annule')
      LIMIT 1`,
     [patientId, dateHeure]

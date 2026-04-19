@@ -150,10 +150,7 @@ export default function ConsultationTimer({ currentPatient = null, onFinish }) {
           </div>
           <div>
             <span className="consultation-patient-name">{patientName}</span>
-            {isActive
-              ? <span className="consultation-patient-sub">In consultation</span>
-              : <span className="consultation-patient-sub">Serve a patient to begin</span>
-            }
+            
           </div>
         </div>
         <div className="consultation-timer-display">

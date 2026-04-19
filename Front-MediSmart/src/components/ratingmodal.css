@@ -26,12 +26,12 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: #E1F5EE;
+  background: #bfd1ff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  color: #1D9E75;
+  color: #132249;
   margin-bottom: 1rem;
 }
 
@@ -114,6 +114,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: opacity 0.2s, transform 0.1s;
+  padding-left: 3.5cm;
 }
 
 .rm-btn--disabled {
@@ -123,7 +124,7 @@
 }
 
 .rm-btn--active {
-  background: #1D9E75;
+  background: #132249;
   color: #fff;
 }
 

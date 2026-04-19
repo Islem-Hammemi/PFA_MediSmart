@@ -87,7 +87,7 @@ const reserver = async (userId, { medecinId, dateHeure, motif }) => {
   //  important 
   const conflitPatient = await rendezVousRepository.verifierConflitPatient(patientId, dateHeure);
   if (conflitPatient)
-    throw new Error("Vous avez déjà un RDV à cette date.");
+    throw new Error("Vous avez déjà un RDV à cette heure.");
 
   const conflitMedecin = await rendezVousRepository.verifierConflitMedecin(medecinId, dateHeure);
   if (conflitMedecin)
