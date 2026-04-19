@@ -66,7 +66,7 @@ function Navbarmedecin() {
             <li><a href="/dashboard-medecin">Dashboard</a></li>
             <li><a href="/patients">Patients</a></li>
             <li><a href="/schedule">Schedule</a></li>
-            <li><a href="/tickets">Tickets</a></li>
+            <li><a href="/tickets">Consultation</a></li>
             <li><a href="/reviews">Reviews</a></li>
           </ul>
 

@@ -5,11 +5,7 @@ import "./doctorspage.css";
 
 const API_BASE = "http://localhost:5000/api";
 
-const PlayIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-    <polygon points="3,1 13,7 3,13" />
-  </svg>
-);
+
 
 const ArrowIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -110,7 +106,6 @@ export default function TicketQueuemed() {
           <span>Ticket</span>
           <span>Patient</span>
           <span>Checked In</span>
-          <span>Action</span>
         </div>
 
         {/* Rows */}
@@ -132,12 +127,7 @@ export default function TicketQueuemed() {
 
               {/* Patient */}
               <div className="tq-patient">
-                <div
-                  className="tq-avatar-initials"
-                  style={{ background: getGradient(ticket.patient_nom) }}
-                >
-                  {getInitials(ticket.patient_nom)}
-                </div>
+                
                 <span className="tq-name">{ticket.patient_nom}</span>
               </div>
 
@@ -145,14 +135,7 @@ export default function TicketQueuemed() {
               <span className="tq-time">{ticket.checked_in}</span>
 
               {/* Serve button */}
-              <button
-                className="tq-serve-btn"
-                onClick={() => handleServe(ticket.id)}
-                disabled={actioning[ticket.id]}
-              >
-                <PlayIcon />
-                {actioning[ticket.id] ? "..." : "Serve"}
-              </button>
+              
 
             </div>
           ))}

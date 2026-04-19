@@ -183,7 +183,7 @@ function QueueTracker() {
             <div className="qt-step__line qt-step__line--done" />
             <div className="qt-step__info">
               <span className="qt-step__label">Ticket Created</span>
-              <span className="qt-step__time">{createdTime}</span>
+              
             </div>
           </div>
 

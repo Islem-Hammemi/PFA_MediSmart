@@ -208,6 +208,28 @@ const getStats = async () => {
   return rows[0];
 };
 
+//  NEW — dynamic dashboard stats for a specific doctor
+const getDoctorDashboardStats = async (medecinId) => {
+  const [rows] = await pool.query(
+    `SELECT
+       (SELECT COUNT(*) FROM RENDEZ_VOUS
+        WHERE medecin_id = ? AND DATE(date_heure) = CURDATE()
+        AND statut = 'confirme') AS todayConfirmedAppointments,
+       (SELECT COUNT(*) FROM RENDEZ_VOUS
+        WHERE medecin_id = ? AND DATE(date_heure) = CURDATE()
+        AND statut = 'planifie') AS pendingRequests,
+       (SELECT COUNT(*) FROM TICKETS
+        WHERE medecin_id = ? AND statut IN ('en_attente', 'en_cours')
+        AND DATE(created_at) = CURDATE()) AS patientsInQueue,
+       (SELECT ROUND(AVG(TIMESTAMPDIFF(MINUTE, created_at, updated_at)), 0)
+        FROM TICKETS
+        WHERE medecin_id = ? AND statut = 'termine'
+        AND DATE(created_at) = CURDATE()) AS avgWaitTime`,
+    [medecinId, medecinId, medecinId, medecinId]
+  );
+  return rows[0];
+};
+
 module.exports = {
   findAll,
   findBySearch,
@@ -222,4 +244,5 @@ module.exports = {
   updateStatut,
   updateUserProfile,
   getStats,
+  getDoctorDashboardStats,
 };

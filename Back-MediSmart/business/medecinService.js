@@ -70,6 +70,12 @@ const updateProfile = async (user_id, { prenom, nom, email, telephone }) => {
 //  dashboard stats
 const getStats = async () => await medecinRepository.getStats();
 
+//  dynamic dashboard stats for a specific doctor
+const getDoctorDashboardStats = async (medecinId) => {
+  if (!medecinId) throw new Error("medecinId requis");
+  return await medecinRepository.getDoctorDashboardStats(medecinId);
+};
+
 module.exports = {
   getMedecins,
   getMedecinsPresents,
@@ -81,4 +87,5 @@ module.exports = {
   setStatut,
   updateProfile,
   getStats,
+  getDoctorDashboardStats,
 };

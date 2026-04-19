@@ -46,5 +46,6 @@ router.get("/mon-statut",    medecinAuth, ctrl.getMonStatut);
 router.post("/checkin-auth", medecinAuth, ctrl.checkin);
 router.post("/checkout-auth",medecinAuth, ctrl.checkout);
 router.put("/profile",       medecinAuth, ctrl.updateProfile);
+router.get("/dashboard-stats", medecinAuth, ctrl.getDoctorDashboardStats);
 
 module.exports = router;

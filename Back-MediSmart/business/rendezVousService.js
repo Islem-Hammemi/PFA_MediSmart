@@ -24,6 +24,10 @@ const _formaterRdvPatient = (row, avecEvaluation = false) => {
     date_heure: row.date_heure,
     statut    : row.statut,
     motif     : row.motif,
+    source_type: row.source_type || 'rdv',
+    diagnostic: row.diagnostic || null,
+    traitement: row.traitement || null,
+    notes     : row.notes || null,
     medecin: {
       id        : row.medecin_id,
       nom       : row.medecin_nom,
@@ -87,7 +91,7 @@ const reserver = async (userId, { medecinId, dateHeure, motif }) => {
   //  important 
   const conflitPatient = await rendezVousRepository.verifierConflitPatient(patientId, dateHeure);
   if (conflitPatient)
-    throw new Error("Vous avez déjà un RDV à cette date.");
+    throw new Error("Vous avez déjà un RDV à cette heure.");
 
   const conflitMedecin = await rendezVousRepository.verifierConflitMedecin(medecinId, dateHeure);
   if (conflitMedecin)

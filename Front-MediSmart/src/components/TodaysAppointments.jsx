@@ -62,9 +62,6 @@ export default function TodaysAppointments({ refreshKey }) {
 
         <div className="ta-header">
           <h2 className="ta-title">Today's Appointments</h2>
-          <button className="ta-view-all">
-            View All <ArrowIcon />
-          </button>
         </div>
 
         <div className="ta-list">
@@ -105,7 +102,7 @@ export default function TodaysAppointments({ refreshKey }) {
                 </span>
               )}
 
-              <button className="ta-details-btn">Details</button>
+             
             </div>
           ))}
 

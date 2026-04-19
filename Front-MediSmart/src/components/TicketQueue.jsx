@@ -23,21 +23,10 @@ function TypeBadge({ type }) {
 
 function ServeButton({ onClick }) {
   return (
-    <button className="serve-btn" onClick={onClick}>
+    <button className="tq-serve-btn" onClick={onClick}>
       <PlayIcon size={12} />
       Serve
     </button>
-  );
-}
-
-function Avatar({ patient, size = "current" }) {
-  const photoUrl = patient?.photo ? `${API_BASE}${patient.photo}` : null;
-  const initials = `${patient?.patient_nom?.split(" ")[0]?.[0] ?? ""}${patient?.patient_nom?.split(" ")[1]?.[0] ?? ""}`;
-  const className = size === "current" ? "current-avatar" : "queue-avatar";
-  return photoUrl ? (
-    <img src={photoUrl} alt={patient.patient_nom} className={className} />
-  ) : (
-    <div className={`${className} avatar-initials`}>{initials}</div>
   );
 }
 
@@ -74,7 +63,6 @@ function EmptyQueue({ lastFetched }) {
       alignItems: "center", gap: "20px",
       padding: "56px 32px",
     }}>
-      {/* Icon */}
       <div style={{
         width: "72px", height: "72px", borderRadius: "50%",
         background: "#f0f4ff",
@@ -89,7 +77,6 @@ function EmptyQueue({ lastFetched }) {
         </svg>
       </div>
 
-      {/* Text */}
       <div style={{ textAlign: "center" }}>
         <p style={{ fontSize: "17px", fontWeight: 500, color: "#1a1f36", margin: "0 0 8px" }}>
           Queue is clear
@@ -100,7 +87,6 @@ function EmptyQueue({ lastFetched }) {
         </p>
       </div>
 
-      {/* Live pills */}
       <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center" }}>
         <div style={pillStyle}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
@@ -136,7 +122,7 @@ export default function TicketQueue({
         <div className="queue-table">
           {[1, 2, 3].map(i => (
             <div key={i} className="queue-row" style={{ opacity: 0.4 }}>
-              <span>—</span><span>Loading...</span><span>—</span><span>—</span>
+              <span>—</span><span>Loading...</span><span>—</span><span>—</span><span>—</span>
             </div>
           ))}
         </div>
@@ -156,7 +142,6 @@ export default function TicketQueue({
                 ? `T-${String(currentPatient.ticket_numero).padStart(3, "0")}`
                 : "RDV"}
             </span>
-            <Avatar patient={currentPatient} size="current" />
             <div className="current-info">
               <span className="current-name">{currentPatient.patient_nom}</span>
               <span className="current-checkin">
@@ -166,47 +151,54 @@ export default function TicketQueue({
           </div>
           <NowServingBadge />
         </div>
-      )  : null}
+      ) : null}
 
       {/* ── Waiting queue or empty state ── */}
       {queue.length === 0 ? (
         <EmptyQueue lastFetched={lastFetched} />
       ) : (
-        <div className="queue-table">
-          <div className="queue-header">
+        <div className="tq-wrapper">
+          {/* Column headers */}
+          <div className="tq-table-header">
             <span>Ticket</span>
             <span>Patient</span>
             <span>Type</span>
             <span>Checked In</span>
-            <span>Action</span>
+            <span></span>
           </div>
 
-          {queue.map((patient, index) => (
-            <div
-              key={`${patient.source_type}-${patient.source_id}`}
-              className={`queue-row ${index === 0 ? "next-row" : ""}`}
-            >
-              <div className="queue-ticket-cell">
-                <span className={`queue-ticket ${index === 0 ? "ticket-orange" : "ticket-gray"}`}>
-                  {patient.source_type === "ticket" && patient.ticket_numero
-                    ? `T-${String(patient.ticket_numero).padStart(3, "0")}`
-                    : "RDV"}
-                </span>
-                {index === 0 && <span className="next-badge">NEXT</span>}
+          <div className="tq-list">
+            {queue.map((patient, index) => (
+              <div
+                key={`${patient.source_type}-${patient.source_id}`}
+                className={`tq-row ${index === 0 ? "next-row" : ""}`}
+              >
+                {/* Ticket */}
+                <div className="queue-ticket-cell">
+                  <span className={`queue-ticket ${index === 0 ? "ticket-orange" : "ticket-gray"}`}>
+                    {patient.source_type === "ticket" && patient.ticket_numero
+                      ? `T-${String(patient.ticket_numero).padStart(3, "0")}`
+                      : "RDV"}
+                  </span>
+                  {index === 0 && <span className="next-badge">NEXT</span>}
+                </div>
+
+                {/* Patient */}
+                <div className="tq-patient">
+                  <span className="tq-name">{patient.patient_nom}</span>
+                </div>
+
+                {/* Type */}
+                <TypeBadge type={patient.source_type} />
+
+                {/* Checked In */}
+                <span className="tq-time">{patient.heure_affichee}</span>
+
+                {/* Action — same row, right after time */}
+                <ServeButton onClick={() => onServe && onServe(patient)} />
               </div>
-
-              <div className="queue-patient-cell">
-                <Avatar patient={patient} size="queue" />
-                <span className="queue-name">{patient.patient_nom}</span>
-              </div>
-
-              <TypeBadge type={patient.source_type} />
-
-              <span className="queue-checkin">{patient.heure_affichee}</span>
-
-              <ServeButton onClick={() => onServe && onServe(patient)} />
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </div>

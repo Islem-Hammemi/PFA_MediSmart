@@ -6,10 +6,12 @@
 const express = require('express');
 const router  = express.Router();
 
-//  Free models that are currently available on OpenRouter
-const MODEL = 'openai/gpt-oss-120b:free';
+// ✅ openrouter/free = auto-selects any working free model
+// Fallbacks if it ever fails: meta-llama/llama-3.3-70b-instruct:free
+//                              google/gemma-3-27b-it:free
+//                              deepseek/deepseek-r1:free
+const MODEL = 'openrouter/free';
 
-// POST /api/chat
 router.post('/', async (req, res) => {
   try {
     const { messages } = req.body;
@@ -20,6 +22,7 @@ router.post('/', async (req, res) => {
 
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
+      console.error('[chatRoutes] OPENROUTER_API_KEY not set in .env');
       return res.status(500).json({ error: 'API key not configured on server.' });
     }
 
