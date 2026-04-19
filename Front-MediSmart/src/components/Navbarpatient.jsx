@@ -15,11 +15,18 @@ function NavBarpatient() {
   const [helplineOpen,  setHelplineOpen]  = useState(false);
   const dropdownRef = useRef(null);
   const helplineRef = useRef(null);
+  const [activePath, setActivePath] = useState(window.location.pathname);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const onPop = () => setActivePath(window.location.pathname);
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
   }, []);
 
   useEffect(() => {
@@ -50,12 +57,24 @@ function NavBarpatient() {
         </div>
 
         <ul className={menuOpen ? "nav-links active" : "nav-links"}>
-          <li><a href="/">Home</a></li>
-          <li><a href="/doctors">Doctors</a></li>
-          <li><a href="/specialities">Specialities</a></li>
-          <li><a href="/dashboard-patient">Dashboard</a></li>
-          <li><a href="/appointments">Appointments</a></li>
-          <li><a href="/queue">Queue</a></li>
+          <li>
+            <a href="/" className={activePath === '/' ? 'active' : ''} onClick={() => setActivePath('/')}>Home</a>
+          </li>
+          <li>
+            <a href="/doctors" className={activePath === '/doctors' ? 'active' : ''} onClick={() => setActivePath('/doctors')}>Doctors</a>
+          </li>
+          <li>
+            <a href="/specialities" className={activePath === '/specialities' ? 'active' : ''} onClick={() => setActivePath('/specialities')}>Specialities</a>
+          </li>
+          <li>
+            <a href="/dashboard-patient" className={activePath === '/dashboard-patient' ? 'active' : ''} onClick={() => setActivePath('/dashboard-patient')}>Dashboard</a>
+          </li>
+          <li>
+            <a href="/appointments" className={activePath === '/appointments' ? 'active' : ''} onClick={() => setActivePath('/appointments')}>Appointments</a>
+          </li>
+          <li>
+            <a href="/queue" className={activePath === '/queue' ? 'active' : ''} onClick={() => setActivePath('/queue')}>Queue</a>
+          </li>
         </ul>
 
         <div className="nav-right">

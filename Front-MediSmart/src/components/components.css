@@ -176,6 +176,18 @@ li a:hover::after{
     width:100%;
 }
 
+li a.active{
+  color:#60A5FA;
+}
+
+li a.active::after{
+  width:100%;
+}
+
+li a:active{
+    color:#60A5FA;
+}
+
 
 
 
@@ -588,7 +600,7 @@ h3{
   padding: 10px 14px;
   background: none;
   border: none;
-  color: #e2e8f0;
+  color: #00070f;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -597,7 +609,7 @@ h3{
   transition: background 0.15s ease;
 }
 
-.pdp-dropdown__profile:hover { background: #2a3145; }
+.pdp-dropdown__profile:hover { background: #b9c0d2; }
 
 /* ── Profile side panel backdrop ── */
 .profile-panel-backdrop {

@@ -6,6 +6,7 @@ function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [helplineOpen, setHelplineOpen] = useState(false);
+  const [activePath, setActivePath] = useState(window.location.pathname);
   const popupRef = useRef(null);
 
   useEffect(() => {
@@ -24,6 +25,12 @@ function NavBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [helplineOpen]);
 
+  useEffect(() => {
+    const onPop = () => setActivePath(window.location.pathname);
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
   return (
     <header className={scrolled ? "scrolled" : ""}>
       <nav>
@@ -36,9 +43,15 @@ function NavBar() {
         </div>
 
         <ul className={menuOpen ? "nav-links active" : "nav-links"}>
-          <li><a href="/">Home</a></li>
-          <li><a href="/doctors">Doctors</a></li>
-          <li><a href="/specialities">Specialities</a></li>
+          <li>
+            <a href="/" className={activePath === '/' ? 'active' : ''} onClick={() => setActivePath('/')}>Home</a>
+          </li>
+          <li>
+            <a href="/doctors" className={activePath === '/doctors' ? 'active' : ''} onClick={() => setActivePath('/doctors')}>Doctors</a>
+          </li>
+          <li>
+            <a href="/specialities" className={activePath === '/specialities' ? 'active' : ''} onClick={() => setActivePath('/specialities')}>Specialities</a>
+          </li>
         </ul>
 
         <div className="nav-right">

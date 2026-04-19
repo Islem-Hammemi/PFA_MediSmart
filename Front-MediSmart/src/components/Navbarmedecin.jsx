@@ -25,11 +25,18 @@ function Navbarmedecin() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [profileOpen,  setProfileOpen]  = useState(false);
   const dropdownRef = useRef(null);
+  const [activePath, setActivePath] = useState(window.location.pathname);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const onPop = () => setActivePath(window.location.pathname);
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
   }, []);
 
   useEffect(() => {
@@ -63,11 +70,21 @@ function Navbarmedecin() {
           </div>
 
           <ul className={menuOpen ? "nav-links active" : "nav-links"}>
-            <li><a href="/dashboard-medecin">Dashboard</a></li>
-            <li><a href="/patients">Patients</a></li>
-            <li><a href="/schedule">Schedule</a></li>
-            <li><a href="/tickets">Consultation</a></li>
-            <li><a href="/reviews">Reviews</a></li>
+              <li>
+                <a href="/dashboard-medecin" className={activePath === '/dashboard-medecin' ? 'active' : ''} onClick={() => setActivePath('/dashboard-medecin')}>Dashboard</a>
+              </li>
+              <li>
+                <a href="/patients" className={activePath === '/patients' ? 'active' : ''} onClick={() => setActivePath('/patients')}>Patients</a>
+              </li>
+              <li>
+                <a href="/schedule" className={activePath === '/schedule' ? 'active' : ''} onClick={() => setActivePath('/schedule')}>Schedule</a>
+              </li>
+              <li>
+                <a href="/tickets" className={activePath === '/tickets' ? 'active' : ''} onClick={() => setActivePath('/tickets')}>Consultation</a>
+              </li>
+              <li>
+                <a href="/reviews" className={activePath === '/reviews' ? 'active' : ''} onClick={() => setActivePath('/reviews')}>Reviews</a>
+              </li>
           </ul>
 
           <div className="nav-right">
